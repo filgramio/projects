@@ -8,49 +8,62 @@
     <meta http-equiv="Expires" content="0">
     <title>Minimal Web Page</title>
 </head>
-  <body>
-	<!--This draws the canvas on the webpage -->
+<body>
+    <!--This draws the canvas on the webpage -->
     <canvas id="mycanvas"></canvas> 
-  </body>
- 
-  <!-- Include the processing.js library -->
-  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
-  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
-  <script>
-  var programCode = function(processingInstance) {
+</body>
+
+<!-- Include the processing.js library -->
+<!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+<script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+<script>
+var programCode = function(processingInstance) {
     with (processingInstance) {
-      size(window.innerWidth-15, window.innerHeight-15); 
-      frameRate(30);
+        size(window.innerWidth-15, window.innerHeight-15); 
+        frameRate(30);
         
-      // Paste code from Khan Academy here:
-      var selected_area = 0;
-      var selected_button = [0,0];
+        // Paste code from Khan Academy here:
+        var targeted_area = 0;
+        var targeted_button = [];
+        var selected_dice = 0;
+        var dices = [4,6,8,10,12,20];
 
-      draw = function(){
-        background(200, 200, 200);
-
-        textAlign(CENTER, CENTER);
-        textSize(40);
-        fill(0, 0, 0);
-        text("Choose a dice to roll", width/2, 30);
-        for(var i = 0; i < 3; i++){
-          for(var j = 0; j < 2; j++){
-            noFill();
-            rect(width/5+i*width/5, 80+j*width/5, width/5, width/5,10);
-            if(selected_button[0] == i && selected_button[1] == j){
-              fill(0, 255, 0);
-            }else{
-              fill(0, 0, 255);
+        strokeWeight(2);
+        draw = function(){
+            background(200, 200, 200);
+            targeted_button = [];
+            if(mouseY < 80 + 2*width/5){
+                targeted_area = 0;
+                targeted_button[0] = floor((mouseX-width/5)/width*5);
+                targeted_button[1] = floor((mouseY-80)/width*5);
+            }else{  
+                targeted_area = 1;
             }
-          }
+
+            textAlign(CENTER, CENTER);
+            textSize(40);
+            fill(0, 0, 0);
+            text("Choose a dice to roll", width/2, 30);
+            for(var i = 0; i < 3; i++){
+                for(var j = 0; j < 2; j++){
+                    noFill();
+                    if(targeted_button[0] == i && targeted_button[1] == j){
+                        stroke(255, 255, 255);
+                    }else if(selected_dice == i+j*3){
+                        stroke(255, 0, 0);
+                    }else{
+                        stroke(0, 0, 0);
+                    }
+                    rect(width/5+i*width/5+2, 80+j*width/5+2, width/5-4, width/5-4,10);
+                }
+            }
         }
-      }
 
     }};
 
-  // Get the canvas that ProcessingJS will use
-  var canvas = document.getElementById("mycanvas"); 
-  // Pass the function to ProcessingJS constructor
-  var processingInstance = new Processing(canvas, programCode); 
-  </script>
+    // Get the canvas that ProcessingJS will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function to ProcessingJS constructor
+    var processingInstance = new Processing(canvas, programCode); 
+</script>
 </html>
