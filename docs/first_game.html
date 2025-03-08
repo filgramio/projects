@@ -19,7 +19,7 @@
   <script>
   var programCode = function(processingInstance) {
     with (processingInstance) {
-      size(window.innerWidth-15, window.innerHeight-15); 
+      size(600, 600); 
       frameRate(30);
         
       // Paste code from Khan Academy here:
@@ -53,7 +53,8 @@
       var player = {
           x: 140,
           y: 140,
-          speed: 5
+          speed: 5,
+          covered_tiles: []
       };
 
 
@@ -89,6 +90,21 @@
         fill(255,0,0); 
         ellipse(player.x, player.y, 20, 20);
 
+        // Player collision with trees
+        
+        player.x = mouseX;
+        player.y = mouseY;
+
+        player.covered_tiles = [];
+        for (var i = 0; i < 15; i++) {
+            for (var j = 0; j < 15; j++) {
+              if (player.x > i*40-10 && player.x < i*40+50 && player.y > j*40-10 && player.y < j*40+50) {
+                        player.covered_tiles.push([i,j]);
+              }
+            }
+        }
+        fill(0,0,0);
+        text(player.covered_tiles,200,200);
       };
       
 
