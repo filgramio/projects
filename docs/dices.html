@@ -23,8 +23,28 @@
       frameRate(30);
         
       // Paste code from Khan Academy here:
+      var selected_area = 0;
+      var selected_button = [0,0];
 
-      
+      draw = function(){
+        background(200, 200, 200);
+
+        textAlign(CENTER, CENTER);
+        textSize(40);
+        fill(0, 0, 0);
+        text("Choose a dice to roll", width/2, 30);
+        for(var i = 0; i < 3; i++){
+          for(var j = 0; j < 2; j++){
+            noFill();
+            rect(width/5+i*width/5, 80+j*width/5, width/5, width/5,10);
+            if(selected_button[0] == i && selected_button[1] == j){
+              fill(0, 255, 0);
+            }else{
+              fill(0, 0, 255);
+            }
+          }
+        }
+      }
 
     }};
 
