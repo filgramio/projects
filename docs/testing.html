@@ -19,14 +19,18 @@
   <script>
   var programCode = function(processingInstance) {
     with (processingInstance) {
-      size(400, 400); 
+      size(600, 600); 
       frameRate(30);
         
       // Paste code from Khan Academy here:
 
       background(255, 255, 255);
       fill(255, 0, 0);
-      rect(200, 200, 200, 200);
+      rect(0, 0, 200, 200);
+      mousePressed = function() {
+        fill(0, 255, 0);
+        rect(200, 200, 200, 200);
+      };
 
     }};
 
