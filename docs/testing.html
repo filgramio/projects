@@ -24,14 +24,19 @@
         
       // Paste code from Khan Academy here:
 
-      background(255, 255, 255);
-      fill(255, 0, 0);
-      rect(0, 0, 200, 200);
-      mousePressed = function() {
-        fill(0, 255, 0);
-        rect(200, 200, 200, 200);
+      var keys = [];
+      
+      keyPressed = function() {
+        keys[keyCode] = true;
+      };
+      
+      keyReleased = function() {
+        keys[keyCode] = false;
       };
 
+      draw = function() {
+        background(255, 255, 255);
+      };
     }};
 
   // Get the canvas that ProcessingJS will use
