@@ -29,32 +29,85 @@ var programCode = function(processingInstance) {
         var dices = [4,6,8,10,12,20];
 
         strokeWeight(2);
+
+        mouseClicked = function(){
+            if(targeted_area == 0){
+                selected_dice = targeted_button[0]+targeted_button[1]*3;
+            }
+        }
         draw = function(){
             background(200, 200, 200);
             targeted_button = [];
-            if(mouseY < 80 + 2*width/5){
+            if(mouseY < width/8 + 2*width/4){
                 targeted_area = 0;
-                targeted_button[0] = floor((mouseX-width/5)/width*5);
-                targeted_button[1] = floor((mouseY-80)/width*5);
+                targeted_button[0] = floor((mouseX-width/8)/width*4);
+                targeted_button[1] = floor((mouseY-80)/width*4);
             }else{  
                 targeted_area = 1;
             }
 
             textAlign(CENTER, CENTER);
-            textSize(40);
+            textSize(width/16);
             fill(0, 0, 0);
-            text("Choose a dice to roll", width/2, 30);
+            text("Choose a dice to roll", width/2, width/16);
+
+            stroke(0, 0, 0);
+
+            pushMatrix();
+            translate(width/4, width/4);
+            fill(255, 0, 0)
+            triangle(0, -width/14, -width/15, width/20, width/15, width/20);
+            popMatrix();
+
+            pushMatrix();
+            translate(width/2, width/4);
+            fill(50, 200, 50)
+            rect(-width/15, -width/15, width/7.5, width/7.5);
+            popMatrix();
+
+            pushMatrix();
+            translate(3*width/4, width/4);
+            fill(100, 100, 255)
+            triangle(0, -width/14, -width/15, width/20, width/15, width/20);
+            popMatrix();
+
+            pushMatrix();
+            translate(width/4, width/2);
+            fill(255, 100, 255)
+            quad(0, -width/11, width/15, width/18, 0, width/14, -width/15, width/18);
+            popMatrix();
+
+            pushMatrix();
+            translate(width/2, width/2);
+            fill(255, 255, 0);
+            beginShape();
+            for (var i = 0; i < 5; i++) {
+                var angle = TWO_PI / 5 * i;
+                var x = cos(angle+60) * width / 14;
+                var y = sin(angle+60) * width / 14;
+                vertex(x, y);
+            }
+            endShape(CLOSE);
+            popMatrix();
+
+            pushMatrix();
+            translate(width/2+width/4, width/2);
+            fill(100, 100, 255)
+            triangle(0, -width/14, -width/15, width/20, width/15, width/20);
+            popMatrix();
+
             for(var i = 0; i < 3; i++){
                 for(var j = 0; j < 2; j++){
                     noFill();
-                    if(targeted_button[0] == i && targeted_button[1] == j){
+                    if(selected_dice == i+j*3){
                         stroke(255, 255, 255);
-                    }else if(selected_dice == i+j*3){
-                        stroke(255, 0, 0);
                     }else{
                         stroke(0, 0, 0);
                     }
-                    rect(width/5+i*width/5+2, 80+j*width/5+2, width/5-4, width/5-4,10);
+                    rect(width/8+i*width/4+2, width/8+j*width/4+2, width/4-4, width/4-4,10);
+                    textSize(width/16);
+                    fill(0, 0, 0);
+                    text(dices[i+j*3], width/8+i*width/4+width/8, width/8+j*width/4+width/8);
                 }
             }
         }
