@@ -50,8 +50,10 @@ var programCode = function(processingInstance) {
                     }
                     dices_total += dice_rolls[i];
                 }
-                rolls_message += "=   ";
-                rolls_message += dices_total; 
+                if(dice_count === 1){
+                    rolls_message += "=   ";
+                    rolls_message += dices_total;
+                }
                 alert(rolls_message);
                 rolls_message = "";
             }else{
