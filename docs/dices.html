@@ -43,7 +43,11 @@ var programCode = function(processingInstance) {
                 dices_total = 0;
                 for(var i = 0; i < dice_count; i++){
                     dice_rolls[i] = floor(random(dices[selected_dice]))+1;
-                    rolls_message += dice_rolls[i]+"   ";
+                    if(i+1 === dice_count){
+                        rolls_message += dice_rolls[i]+"   ";
+                    }else{
+                        rolls_message += dice_rolls[i]+" + ";
+                    }
                     dices_total += dice_rolls[i];
                 }
                 rolls_message += "=   ";
