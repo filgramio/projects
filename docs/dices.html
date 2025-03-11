@@ -43,13 +43,19 @@ var programCode = function(processingInstance) {
                 dices_total = 0;
                 for(var i = 0; i < dice_count; i++){
                     dice_rolls[i] = floor(random(dices[selected_dice]))+1;
-                    rolls_message += dice_rolls[i]+"   ";
+                    if(i+1 === dice_count){
+                        rolls_message += dice_rolls[i]+"   ";
+                    }else{
+                        rolls_message += dice_rolls[i]+" + ";
+                    }
                     dices_total += dice_rolls[i];
                 }
-                rolls_message += "=   ";
-                rolls_message += dices_total; 
+                if(dice_count !== 1){
+                    rolls_message += "=   ";
+                    rolls_message += dices_total;
+                }
                 alert(rolls_message);
-                rolls_message = "";
+                rolls_message = "You rolled: ";
             }else{
                 dice_count = targeted_count+1;
             }
@@ -119,7 +125,7 @@ var programCode = function(processingInstance) {
 
             pushMatrix();
             translate(width/2+width/4, width/2);
-            fill(100, 100, 255)
+            fill(200, 100, 0)
             triangle(0, -width/14, -width/15, width/20, width/15, width/20);
             popMatrix();
 
@@ -138,7 +144,7 @@ var programCode = function(processingInstance) {
                 }
             }
 
-            text("How many dices to roll", width/2, width/16+5*width/8);
+            text("How many dices?", width/2, width/16+5*width/8);
 
             for(var i = 0; i < 3; i++){
                 noFill();
