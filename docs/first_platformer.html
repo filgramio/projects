@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Minimal Web Page</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(600, 600); 
+      frameRate(60);
+        
+      // Paste code from Khan Academy here:
+
+      var keys = [];
+
+      keyPressed = function(){
+        keys[keyCode] = true;
+      }
+
+      keyReleased = function(){
+        keys[keyCode] = false;
+      }
+
+      var level = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,1,1,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,1,1,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
+
+      var player = {
+        x:120,
+        y:200
+      };
+
+      var onGround = false;
+      var jump = false;
+      var jumpDuration = 0;
+      var fallDuration = 0;
+
+      draw = function() {
+        background(145, 185, 255);
+
+        //draw the level
+
+        for(var i = 0; i < 15; i++){
+          for(var j = 0; j < level[0].length; j++){
+            switch(level[i][j]){
+              case 0:
+                
+              break;
+              case 1:
+                fill(100, 50, 0);
+                rect(40*j, 40*i, 40, 40);
+              break;
+            }
+          }
+        }
+
+        //draw the player
+
+        fill(255,0,0);
+        rect(player.x, player.y, 40, 40);
+
+        //checks on ground
+
+        if(level[floor(player.y/40)+1][floor(player.x/40)] === 1 || level[floor(player.y/40)+1][floor((player.x-1)/40)+1] === 1){
+          onGround = true;
+        }else{
+          onGround = false;
+        }
+        println(jump);
+        //move the player
+
+        if(keys[RIGHT] && level[floor(player.y/40)][floor(player.x/40)+1] === 0 && level[floor((player.y-1)/40)+1][floor(player.x/40)+1] === 0){
+          player.x += 5;
+        }
+        if(keys[LEFT] && level[floor(player.y/40)][floor((player.x-1)/40)] === 0 && level[floor((player.y-1)/40)+1][floor((player.x-1)/40)] === 0){
+          player.x -= 5;
+        }
+        if(keys[32] && onGround){
+          jump = true;
+        }
+
+        //jump
+
+        if(jump && jumpDuration < 20){
+          player.y -= 20-jumpDuration;
+          jumpDuration++;
+        }else if(jump){
+          jump = false;
+          jumpDuration = 0;
+        }
+
+        
+
+        //apply gravity
+
+        if(!onGround){
+          player.y += 5;
+          fallDuration++;
+        }
+      }
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
