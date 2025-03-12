@@ -733,7 +733,29 @@ blocks:[]
         }
       };
 
+      //swipe detection
 
+      var swipe = function(){
+        if(touches.length > 0){
+          var x = touches[0].x;
+          var y = touches[0].y;
+          var dx = touches[0].dx;
+          var dy = touches[0].dy;
+          if(abs(dx) > abs(dy)){
+            if(dx > 0){
+              keys[RIGHT] = true;
+            }else{
+              keys[LEFT] = true;
+            }
+          }else{
+            if(dy > 0){
+              keys[DOWN] = true;
+            }else{
+              keys[UP] = true;
+            }
+          }
+        }
+      };
 
       draw = function() {
         background(250);
