@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Minimal Web Page</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+        
+      translate(floor(width/2)-200,0);
+      // Paste code from Khan Academy here:
+
+      var currentDimension = 0;
+      var oldDimension = 0;
+
+      var keys = [];
+
+      keyPressed = function(){
+        keys[keyCode] = true;
+        if(keyCode === 16){
+          oldDimension = currentDimension;
+        }
+      }
+
+      keyReleased = function(){
+        keys[keyCode] = false;
+        if(keyCode === 16 && blink){
+          currentDimension = oldDimension;
+          blink = false;
+        }
+      }
+
+      var Level = function(config) {
+        this.dimensions = config.dimensions;
+        this.start = config.start;
+      };
+
+      var level1 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,2,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,0,0,1],
+        [1,0,0,0,0,1,1,0,0,1],
+        [1,0,0,0,0,1,1,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]]],
+        start: [3,14]
+      });
+      var level2 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,2,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]]],
+        start: [3,14]
+      });
+      var level3 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,0,0,0,1,1,0,2,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]]],
+        start: [2,15]
+      });
+      var level4 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,1,1,1],
+        [1,0,0,0,0,2,0,1,1,1],
+        [1,0,0,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]]],
+        start: [2,15]
+      });
+      var levels = [level1,level2,level3,level4];
+      var type = 0;
+      var levelNumber = 0;
+      var currentLevel = levels[levelNumber];
+      var finish = false;
+      var blink = 0;
+
+      var playerX = currentLevel.start[0];
+      var playerY = currentLevel.start[1];
+
+      var moveCooldown = 3;
+
+      var drawMap = function(level){
+        fill(255);
+        for (var i = 0; i < 18; i++) {
+          for (var j = 0; j < 10; j++) {
+            if (level[i][j] === 1) {
+
+              type = 0;
+
+              if(level[max(i-1,0)][j] === 1){
+                type += 1;
+              }
+              if(level[i][min(j+1,level[i].length)] === 1){
+                type += 2;
+              }
+              if(level[min(i+1,level.length-1)][j] === 1){
+                type += 4;
+              }
+              if(level[i][max(j-1,0)] === 1){
+                type += 8;
+              }
+
+
+              pushMatrix();
+              translate(j*40, i*40);
+              noStroke();
+              switch(type){
+                case 0:
+                  fill(140);
+                  triangle(0,0,40,0,20,20);
+                  fill(160);
+                  triangle(40,40,40,0,20,20);
+                  fill(240);
+                  triangle(40,40,0,40,20,20);
+                  fill(220);
+                  triangle(0,0,0,40,20,20);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                break;
+                case 1:
+                  fill(160);
+                  triangle(40,40,40,0,20,20);
+                  triangle(20,0,40,0,20,20);
+                  fill(240);
+                  triangle(40,40,0,40,20,20);
+                  fill(220);
+                  triangle(0,0,0,40,20,20);
+                  triangle(0,0,20,0,20,20);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(8, 0, 24, 24);
+                break;
+                case 2:
+                  fill(140);
+                  triangle(0,0,40,0,20,20);
+                  triangle(40,20,40,0,20,20);
+                  fill(240);
+                  triangle(40,40,0,40,20,20);
+                  triangle(40,40,40,20,20,20);
+                  fill(220);
+                  triangle(0,0,0,40,20,20);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(16, 8, 24, 24);
+                break;
+                case 3:
+                  fill(240);
+                  triangle(40,40,0,40,40,0);
+                  fill(220);
+                  triangle(0,0,0,40,40,0);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(16, 0, 24, 32);
+                  rect(8, 0, 24, 24);
+                break;
+                case 4:
+                  fill(140);
+                  triangle(0,0,40,0,20,20);
+                  fill(160);
+                  triangle(40,40,40,0,20,20);
+                  triangle(40,40,20,40,20,20);
+                  fill(220);
+                  triangle(0,0,0,40,20,20);
+                  triangle(20,40,0,40,20,20);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(8, 16, 24, 24);
+                break;
+                case 5:
+                  fill(160);
+                  rect(20,0,20,40);
+                  fill(220);
+                  rect(0,0,20,40);
+                  fill(200);
+                  rect(8, 0, 24, 40);
+                break;
+                case 6:
+                  fill(140);
+                  triangle(0,0,40,0,40,40);
+                  fill(220);
+                  triangle(0,0,0,40,40,40);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(8, 16, 32, 24);
+                  rect(16, 8, 24, 24);
+                break;
+                case 7:
+                  fill(220);
+                  rect(0,0,20,40);
+                  fill(200);
+                  rect(8, 0, 32, 40);
+                break;
+                case 8:
+                  fill(140);
+                  triangle(0,0,40,0,20,20);
+                  triangle(0,0,0,20,20,20);
+                  fill(160);
+                  triangle(40,40,40,0,20,20);
+                  fill(240);
+                  triangle(40,40,0,40,20,20);
+                  triangle(0,20,0,40,20,20);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(0, 8, 24, 24);
+                break
+                case 9:
+                  fill(160);
+                  triangle(40,40,40,0,0,0);
+                  fill(240);
+                  triangle(40,40,0,40,0,0);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(0, 0, 32, 24);
+                  rect(0, 0, 24, 32);
+                break
+                ;
+                case 10:
+                  fill(140);
+                  rect(0,0,40,20);
+                  fill(240);
+                  rect(0,20,40,20);
+                  fill(200);
+                  rect(0, 8, 40, 24);
+                break;
+                case 11:
+                  fill(240);
+                  rect(0,20,40,20);
+                  fill(200);
+                  rect(0, 0, 40, 32);
+                break;
+                case 12:
+                  fill(140);
+                  triangle(0,0,40,0,0,40);
+                  fill(160);
+                  triangle(40,40,40,0,0,40);
+                  fill(200);
+                  rect(8, 8, 24, 24, 5);
+                  rect(0, 8, 24, 32);
+                  rect(8, 16, 24, 24);
+                break;
+                case 13:
+                  fill(160);
+                  rect(20,0,20,40);
+                  fill(200);
+                  rect(0, 0, 32, 40);
+                break;
+                case 14:
+                  fill(140);
+                  rect(0,0,40,20);
+                  fill(200);
+                  rect(0, 8, 40, 32);
+                break;
+                case 15:
+                  fill(200);
+                  rect(0, 0, 40, 40);
+                break; 
+              }
+
+              popMatrix();
+            }else if (level[i][j] === 2){
+              fill(230);
+              rect(40*j,40*i,40,40);
+              fill(50,230,50);
+              rect(40*j,40*i,40,40,5);
+              fill(50,150,50);
+              pushMatrix();
+                translate(40*j+25,40*i+3);
+                rotate(PI/4);
+                rect(0,0,15,27);
+                fill(50,230,50);
+                rect(-1,-1,9,21);
+              popMatrix();
+            }else if (level[i][j] === 0){
+              fill(230);
+              rect(40*j,40*i,40,40);
+            }
+          }
+        }
+      };
+
+
+
+      draw = function() {
+        background(250);
+        //println("Drawing...");
+
+        //move the player
+        if(moveCooldown < 0 && !finish && !keys[16]){ 
+          if(keys[UP] && currentLevel.dimensions[currentDimension][playerY-1][playerX] !== 1){
+            playerY -= 1;
+            moveCooldown = 3;
+          }
+          if(keys[DOWN] && currentLevel.dimensions[currentDimension][playerY+1][playerX] !== 1){
+            playerY += 1;
+            moveCooldown = 3;
+          }
+          if(keys[LEFT] && currentLevel.dimensions[currentDimension][playerY][playerX-1] !== 1){
+            playerX -= 1;
+            moveCooldown = 3;
+          }
+          if(keys[RIGHT] && currentLevel.dimensions[currentDimension][playerY][playerX+1] !== 1){
+            playerX += 1;
+            moveCooldown = 3;
+          }
+        }
+        moveCooldown -= 1;
+
+        //draw the level
+
+        drawMap(currentLevel.dimensions[currentDimension]);
+        
+        //draw the player
+
+        noStroke();
+        fill(255,0,0);
+        rect(playerX*40,playerY*40,40,40,5);
+
+        //draw the dimension list
+
+        fill(220);
+        rect(-80,730,560,164);
+
+        for(var i = 0; i < currentLevel.dimensions.length; i++){
+          pushMatrix();
+          translate(-30, 740);
+          translate(460/(currentLevel.dimensions.length+0.5)*(i+0.75),0);
+
+          pushMatrix();
+          scale(0.2);
+          translate(-200, 0);
+          if(i === currentDimension){
+            fill(255,0,0);
+            rect(-20,-20,20,760);
+            rect(-20,-20,440,20);
+            rect(400,-20,20,760);
+            rect(-20,720,440,20);
+          }
+          drawMap(currentLevel.dimensions[i]);
+          noStroke();
+          fill(255,0,0)
+          rect(playerX*40,playerY*40,40,40,5);
+          popMatrix();
+
+          popMatrix();
+        }
+
+        //check for finish
+
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 2){
+          finish = true;
+        }
+        if(finish){
+          fill(0,200,0,100);
+          rect(-100, 250, width, 250);
+          fill(0);
+          textSize(50);
+          text("Level Complete!", 50, 350);
+          textSize(20);
+          text("Press Space to continue", 100, 400);
+          if(keys[32]){
+            finish = false;
+            levelNumber += 1;
+            currentLevel = levels[levelNumber];
+            playerX = currentLevel.start[0];
+            playerY = currentLevel.start[1];
+            currentDimension = 0;
+          }
+        }
+
+        //dimension switch
+
+        if(keys[16]){
+          background(220);
+          for(var i = 0; i < currentLevel.dimensions.length; i++){
+            pushMatrix();
+            translate(-90+(i%3)*(200), 20+320*floor(i/3));
+            scale(0.4);
+            if(i === currentDimension){
+              fill(255,0,0);
+              rect(-20,-20,20,760);
+              rect(-20,-20,440,20);
+              rect(400,-20,20,760);
+              rect(-20,720,440,20);
+            }
+            drawMap(currentLevel.dimensions[i]);
+            noStroke();
+            fill(255,0,0)
+            rect(playerX*40,playerY*40,40,40,5);
+            popMatrix();
+
+            popMatrix();
+          }
+          if(keys[RIGHT]){
+            currentDimension += 1;
+            if(currentDimension >= currentLevel.dimensions.length){
+              currentDimension = 0;
+            }
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+              blink = true;
+            }else{
+              blink = false;
+            }
+            keys[RIGHT] = false;
+          }
+          if(keys[LEFT]){
+            currentDimension -= 1;
+            if(currentDimension < 0){
+              currentDimension = currentLevel.dimensions.length-1;
+            }
+            keys[LEFT] = false;
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){  
+              blink = true;
+            }else{
+              blink = false;
+            }
+          }
+          if(keys[DOWN]){
+            currentDimension += 3;
+            if(currentDimension >= currentLevel.dimensions.length){
+              currentDimension -= currentLevel.dimensions.length;
+            }
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+              blink = true;
+            }else{
+              blink = false;
+            }
+            keys[DOWN] = false;
+          }
+          if(keys[UP]){
+            currentDimension -= 3;
+            if(currentDimension < 0){
+              currentDimension += currentLevel.dimensions.length;
+            }
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+              blink = true;
+            }else{
+              blink = false;
+            }
+            keys[UP] = false;
+          }
+          if(blink){
+            fill(220,0,0,100);
+            rect(-width,-height,2*width,2*height);
+          }
+        }
+
+
+      }
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
