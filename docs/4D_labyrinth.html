@@ -21,9 +21,11 @@
     with (processingInstance) {
       size(window.innerWidth-15, window.innerHeight-15); 
       frameRate(30);
-        
-      translate(floor(width/2)-200,0);
+      
+      translate(floor(width/2)-200*(floor(height/900*40)/40),0);
       // Paste code from Khan Academy here:
+
+      scale(floor(height/900*40)/40);
 
       var currentDimension = 0;
       var oldDimension = 0;
@@ -50,6 +52,27 @@
         this.start = config.start;
       };
 
+/*
+1---111-111-1-1-111-1-1--1-111-1-1
+1---1-1-1-1-111-1-1-1-11-1--1--111
+1---111-11---1--11--1-1-11--1--1-1
+111-1-1-111--1--1-1-1-1--1--1--1-1
+*/
+
+
+      var title = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,0,0,0,0,1,0,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,1,0,1,0,1],
+        [1,0,0,0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,0,1,1,0,1,0,0,1,0,0,1,1,1],
+        [1,0,0,0,1,1,1,0,1,1,1,0,0,1,0,0,1,1,0,0,1,0,1,0,1,1,0,0,1,0,0,1,0,1],
+        [1,1,1,0,1,0,1,0,1,1,1,0,0,1,0,0,1,0,1,0,1,0,1,0,0,1,0,0,1,0,0,1,0,1]];
       var level1 = new Level({
         dimensions: [[
         [1,1,1,1,1,1,1,1,1,1],
@@ -287,6 +310,8 @@
         start: [2,15]
       });
       
+
+      var scene = 0;
       var levels = [level1,level2,level3,level4,level5];
       var type = 0;
       var levelNumber = 0;
@@ -300,9 +325,10 @@
       var moveCooldown = 3;
 
       var drawMap = function(level){
+        noStroke();
         fill(255);
-        for (var i = 0; i < 18; i++) {
-          for (var j = 0; j < 10; j++) {
+        for (var i = 0; i < level.length; i++) {
+          for (var j = 0; j < level[i].length; j++) {
             if (level[i][j] === 1) {
 
               type = 0;
@@ -515,6 +541,23 @@
 
       draw = function() {
         background(250);
+
+        switch(scene){
+        case 0:
+          background(230);
+          pushMatrix();
+          translate(-80,100);
+          scale(560/(34*40));
+          drawMap(title);
+          popMatrix();
+          fill(0);
+          textSize(50);
+          text("Press Space\n     to start", 60, 500);
+          if(keys[32]){
+            scene = 1;
+          }
+        break;
+        case 1:
         //println("Drawing...");
 
         //move the player
@@ -541,6 +584,7 @@
         //press the buttons
 
         if(currentLevel.dimensions[currentDimension][playerY][playerX] === 3){
+          currentLevel.dimensions[currentDimension][playerY][playerX] = 0;
           for(var i = 0; i < currentLevel.dimensions.length; i++){
             for(var j = 0; j < currentLevel.dimensions[i].length; j++){
               for(var k = 0; k < currentLevel.dimensions[i][j].length; k++){
@@ -696,8 +740,25 @@
             fill(220,0,0,100);
             rect(-width,-height,2*width,2*height);
           }*/
+        
         }
 
+        //tutorial text
+
+        if(levelNumber === 0){
+          fill(0);
+          textSize(25);
+          text("Use the arrow\nkeys to move", 180, 500);
+        }
+        if(levelNumber === 1){
+          fill(0);
+          textSize(25);
+          text("Hold shift to\nswitch\ndimensions", 210, 500);
+        }
+
+        break;
+
+        };
 
       }
     }};
