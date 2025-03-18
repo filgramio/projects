@@ -21,8 +21,10 @@
     with (processingInstance) {
       size(window.innerWidth-15, window.innerHeight-15); 
       frameRate(30);
-      
-      translate(floor(width/2)-200*(floor(height/900*40)/40),0);
+
+      scale(height/900);
+        
+      translate(floor(width/2)-(200)*height/900,0);
       // Paste code from Khan Academy here:
 
       scale(floor(height/900*40)/40);
