@@ -22,7 +22,7 @@
       size(window.innerWidth-15, window.innerHeight-15); 
       frameRate(30);
         
-      translate(floor(width/2)-(200)*height/900,0);
+      translate(floor(floor(width/2)-(200)*height/900),0);
       // Paste code from Khan Academy here:
 
       scale(floor(height/900*40)/40);
@@ -47,9 +47,51 @@
         }
       }
 
+      //swiping on screen
+
+      var swipeStartX = 0;
+      var swipeStartY = 0;
+      var swipeEndX = 0;
+      var swipeEndY = 0;
+      var swipeX = 0;
+      var swipeY = 0;
+      var swipeDelay = 10;
+      var swipe = false;
+
+      mousePressed = function(){
+        swipeStartX = mouseX;
+        swipeStartY = mouseY;
+      };
+      mouseReleased = function(){
+        swipeEndX = mouseX;
+        swipeEndY = mouseY;
+
+        swipeX = swipeEndX - swipeStartX;
+        swipeY = swipeEndY - swipeStartY;
+
+        if(abs(swipeX) > abs(swipeY)){
+          //horizontal
+          if(swipeX > 0){
+            keys[RIGHT] = true;
+          }else{
+            keys[LEFT] = true;
+          }
+        }else{
+          //vertical
+          if(swipeY > 0){
+            keys[DOWN] = true;
+          }else{
+            keys[UP] = true;
+          }
+        }
+        swipe = true;
+        swipeDelay = 2;
+      };
+
       var Level = function(config) {
         this.dimensions = config.dimensions;
         this.start = config.start;
+        this.locked = config.locked || [];
       };
 
 /*
@@ -309,16 +351,93 @@
         [1,1,1,1,1,1,1,1,1,1]]],
         start: [2,15]
       });
+      var level6 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,3,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,2,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1]]],
+        start: [2,15],
+        locked: [0,0,3,0]
+      });
       
 
       var scene = 0;
-      var levels = [level1,level2,level3,level4,level5];
+      var levels = [level1,level2,level3,level4,level5,level6];
       var type = 0;
-      var levelNumber = 0;
+      var levelNumber = 5;
       var currentLevel = levels[levelNumber];
       var finish = false;
       var blink = 0;
-
+      
       var playerX = currentLevel.start[0];
       var playerY = currentLevel.start[1];
 
@@ -583,8 +702,9 @@
 
         //press the buttons
 
-        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 3){
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 3 && !keys[16]){
           currentLevel.dimensions[currentDimension][playerY][playerX] = 0;
+          buttons[0] = true;
           for(var i = 0; i < currentLevel.dimensions.length; i++){
             for(var j = 0; j < currentLevel.dimensions[i].length; j++){
               for(var k = 0; k < currentLevel.dimensions[i][j].length; k++){
@@ -615,7 +735,7 @@
         for(var i = 0; i < currentLevel.dimensions.length; i++){
           pushMatrix();
           translate(-30, 740);
-          translate(460/(currentLevel.dimensions.length+0.5)*(i+0.75),0);
+          translate(floor(460/(currentLevel.dimensions.length+0.5)*(i+0.75)),0);
 
           pushMatrix();
           scale(0.2);
@@ -628,6 +748,20 @@
             rect(-20,720,440,20);
           }
           drawMap(currentLevel.dimensions[i]);
+          if(currentLevel.locked[i] === 3){
+            fill(0,0,255);
+            rect(-20,-20,20,760);
+            rect(-20,-20,440,20);
+            rect(400,-20,20,760);
+            rect(-20,720,440,20);
+            fill(0,0,255,100);
+            rect(-20,-20,440,760);
+            fill(255);
+            rect(100,280,200,150,30);
+            arc(200,290,170,170,PI,PI*2);
+            fill(100,100,250);
+            arc(200,290,130,130,PI,PI*2);
+          }
           noStroke();
           fill(255,0,0)
           rect(playerX*40,playerY*40,40,40,5);
@@ -675,7 +809,20 @@
               rect(-20,720,440,20);
             }
             drawMap(currentLevel.dimensions[i]);
-            if(currentLevel.dimensions[i][playerY][playerX]){
+            if(currentLevel.locked[i] === 3){
+              fill(0,0,255);
+              rect(-20,-20,20,760);
+              rect(-20,-20,440,20);
+              rect(400,-20,20,760);
+              rect(-20,720,440,20);
+              fill(0,0,255,100);
+              rect(-20,-20,440,760);
+              fill(255);
+              rect(100,280,200,150,30);
+              arc(200,290,170,170,PI,PI*2);
+              fill(100,100,250);
+              arc(200,290,130,130,PI,PI*2);
+            }else if(currentLevel.dimensions[i][playerY][playerX]){
               fill(255,0,0,100);
               rect(-20,-20,440,760);
             }
@@ -691,7 +838,7 @@
             if(currentDimension >= currentLevel.dimensions.length){
               currentDimension = 0;
             }
-            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
               blink = true;
             }else{
               blink = false;
@@ -704,7 +851,7 @@
               currentDimension = currentLevel.dimensions.length-1;
             }
             keys[LEFT] = false;
-            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){  
+            if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){  
               blink = true;
             }else{
               blink = false;
@@ -716,7 +863,7 @@
               if(currentDimension >= currentLevel.dimensions.length){
                 currentDimension -= currentLevel.dimensions.length;
               }
-              if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+              if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
               blink = true;
             }else{
                 blink = false;
@@ -728,7 +875,7 @@
               if(currentDimension < 0){
                 currentDimension = currentLevel.dimensions.length;
               }
-              if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1){
+              if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
                 blink = true;
               }else{
                 blink = false;
@@ -754,6 +901,19 @@
           fill(0);
           textSize(25);
           text("Hold shift to\nswitch\ndimensions", 210, 500);
+        }
+
+        //swiping checks
+
+        if(swipe){
+          swipeDelay--;
+        }
+        if(swipeDelay === 0){
+          swipe = false;
+          keys[RIGHT] = false;
+          keys[LEFT] = false;
+          keys[DOWN] = false;
+          keys[UP] = false;
         }
 
         break;
