@@ -47,51 +47,6 @@
         }
       }
 
-      //swiping on screen
-
-      var swipeStartX = 0;
-      var swipeStartY = 0;
-      var swipeEndX = 0;
-      var swipeEndY = 0;
-      var swipeX = 0;
-      var swipeY = 0;
-      var swipeDelay = 2;
-      var swipe = false;
-      var spaceDelay = 2;
-      var space = 0;
-
-      mousePressed = function(){
-        swipeStartX = mouseX;
-        swipeStartY = mouseY;
-        keys[32] = true;
-        space = true;
-        spaceDelay = 2;
-      };
-      mouseReleased = function(){
-        swipeEndX = mouseX;
-        swipeEndY = mouseY;
-
-        swipeX = swipeEndX - swipeStartX;
-        swipeY = swipeEndY - swipeStartY;
-
-        if(abs(swipeX) > abs(swipeY)){
-          //horizontal
-          if(swipeX > 0){
-            keys[RIGHT] = true;
-          }else{
-            keys[LEFT] = true;
-          }
-        }else{
-          //vertical
-          if(swipeY > 0){
-            keys[DOWN] = true;
-          }else{
-            keys[UP] = true;
-          }
-        }
-        swipe = true;
-        swipeDelay = 2;
-      };
 
       var Level = function(config) {
         this.dimensions = config.dimensions;
@@ -908,24 +863,6 @@
           text("Hold shift to\nswitch\ndimensions", 210, 500);
         }
 
-        //swiping checks
-
-        if(swipe){
-          swipeDelay--;
-        }
-        if(swipeDelay === 0){
-          swipe = false;
-          keys[RIGHT] = false;
-          keys[LEFT] = false;
-          keys[DOWN] = false;
-          keys[UP] = false;
-        }
-        if(space){
-          spaceDelay--;
-        }
-        if(spaceDelay === 0){
-          space = false;
-        }
         break;
 
         };
