@@ -55,12 +55,17 @@
       var swipeEndY = 0;
       var swipeX = 0;
       var swipeY = 0;
-      var swipeDelay = 10;
+      var swipeDelay = 2;
       var swipe = false;
+      var spaceDelay = 2;
+      var space = 0;
 
       mousePressed = function(){
         swipeStartX = mouseX;
         swipeStartY = mouseY;
+        keys[32] = true;
+        space = true;
+        spaceDelay = 2;
       };
       mouseReleased = function(){
         swipeEndX = mouseX;
@@ -915,7 +920,12 @@
           keys[DOWN] = false;
           keys[UP] = false;
         }
-
+        if(space){
+          spaceDelay--;
+        }
+        if(spaceDelay === 0){
+          space = false;
+        }
         break;
 
         };
