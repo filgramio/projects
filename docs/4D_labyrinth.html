@@ -550,9 +550,14 @@
       var playerX = currentLevel.start[0];
       var playerY = currentLevel.start[1];
 
+      var opMode = false;
+
       var moveCooldown = 3;
 
       var isSolid = function(coordinates){
+        if(opMode && keys[88]){
+          return(false);
+        }
         switch(coordinates){
           case 0:
             return(false);
@@ -831,6 +836,8 @@
       draw = function() {
         background(250);
 
+        textFont(createFont("sans-serif"));
+
         switch(scene){
         case 0:
           background(230);
@@ -872,7 +879,7 @@
 
         //press the buttons
 
-        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 3 && !keys[16]){
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 3 && !keys[16] || opMode && keys[66]){
           currentLevel.dimensions[currentDimension][playerY][playerX] = 0;
           for(var i = 0; i < currentLevel.dimensions.length; i++){
             for(var j = 0; j < currentLevel.dimensions[i].length; j++){
@@ -889,7 +896,7 @@
             }
           }
         }
-        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 5 && !keys[16]){
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 5 && !keys[16] || opMode && keys[80]){
           currentLevel.dimensions[currentDimension][playerY][playerX] = 0;
           for(var i = 0; i < currentLevel.dimensions.length; i++){
             for(var j = 0; j < currentLevel.dimensions[i].length; j++){
@@ -1126,6 +1133,22 @@
           fill(0);
           textSize(25);
           text("Hold shift to\nswitch\ndimensions", 210, 500);
+        }
+
+        //op mode
+
+        if(keys[51] && keys[55] && keys[81] && keys[67]){
+          opMode = true;
+        }
+        if(opMode){
+          textFont(createFont("monospace"));
+          fill(0,255,0);
+          text("B to press blue buttons",420,200);
+          text("P to press pink buttons",420,230);
+          text("Hold X to phase through walls",420,260);
+        }
+        if(keys[50] && keys[52] && keys[81]){
+          opMode = false;
         }
 
         break;
