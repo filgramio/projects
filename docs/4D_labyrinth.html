@@ -41,7 +41,7 @@
 
       keyReleased = function(){
         keys[keyCode] = false;
-        if(keyCode === 16 && blink){
+        if(keyCode === 16 && !keys[16] && blink){
           currentDimension = oldDimension;
           blink = false;
         }
@@ -90,7 +90,7 @@
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,7,0,0,8,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
@@ -538,7 +538,8 @@
       var currentLevel = levels[levelNumber];
       var finish = false;
       var blink = 0;
-      var symmetryPressed = false;
+      var verticalSymmetryPressed = false;
+      var horizontalSymmetryPressed = false;
       var symmetryDimension = [];
       for(var i = 0; i < 18; i++){
         symmetryDimension.push([]);
@@ -546,7 +547,7 @@
           symmetryDimension[i].push([]);
         }
       }
-
+      
       var playerX = currentLevel.start[0];
       var playerY = currentLevel.start[1];
 
@@ -826,6 +827,25 @@
                 rect(0,0,12,4);
               popMatrix();
               rect(j*40+18,i*40+10,4,22);
+            }else if (level[i][j] === 8){
+              fill(230);
+              rect(40*j,40*i,40,40);
+              fill(50,230,50);
+              rect(40*j,40*i,40,40,5);
+              fill(50,150,50);
+              pushMatrix();
+                translate(40*j+35,40*i+20);
+                rotate(PI/4*3);
+                rect(0,0,4,12);
+                rect(0,0,12,4);
+              popMatrix();
+              pushMatrix();
+                translate(40*j+5,40*i+20);
+                rotate(PI/4*7);
+                rect(0,0,4,12);
+                rect(0,0,12,4);
+              popMatrix();
+              rect(j*40+10,i*40+18,22,4);
             }
           }
         }
@@ -858,19 +878,19 @@
 
         //move the player
         if(moveCooldown < 0 && !finish && !keys[16]){ 
-          if(keys[UP] && !isSolid(currentLevel.dimensions[currentDimension][playerY-1][playerX])){
+          if((keys[UP] || keys[87]) && !isSolid(currentLevel.dimensions[currentDimension][playerY-1][playerX])){
             playerY -= 1;
             moveCooldown = 3;
           }
-          if(keys[DOWN] && !isSolid(currentLevel.dimensions[currentDimension][playerY+1][playerX])){
+          if((keys[DOWN] || keys[83]) && !isSolid(currentLevel.dimensions[currentDimension][playerY+1][playerX])){
             playerY += 1;
             moveCooldown = 3;
           }
-          if(keys[LEFT] && !isSolid(currentLevel.dimensions[currentDimension][playerY][playerX-1])){
+          if((keys[LEFT] || keys[65]) && !isSolid(currentLevel.dimensions[currentDimension][playerY][playerX-1])){
             playerX -= 1;
             moveCooldown = 3;
           }
-          if(keys[RIGHT] && !isSolid(currentLevel.dimensions[currentDimension][playerY][playerX+1])){
+          if((keys[RIGHT] || keys[68]) && !isSolid(currentLevel.dimensions[currentDimension][playerY][playerX+1])){
             playerX += 1;
             moveCooldown = 3;
           }
@@ -917,8 +937,8 @@
         //press the symmetry buttons
 
         if(currentLevel.dimensions[currentDimension][playerY][playerX] === 7){
-          if(!symmetryPressed && !keys[16]){
-            symmetryPressed = true;
+          if(!verticalSymmetryPressed && !keys[16]){
+            verticalSymmetryPressed = true;
             symmetryDimension = [
             [0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0,0],
@@ -945,7 +965,40 @@
             playerY = 17-playerY;
           }
         }else{
-          symmetryPressed = false;
+          verticalSymmetryPressed = false;
+        }
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 8){
+          if(!horizontalSymmetryPressed && !keys[16]){
+            horizontalSymmetryPressed = true;
+            symmetryDimension = [
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0]];
+            for(var i = 0; i < 18; i++){
+              for(var j = 0; j < 10; j++){
+                symmetryDimension[i][j] = currentLevel.dimensions[currentDimension][i][9-j];
+              }
+            }
+            currentLevel.dimensions[currentDimension] = symmetryDimension;
+            playerX = 9-playerX;
+          }
+        }else{
+          horizontalSymmetryPressed = false;
         }
 
         //draw the level
@@ -1065,7 +1118,7 @@
 
             popMatrix();
           }
-          if(keys[RIGHT]){
+          if((keys[RIGHT] || keys[68])){
             currentDimension += 1;
             if(currentDimension >= currentLevel.dimensions.length){
               currentDimension = 0;
@@ -1076,13 +1129,15 @@
               blink = false;
             }
             keys[RIGHT] = false;
+            keys[68] = false;
           }
-          if(keys[LEFT]){
+          if((keys[LEFT] || keys[65])){
             currentDimension -= 1;
             if(currentDimension < 0){
               currentDimension = currentLevel.dimensions.length-1;
             }
             keys[LEFT] = false;
+            keys[65] = false;
             if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){  
               blink = true;
             }else{
@@ -1090,7 +1145,7 @@
             }
           }
           if(currentLevel.dimensions.length > 3){
-            if(keys[DOWN]){
+            if((keys[DOWN] || keys[83])){
               currentDimension += 3;
               if(currentDimension >= currentLevel.dimensions.length){
                 currentDimension -= currentLevel.dimensions.length;
@@ -1101,8 +1156,9 @@
                 blink = false;
               }
               keys[DOWN] = false;
+              keys[83] = false;
             }
-            if(keys[UP] && currentDimension > 2){
+            if((keys[UP] || keys[104]) && currentDimension > 2){
               currentDimension -= 3;
               if(currentDimension < 0){
                 currentDimension = currentLevel.dimensions.length;
@@ -1113,6 +1169,7 @@
                 blink = false;
               }
               keys[UP] = false;
+              keys[87] = false;
             }
           }
           /*if(blink){
@@ -1127,7 +1184,7 @@
         if(levelNumber === 0){
           fill(0);
           textSize(25);
-          text("Use the arrow\nkeys to move", 180, 500);
+          text("Use the arrow\nkeys or WASD\nto move", 180, 500);
         }
         if(levelNumber === 1){
           fill(0);
