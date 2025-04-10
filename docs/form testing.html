@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Testing form</title>
+</head>
+  <body>
+    <label for="VALUE">Value:</label>
+    <input type="text" id="VALUE" name="VALUE"><br><br>
+    <button id="submit" onclick="Clicked()">Submit</button>
+    <span id="output">NIC</span>
+
+  <script>
+    var Clicked = function() {
+      var value = document.getElementById("VALUE").value;
+      var output = document.getElementById("output");
+      output.innerHTML = "<a href=" + value + ">Click here</a>";
+      console.log(value);
+    };
+
+  </script>
+  </body>
+</html>
