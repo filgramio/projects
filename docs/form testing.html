@@ -11,14 +11,19 @@
   <body>
     <label for="VALUE">Value:</label>
     <input type="text" id="VALUE" name="VALUE"><br><br>
-    <button id="submit" onclick="Clicked()">Submit</button>
+    <button id="submit" onclick="Clicked()">Submit</button><br><br>
     <span id="output">NIC</span>
 
   <script>
     var Clicked = function() {
       var value = document.getElementById("VALUE").value;
       var output = document.getElementById("output");
-      output.innerHTML = "<a href=" + value + ">Click here</a>";
+      if(value == ""){
+        output.innerHTML = "<a href="+"youtube.com"+">Click here</a>";
+      }
+      else{
+        output.innerHTML = "Wrong code";
+      }
       console.log(value);
     };
 
