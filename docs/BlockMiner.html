@@ -616,16 +616,16 @@
         
         ///select the inventory slot
 
-        if(keys[103]){
+        if(keys[103] || keys[55]){
           player.selectedSlot = 0;
         }else 
-        if(keys[104]){
+        if(keys[104] || keys[56]){
           player.selectedSlot = 1;
         }else 
-        if(keys[105]){
+        if(keys[105] || keys[57]){
           player.selectedSlot = 2;
         }else 
-        if(keys[107]){
+        if(keys[107] || keys[48]){
           player.selectedSlot = 3;
         }
 
