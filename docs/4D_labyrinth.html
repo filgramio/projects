@@ -10,6 +10,12 @@
 </head>
   <body>
 	<!--This draws the canvas on the webpage -->
+  <div id="cookieConsentBanner" style="position: fixed; bottom: 0; width: 100%; background: #333; color: white; padding: 10px; text-align: center; display: none;">
+    Cookies? 
+    <input type="text" id="nicknameInput" placeholder="Enter your nickname" style="margin: 0 10px;">
+    <button id="acceptCookies">Yes</button>
+    <button id="declineCookies">No</button>
+</div>
     <canvas id="mycanvas"></canvas> 
   </body>
  
@@ -22,6 +28,37 @@
       size(window.innerWidth-15, window.innerHeight-15); 
       frameRate(30);
         
+      
+      document.addEventListener("DOMContentLoaded", function() {
+        const cookieBanner = document.getElementById("cookieConsentBanner");
+        const acceptButton = document.getElementById("acceptCookies");
+        const declineButton = document.getElementById("declineCookies");
+        const nicknameInput = document.getElementById("nicknameInput");
+
+        // Check if the user has already accepted cookies
+        if (!localStorage.getItem("cookiesAccepted")) {
+          cookieBanner.style.display = "block"; // Show the banner
+        }
+
+        acceptButton.onclick = function() {
+          const nickname = nicknameInput.value.trim();
+          if (nickname) {
+            localStorage.setItem("nickname", nickname); // Save the nickname
+          }
+          localStorage.setItem("cookiesAccepted", "true");
+          cookieBanner.style.display = "none"; // Hide the banner
+          // Here you can add your cookie setting logic
+          document.cookie = nickname; // Example cookie
+        };
+
+        declineButton.onclick = function() {
+          localStorage.setItem("cookiesAccepted", "false");
+          cookieBanner.style.display = "none";
+          document.cookie = "Anonymous"; // Example cookie
+        };
+      });
+
+
       translate(floor(floor(width/2)-(200)*height/900),0);
       // Paste code from Khan Academy here:
 
@@ -86,9 +123,9 @@
         [1,0,0,0,0,0,1,0,0,1],
         [1,0,0,0,0,1,1,0,0,1],
         [1,0,0,0,0,1,1,0,0,1],
-        [1,0,0,0,1,1,0,9,0,1],
+        [1,0,0,0,1,1,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,9,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
@@ -571,16 +608,59 @@
         start: [2,15],
         locked: [0,0]
       });
+      var level11 = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,2,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,10,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,9,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],],
+        start: [2,15],
+        locked: [0,0]
+      });
+
 
       var scene = 0;
-      var levels = [level1,level2,level3,level4,level5,level6,level7,level8,level9,level10];
+      var levels = [level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11];
       var type = 0;
-      var levelNumber = 0; 
+      var levelNumber = 10; 
       var currentLevel = levels[levelNumber];
       var finish = false;
       var blink = 0;
       var verticalSymmetryPressed = false;
       var horizontalSymmetryPressed = false;
+      var portalDelay = false;
       var symmetryDimension = [];
       for(var i = 0; i < 18; i++){
         symmetryDimension.push([]);
@@ -896,11 +976,20 @@
             }else if (level[i][j] === 9){
               fill(230);
               rect(40*j,40*i,40,40);
-              fill(200,0,220);
+              fill(255,165,0);
               rect(40*j,40*i,40,40,5);
-              fill(255,80,255);
+              fill(225,135,0);
               ellipse(40*j+20,40*i+20,30,30);
-              fill(200,0,220);
+              fill(255,165,0);
+              ellipse(40*j+20,40*i+20,20,20);
+            }else if (level[i][j] === 10){
+              fill(230);
+              rect(40*j,40*i,40,40);
+              fill(30,144,255);
+              rect(40*j,40*i,40,40,5);
+              fill(10,114,225);
+              ellipse(40*j+20,40*i+20,30,30);
+              fill(30,144,255);
               ellipse(40*j+20,40*i+20,20,20);
             }
           }
@@ -1063,19 +1152,45 @@
           for(var i = 0; i < currentLevel.dimensions.length; i++){
             for(var j = 0; j < currentLevel.dimensions[i].length; j++){
               for(var k = 0; k < currentLevel.dimensions[i][j].length; k++){
-                if(currentLevel.dimensions[i][j][k] === 9 && !(i === currentDimension && j === playerY && k === playerX)){
+                if(currentLevel.dimensions[i][j][k] === 10 && !(i === currentDimension && j === playerY && k === playerX) && !portalDelay){
                   playerX = k;
                   playerY = j;
                   currentDimension = i;
+                  portalDelay = true;
                 }
               }  
             }  
           }
         }
 
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] === 10){
+          for(var i = 0; i < currentLevel.dimensions.length; i++){
+            for(var j = 0; j < currentLevel.dimensions[i].length; j++){
+              for(var k = 0; k < currentLevel.dimensions[i][j].length; k++){
+                if(currentLevel.dimensions[i][j][k] === 9 && !(i === currentDimension && j === playerY && k === playerX) && !portalDelay){
+                  playerX = k;
+                  playerY = j;
+                  currentDimension = i;
+                  portalDelay = true;
+                }
+              }  
+            }  
+          }
+        }
+
+        if(currentLevel.dimensions[currentDimension][playerY][playerX] !== 9 && currentLevel.dimensions[currentDimension][playerY][playerX] !== 10){          
+          portalDelay = false;
+        }
+
         //draw the level
 
         drawMap(currentLevel.dimensions[currentDimension]);
+
+        //draw the nickname
+
+        fill(0);
+        textSize(20);
+        text(document.cookie, 10, 40);
         
         //draw the player
 
@@ -1179,7 +1294,7 @@
               arc(200,290,170,170,PI,PI*2);
               fill(100,100,250);
               arc(200,290,130,130,PI,PI*2);
-            }else if(currentLevel.dimensions[i][playerY][playerX]){
+            }else if(currentLevel.dimensions[i][playerY][playerX] === 1){
               fill(255,0,0,100);
               rect(-20,-20,440,760);
             }
@@ -1193,7 +1308,7 @@
           if((keys[RIGHT] || keys[68])){
             currentDimension += 1;
             if(currentDimension >= currentLevel.dimensions.length){
-              currentDimension = 0;
+              currentDimension = currentLevel.dimensions.length-1;
             }
             if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
               blink = true;
@@ -1206,7 +1321,7 @@
           if((keys[LEFT] || keys[65])){
             currentDimension -= 1;
             if(currentDimension < 0){
-              currentDimension = currentLevel.dimensions.length-1;
+              currentDimension = 0;
             }
             keys[LEFT] = false;
             keys[65] = false;
@@ -1220,7 +1335,7 @@
             if((keys[DOWN] || keys[83])){
               currentDimension += 3;
               if(currentDimension >= currentLevel.dimensions.length){
-                currentDimension -= currentLevel.dimensions.length;
+                currentDimension = currentLevel.dimensions.length-1;
               }
               if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
               blink = true;
@@ -1233,7 +1348,7 @@
             if((keys[UP] || keys[104]) && currentDimension > 2){
               currentDimension -= 3;
               if(currentDimension < 0){
-                currentDimension = currentLevel.dimensions.length;
+                currentDimension = 0;
               }
               if(currentLevel.dimensions[currentDimension][playerY][playerX] === 1 || currentLevel.locked[currentDimension] !== 0){
                 blink = true;
