@@ -84,6 +84,14 @@
         }
       }
 
+      mouseClicked = function(){
+        if(mouseX > width - 180 && mouseY < 30){
+          playerNick = prompt("Enter your nickname:", playerNick || "Anonymous");   
+          document.cookie = playerNick; // Save nickname in cookie       
+        }
+      }
+
+      
 
       var Level = function(config) {
         this.dimensions = config.dimensions;
@@ -677,6 +685,8 @@
 
       var moveCooldown = 3;
 
+      
+
       var isSolid = function(coordinates){
         if(opMode && keys[88]){
           return(false);
@@ -1022,6 +1032,10 @@
         case 1:
         //println("Drawing...");
 
+        //update the nickname
+
+        playerNick = document.cookie;
+
         //move the player
         if(moveCooldown < 0 && !finish && !keys[16]){ 
           if((keys[UP] || keys[87]) && !isSolid(currentLevel.dimensions[currentDimension][playerY-1][playerX])){
@@ -1194,8 +1208,15 @@
         translate(-floor(floor(width/2)-(200)*height/900),0);
         fill(0);
         textSize(20);
-        text(document.cookie, 5, 25);
+        text(playerNick, 5, 25);
         text("level: "+(levelNumber+1), 5, 55);
+        
+        fill(200);
+        stroke(0);
+        rect(width-180,0,180,30,4);
+        fill(0);
+        textSize(20);
+        text("Change nickname", width-170, 23);
 
         popMatrix();
 
