@@ -671,6 +671,7 @@
       
       var playerX = currentLevel.start[0];
       var playerY = currentLevel.start[1];
+      var playerNick = "Anonymous";
 
       var opMode = false;
 
@@ -1186,11 +1187,18 @@
 
         drawMap(currentLevel.dimensions[currentDimension]);
 
-        //draw the nickname
+        //draw the nickname and level number
 
+        pushMatrix();
+
+        translate(-floor(floor(width/2)-(200)*height/900),0);
         fill(0);
         textSize(20);
-        text(document.cookie, 10, 40);
+        text(document.cookie, 5, 25);
+        text("level: "+(levelNumber+1), 5, 55);
+
+        popMatrix();
+
         
         //draw the player
 
