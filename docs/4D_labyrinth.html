@@ -1046,7 +1046,7 @@
       };
 
       if(document.cookie.split("*").length < 2){
-        document.cookie = "Anonymous*0";
+        document.cookie = "Anonymous*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
       }
 
       draw = function() {
@@ -1089,7 +1089,7 @@
 
         playerSkin[2] = 2;
 
-        println("Player Skin: " + playerSkin);
+        //println("Player Skin: " + playerSkin);
 
         //move the player
         if(moveCooldown < 0 && !finish && !keys[16]){ 
