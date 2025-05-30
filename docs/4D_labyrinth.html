@@ -48,7 +48,7 @@
           localStorage.setItem("cookiesAccepted", "true");
           cookieBanner.style.display = "none"; // Hide the banner
           // Here you can add your cookie setting logic
-          document.cookie = nickname+"*"+"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+          document.cookie = nickname+"*"+"0020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         };
 
         declineButton.onclick = function() {
@@ -78,8 +78,9 @@
           playerNick = prompt("Enter your nickname:", playerNick || "Anonymous");   
           document.cookie.nick = playerNick;
         }
-        if(keyCode === 80){
-          scene = 2;
+        if(keyCode === 80 && scene > 0){
+          scene = 3-scene;
+          document.cookie = playerNick+"*"+playerSkin.join("");
         }
         if(keyCode >= 49 && keyCode <= 57 && scene === 2){
           skinEditorColor = keyCode - 49;
@@ -694,6 +695,15 @@
 
       var opMode = false;
 
+      replaceAt = function replaceChar(origString, replaceChar, index) {
+        let firstPart = origString.substr(0, index);
+        let lastPart = origString.substr(index + 1);
+      
+        let newString = firstPart + replaceChar + lastPart;
+        return newString;
+      }
+      
+
       mapMouseX = function(value){
         return value - floor(floor(width/2)-(200)*height/900);
       };
@@ -1075,6 +1085,8 @@
 
         playerSkin = document.cookie.split("*")[1];
 
+        playerSkin[2] = 2;
+
         println("Player Skin: " + playerSkin);
 
         //move the player
@@ -1258,8 +1270,29 @@
         //draw the player
 
         noStroke();
-        fill(255,0,0);
-        rect(playerX*40,playerY*40,40,40,5);
+        /*fill(255,0,0);
+        rect(playerX*40,playerY*40,40,40,5);*/
+
+        for(var i = 0; i < 10; i++){
+          for(var j = 0; j < 10; j++){
+            fill(skinEditorColors[playerSkin.substr(i*10+j,1)]);
+            rect(playerX*40+j*4,playerY*40+i*4,4,4);
+          }
+        }
+        fill(230);
+        rect(playerX*40,playerY*40,4,4);
+        rect(playerX*40,playerY*40+36,4,4);
+        rect(playerX*40+36,playerY*40,4,4);
+        rect(playerX*40+36,playerY*40+36,4,4);
+        fill(skinEditorColors[playerSkin.substr(0,1)]);
+        arc(playerX*40+4,playerY*40+4,8,8,PI,PI*1.5);
+        fill(skinEditorColors[playerSkin.substr(9,1)]);
+        arc(playerX*40+36,playerY*40+4,8,8,PI*1.5,PI*2);
+        fill(skinEditorColors[playerSkin.substr(90,1)]);
+        arc(playerX*40+4,playerY*40+36,8,8,PI*0.5,PI);
+        fill(skinEditorColors[playerSkin.substr(99,1)]);
+        arc(playerX*40+36,playerY*40+36,8,8,0,PI*0.5);
+
 
         //draw the dimension list
 
@@ -1492,9 +1525,11 @@
             textSize(30);
             text(i+1-10*max(0,i-8), 10+i*40, 190);
           }
-          if(mousePressed){
-            playerSkin[skinSelectedPixel[1]*10+skinSelectedPixel[0]] = skinEditorColor;
-            println(skinSelectedPixel[1]*10+skinSelectedPixel[0]);
+          text("Hold space to draw pixels",0,760);
+          text("Press numbers to switch colors",0,800);
+          if(keys[32]){
+            playerSkin = replaceAt(playerSkin,skinEditorColor, skinSelectedPixel[0]+skinSelectedPixel[1]*10);
+            document.cookie = playerNick+"*"+playerSkin;
           }
           fill(255,0,0);
           ellipse(MappedX,MappedY, 10, 10);
