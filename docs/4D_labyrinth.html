@@ -1045,7 +1045,9 @@
         }
       };
 
-
+      if(document.cookie.split("*").length < 2){
+        document.cookie = "Anonymous*0";
+      }
 
       draw = function() {
         background(250);
