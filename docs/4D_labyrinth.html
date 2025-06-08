@@ -1285,6 +1285,12 @@
         textSize(20);
         text(playerNick, 5, 25);
         text("level: "+(levelNumber+1), 5, 55);
+        timerMilliseconds = millis() - startMilliseconds;
+        if(timerMilliseconds < 60000){
+          text(floor(timerMilliseconds/1000)%60+"."+timerMilliseconds%1000, 5, 85);
+        }else{ 
+          text(floor(timerMilliseconds/60000)+":"+floor(timerMilliseconds/1000)%60+"."+timerMilliseconds%1000, 5, 85);
+        } 
 
         popMatrix();
 
@@ -1575,9 +1581,9 @@
           text("Your time:", 200, 580);
           textSize(50);
           if(timerMilliseconds < 60000){
-          text(floor(timerMilliseconds/1000)+"."+timerMilliseconds%1000, 200, 650);
+            text(floor(timerMilliseconds/1000)%60+"."+timerMilliseconds%1000, 200, 650);
           }else{ 
-            text(floor(timerMilliseconds/60000)+":"+floor(timerMilliseconds/1000)+"."+timerMilliseconds%1000, 200, 650);
+            text(floor(timerMilliseconds/60000)+":"+floor(timerMilliseconds/1000)%60+"."+timerMilliseconds%1000, 200, 650);
           }
           textAlign(LEFT);
 
