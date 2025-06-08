@@ -701,6 +701,9 @@
       var playerNick = "Anonymous";
       var playerSkin = 0;
 
+      var startMilliseconds = 0;
+      var timerMilliseconds = 0;
+
       var MappedX,MappedY;
 
       var opMode = false;
@@ -1087,6 +1090,8 @@
           text("Press Space\n     to start", 60, 500);
           if(keys[32]){
             scene = 1;
+            startMilliseconds = millis();
+            currentLevel = levels[levelNumber];
           }
         break;
         case 1:
@@ -1367,14 +1372,23 @@
           textSize(50);
           text("Level Complete!", 50, 350);
           textSize(20);
-          text("Press Space to continue", 100, 400);
-          if(keys[32]){
-            finish = false;
-            levelNumber += 1;
-            currentLevel = levels[levelNumber];
-            playerX = currentLevel.start[0];
-            playerY = currentLevel.start[1];
-            currentDimension = 0;
+          if(currentLevel === levels[levels.length-1]){
+            text("Press Space to finish", 110, 400);
+            if(keys[32]){
+              finish = false;
+              scene = 3;
+              timerMilliseconds = millis() - startMilliseconds;
+            }
+          }else{
+            text("Press Space to continue", 100, 400);
+            if(keys[32]){
+              finish = false;
+              levelNumber += 1;
+              currentLevel = levels[levelNumber];
+              playerX = currentLevel.start[0];
+              playerY = currentLevel.start[1];
+              currentDimension = 0;
+            }
           }
         }
 
@@ -1551,7 +1565,23 @@
           fill(255,0,0);
           ellipse(MappedX,MappedY, 10, 10);
         break;
+        case 3:
+          background(230);
+          fill(0);
+          textSize(50);
+          text("You Won!!", 90, 300);
+          textSize(40);
+          textAlign(CENTER);
+          text("Your time:", 200, 580);
+          textSize(50);
+          if(timerMilliseconds < 60000){
+          text(floor(timerMilliseconds/1000)+"."+timerMilliseconds%1000, 200, 650);
+          }else{ 
+            text(floor(timerMilliseconds/60000)+":"+floor(timerMilliseconds/1000)+"."+timerMilliseconds%1000, 200, 650);
+          }
+          textAlign(LEFT);
 
+        break;
         };
 
       }
