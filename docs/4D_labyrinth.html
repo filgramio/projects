@@ -69,6 +69,8 @@
 
       var keys = [];
 
+      var mouseIsPressed = false;
+
       keyPressed = function(){
         keys[keyCode] = true;
         if(keyCode === 16){
@@ -100,6 +102,14 @@
       
       mouseClicked = function(){
         playerSkin[skinSelectedPixel[1]*10+skinSelectedPixel[0]] = skinEditorColor;
+      };
+
+      mousePressed = function() {
+        mouseIsPressed = true;
+      };
+
+      mouseReleased = function() {
+        mouseIsPressed = false;
       };
 
       var Level = function(config) {
@@ -1056,8 +1066,13 @@
 
         //map mouseX
 
-        MappedX = mapMouseX(mouseX);
-        MappedY = mouseY+10;
+        // Calculate the scale and translation used
+        var gridScale = floor(height/900*40)/40;
+        var gridTranslateX = floor(floor(width/2)-(200)*height/900);
+
+        // Map mouseX and mouseY to grid coordinates
+        MappedX = floor((mouseX - gridTranslateX) / gridScale);
+        MappedY = floor(mouseY / gridScale);
 
         switch(scene){
         case 0:
@@ -1529,7 +1544,7 @@
           }
           text("Hold space to draw pixels",0,760);
           text("Press numbers to switch colors",0,800);
-          if(keys[32]){
+          if(keys[32] || mouseIsPressed){
             playerSkin = replaceAt(playerSkin,skinEditorColor, skinSelectedPixel[0]+skinSelectedPixel[1]*10);
             document.cookie = playerNick+"*"+playerSkin;
           }
