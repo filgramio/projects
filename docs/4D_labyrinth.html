@@ -71,14 +71,19 @@
 
       var mouseIsPressed = false;
 
+      var playerNick = "Anonymous";
+      var playerSkin = 0;
+
       keyPressed = function(){
         keys[keyCode] = true;
         if(keyCode === 16){
           oldDimension = currentDimension;
         }
         if(keyCode === 78){
-          playerNick = prompt("Enter your nickname:", playerNick || "Anonymous");   
-          document.cookie.nick = playerNick;
+          println(document.cookie);
+          playerNick = prompt("Enter your nickname:");   
+          document.cookie = playerNick+"*"+playerSkin.join("");
+          println(document.cookie);
         }
         if(keyCode === 80 && scene > 0){
           scene = 3-scene;
@@ -698,8 +703,7 @@
       
       var playerX = currentLevel.start[0];
       var playerY = currentLevel.start[1];
-      var playerNick = "Anonymous";
-      var playerSkin = 0;
+      
 
       var startMilliseconds = 0;
       var timerMilliseconds = 0;
@@ -1061,6 +1065,11 @@
       if(document.cookie.split("*").length < 2){
         document.cookie = "Anonymous*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
       }
+      if(playerNick.length + 101 !== document.cookie.length){
+        document.cookie = "Anonymous*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+      }
+
+      
 
       draw = function() {
         background(250);
@@ -1068,7 +1077,6 @@
         textFont(createFont("sans-serif"));
 
         //map mouseX
-
         // Calculate the scale and translation used
         var gridScale = floor(height/900*40)/40;
         var gridTranslateX = floor(floor(width/2)-(200)*height/900);
@@ -1283,7 +1291,7 @@
         translate(-floor(floor(width/2)-(200)*height/900),0);
         fill(0);
         textSize(20);
-        text(playerNick, 5, 25);
+        text(/*playerNick*/"4D Labyrinth", 5, 25);
         text("level: "+(levelNumber+1), 5, 55);
         timerMilliseconds = millis() - startMilliseconds;
         if(timerMilliseconds < 60000){

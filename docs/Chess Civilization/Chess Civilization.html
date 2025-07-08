@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Minimal Web Page</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var Map = [];
+
+      sizeX = 15;
+      sizeY = 20;
+
+      const generationConstant = 1/8; // Adjust this value to control the density of islands
+      
+      islandX = [];
+      islandY = [];
+
+      for(var i = 0; i < sizeY; i++) {
+        Map[i] = [];
+        for(var j = 0; j < sizeX; j++) {
+          if(random(0,1) < 0.05) {
+            Map[i][j] = 1;
+            islandX.push(i);
+            islandY.push(j);
+          } else {
+            Map[i][j] = 0;
+          }
+        }
+      }
+
+      for(var i = 0; i < sizeY; i++) {
+        Map[i] = [];
+        for(var j = 0; j < sizeX; j++) {
+          var distance = 1000000;
+          for(var k = 0; k < islandX.length; k++) {
+            if(distance > dist(i, j, islandX[k], islandY[k])) {
+              distance = dist(i, j, islandX[k], islandY[k]);
+            }
+          }
+          if(random(0,generationConstant) < 1/(distance*distance*distance)) {
+            Map[i][j] = 1;
+          } else {
+            Map[i][j] = 0;
+          }
+        }
+      }
+
+      possibleBaseX = [];
+      possibleBaseY = [];
+      comfortValue = 0;
+
+
+      while(possibleBaseX.length <= 0) {
+      for(var i = 2; i < sizeY-2; i++) {
+        for(var j = 2; j < sizeX-2; j++) {
+          possibleBaseScore = comfortValue;
+          for(var k = -2; k <= 2; k++) {
+            for(var l = -2; l <= 2; l++) {
+              if(Map[i+k][j+l] == 0) {
+                possibleBaseScore -= 1;
+              }
+            }
+          }
+          if(possibleBaseScore >= 0) {
+            possibleBaseX.push(j);
+            possibleBaseY.push(i);
+          }
+        }
+      }
+      comfortValue += 1;
+      }
+
+      var baseX, baseY;
+
+      baseRandom = floor(random(0, possibleBaseX.length));
+      baseX = possibleBaseX[baseRandom];
+      baseY = possibleBaseY[baseRandom];
+
+      var BaseMap = [];
+
+      var WK = loadImage("images/WK.png");
+      var WQ = loadImage("images/WQ.png");
+      var WR = loadImage("images/WR.png");
+      var WB = loadImage("images/WB.png");
+      var WN = loadImage("images/WN.png");
+      var WP = loadImage("images/WP.png");
+      var BK = loadImage("images/BK.png");
+      var BQ = loadImage("images/BQ.png");
+      var BR = loadImage("images/BR.png");
+      var BB = loadImage("images/BB.png");
+      var BN = loadImage("images/BN.png");
+      var BP = loadImage("images/BP.png");
+      var coin = loadImage("images/coin.png");
+      
+      for(var i = 0; i < sizeX; i++){
+        BaseMap[i] = [];
+        for(var j = 0; j < sizeY; j++){
+          if(abs(baseX-i) <= 2 && abs(baseY-j) <= 2 && Map[j][i] == 1) {
+            BaseMap[i][j] = 1; // Base property
+          }else{
+            BaseMap[i][j] = 0; // Empty space
+          }
+
+        }
+      }
+
+      coinMenu = false;
+      coins = 15;
+
+      mouseTileX = 0;
+      mouseTileY = 0;
+
+      mouseClicked = function(){
+        if(mouseX > 15 && mouseX < 105 && mouseY > 15 && mouseY < 45) {
+          coinMenu = !coinMenu;
+        } else {
+          coinMenu = false;
+        }
+      };
+
+      draw = function() {
+        background(255); // Set background to white
+
+        // Draw the grid
+        for(var i = 0; i < sizeY; i++) {
+          for(var j = 0; j < sizeX; j++) {
+            noStroke();
+            if(Map[i][j] == 1) {
+              if((i+j)%2 == 0) {
+                fill(245,222,179); // white squares
+              } else {
+                fill(181,101,29); // black squares
+              }
+            } else {
+              fill(0,191,255); // Blue for water
+            }
+            rect(j * 40, i * 40, 40, 40);
+          }
+        }
+        fill(0, 255, 0); // Green for the base
+        rect(baseX * 40, baseY * 40, 40, 40);
+
+        // Draw the base
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            if(BaseMap[i][j] == 1) {
+              fill(255, 0, 0, 75); // Green for the base
+              rect(i * 40, j * 40, 40, 40);
+              pushMatrix();
+              translate(i*40,j*40);
+              strokeWeight(5);
+              stroke(255,0,0);
+              if(i > 0){
+                if(BaseMap[i-1][j] == 0) {
+                  line(0, 0, 0, 40); // Left
+                }
+              }
+              if(i < sizeX-1){
+                if(BaseMap[i+1][j] == 0) {
+                  line(40, 0, 40, 40); // Left
+                }
+              }
+              if(j > 0){
+                if(BaseMap[i][j-1] == 0) {
+                  line(0, 0, 40, 0); // Up
+                }
+              }
+              if(j < sizeY-1){
+                if(BaseMap[i][j+1] == 0) {
+                  line(0, 40, 40, 40); // Down
+                }
+              }
+              noStroke();
+              strokeWeight(1);
+              popMatrix();   
+            }
+          }
+        }
+
+        //draw coin count
+
+        fill(150);
+        stroke(0);
+        rect(15,15,90,30);
+        image(coin, 20, 20, 20, 20);
+        fill(0);
+        textSize(20);
+        text(coins, 50, 38);
+        if(!coinMenu) {
+          line(100,33,95,28);
+          line(90,33,95,28);
+        }else{
+          line(100,27,95,32);
+          line(90,27,95,32);
+        }
+
+        if(coinMenu){
+          fill(150);
+          rect(15,45,120,30);
+          rect(15,75,120,30);
+        }
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
