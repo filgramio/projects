@@ -588,6 +588,22 @@
 
       generateSquarePrices();
 
+      Save = function(){
+        var saveData = {
+          Map: Map,
+          BaseMap: BaseMap,
+          PieceMap: PieceMap,
+          coins: coins
+        };
+        localStorage.setItem("chessCivilizationSave", JSON.stringify(saveData));
+      };
+
+      keyPressed = function() {
+        if(keyCode === 83) { // 'S' key for saving
+          Save();
+        }
+      };
+
       draw = function() {
         background(255); // Set background to white
 
@@ -785,6 +801,9 @@
         if(HeldPiece.type != null){
           image(HeldPiece.type.image,mouseX-20,mouseY-20,40,40);
         }
+        fill(0);
+        textSize(20);
+        text(localStorage.getItem("chessCivilizationSave"), 15, height - 15);  
       };
 
     }};
