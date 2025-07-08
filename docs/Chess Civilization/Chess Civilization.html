@@ -490,10 +490,13 @@
                 }
               }
             }
+            if(Map[j][i] == 0 && squaresPriceMap[i][j] != 50) {
+              squaresPriceMap[i][j] -= 5; // Set price for water squares
+            }
             if(squaresPriceMap[i][j] <= 0) {
               squaresPriceMap[i][j] = 5; // Ensure the price is not negative
             }
-            if(Map[j][i] == 0 || BaseMap[i][j] == 1 || squaresPriceMap[i][j] == 50) {
+            if(BaseMap[i][j] == 1 || squaresPriceMap[i][j] == 50 || PieceMap[i][j] != 0) {
               squaresPriceMap[i][j] = 0; // Set price for water squares
             }
 
