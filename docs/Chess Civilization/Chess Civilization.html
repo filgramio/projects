@@ -178,7 +178,7 @@
       pieceMenuOffset = 0;
       squaresMenu = false;
       squaresPriceMap = [];
-      coins = 100;
+      coins = 20;
 
       mouseTileX = 0;
       mouseTileY = 0;
@@ -506,6 +506,11 @@
 
       clickDelay = 0;
 
+      coinBlink = 0;
+      coinBlinkX = 0;
+      coinBlinkY = 0;
+      coinBlinkAmount = 0;
+
       mouseClicked = function(){
         if(mouseX > 15 && mouseX < 105 && mouseY > 15 && mouseY < 45) {
           coinMenu = !coinMenu;
@@ -547,6 +552,13 @@
           generateAvailableSquaresMap(mouseTileX, mouseTileY, HeldPiece.type);
         }else{
           if(availableSquaresMap[mouseTileX][mouseTileY] == 1) {
+          if(PieceMap[mouseTileX][mouseTileY] != 0 && PieceMap[mouseTileX][mouseTileY].color != HeldPiece.type.color) {
+            coins += PieceMap[mouseTileX][mouseTileY].reward; // Add the reward for capturing the piece
+            coinBlink = 10;
+            coinBlinkX = mouseTileX;
+            coinBlinkY = mouseTileY;
+            coinBlinkAmount = PieceMap[mouseTileX][mouseTileY].reward; // Update the coin blink amount
+          }
             PieceMap[mouseTileX][mouseTileY] = HeldPiece.type; // Place the piece on the map
             HeldPiece.type = null; // Clear the held piece
             HeldPiece.origX = null;
@@ -696,6 +708,15 @@
         fill(0,0,0,70);
         // Draw the mouse tile
         rect(mouseTileX * 40, mouseTileY * 40, 40, 40);
+
+        // Draw the coin blink effect
+        if(coinBlink > 0) {
+          image(coin,coinBlinkX * 40+5, coinBlinkY * 40+5, 20, 20);
+          fill(255,205,0);
+          textSize(20);
+          text(coinBlinkAmount, coinBlinkX * 40 + 27, coinBlinkY * 40 + 23);
+          coinBlink--;
+        }
 
         popMatrix();
 
