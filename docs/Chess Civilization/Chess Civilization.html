@@ -26,8 +26,8 @@
 
       var Map = [];
 
-      sizeX = 15;
-      sizeY = 20;
+      sizeX = 30;
+      sizeY = 30;
 
       const generationConstant = 1/8; // Adjust this value to control the density of islands
       
@@ -97,20 +97,6 @@
 
       var BaseMap = [];
 
-      var WK = loadImage("images/WK.png");
-      var WQ = loadImage("images/WQ.png");
-      var WR = loadImage("images/WR.png");
-      var WB = loadImage("images/WB.png");
-      var WN = loadImage("images/WN.png");
-      var WP = loadImage("images/WP.png");
-      var BK = loadImage("images/BK.png");
-      var BQ = loadImage("images/BQ.png");
-      var BR = loadImage("images/BR.png");
-      var BB = loadImage("images/BB.png");
-      var BN = loadImage("images/BN.png");
-      var BP = loadImage("images/BP.png");
-      var coin = loadImage("images/coin.png");
-      
       for(var i = 0; i < sizeX; i++){
         BaseMap[i] = [];
         for(var j = 0; j < sizeY; j++){
@@ -123,23 +109,447 @@
         }
       }
 
+      var WKimg = loadImage("images/WK.png");
+      var WQimg = loadImage("images/WQ.png");
+      var WRimg = loadImage("images/WR.png");
+      var WBimg = loadImage("images/WB.png");
+      var WNimg = loadImage("images/WN.png");
+      var WPimg = loadImage("images/WP.png");
+      var BKimg = loadImage("images/BK.png");
+      var BQimg = loadImage("images/BQ.png");
+      var BRimg = loadImage("images/BR.png");
+      var BBimg = loadImage("images/BB.png");
+      var BNimg = loadImage("images/BN.png");
+      var BPimg = loadImage("images/BP.png");
+      var coin = loadImage("images/coin.png");
+
+      var Piece = function(color,type,value) {
+        this.color = color;
+        this.type = type;
+        this.image = loadImage("images/" + color + type + ".png");
+        this.value = value;
+        switch(type) {
+          case "K":
+            this.name = "King";
+            break;
+          case "Q":
+            this.name = "Queen";
+            break;
+          case "R":     
+            this.name = "Rook";
+            break;
+          case "B":
+            this.name = "Bishop";
+            break;
+          case "N":
+            this.name = "Knight";
+            break;
+          case "P":
+            this.name = "Pawn";
+            break;
+        }
+      };
+
+      var WK = new Piece("W", "K", 1000);
+      var WQ = new Piece("W", "Q", 9); 
+      var WR = new Piece("W", "R", 5);
+      var WB = new Piece("W", "B", 3);
+      var WN = new Piece("W", "N", 3);
+      var WP = new Piece("W", "P", 1);
+      var BK = new Piece("B", "K", 1000);
+      var BQ = new Piece("B", "Q", 9);
+      var BR = new Piece("B", "R", 5);
+      var BB = new Piece("B", "B", 3);
+      var BN = new Piece("B", "N", 3);
+      var BP = new Piece("B", "P", 1);
+
+      var PieceMap = [];
+      for(var i = 0; i < sizeX; i++) {
+        PieceMap[i] = [];
+        for(var j = 0; j < sizeY; j++) {
+          PieceMap[i][j] = 0;
+        }
+      }
+      PieceMap[baseX][baseY] = WK; // Place the king on the base
+
       coinMenu = false;
-      coins = 15;
+      piecesMenu = false;
+      pieceInventory = [WQ, WR, WB, WN, WP, BN];
+      pieceInventoryPrices = [20, 15, 5, 7, 3, 1];
+      pieceMenuOffset = 0;
+      squaresMenu = false;
+      squaresPriceMap = [];
+      coins = 40;
 
       mouseTileX = 0;
       mouseTileY = 0;
 
+      HeldPiece = {
+        type: null,
+        origX: null,
+        origY: null
+      };
+
+      availableSquaresMap = [];
+      for(var i = 0; i < sizeX; i++) {
+        availableSquaresMap[i] = [];
+        for(var j = 0; j < sizeY; j++) {
+          availableSquaresMap[i][j] = 0;
+        }
+      }
+
+      setAvailableSquaresToBase = function() {
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            if(BaseMap[i][j] == 1 && PieceMap[i][j] == 0) {
+              availableSquaresMap[i][j] = 1; // Set the base squares as available
+            } else {
+              availableSquaresMap[i][j] = 0; // Clear the map
+            }
+          }
+        }
+      };
+      resetAvailableSquaresMap = function() {
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            availableSquaresMap[i][j] = 0; // Clear the map
+          }
+        }
+      };
+      generateAvailableSquaresMap = function(x,y,piece){
+        switch(piece.type){
+          case "K":            
+            for(var i = -1; i <= 1; i++) {
+              for(var j = -1; j <= 1; j++) {
+                if(x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY) {
+                  if((PieceMap[x+i][y+j] == 0 || PieceMap[x+i][y+j].color != piece.color) && Map[y+j][x+i] == 1) {
+                    availableSquaresMap[x+i][y+j] = 1;
+                  }
+                }
+              }
+            }
+            availableSquaresMap[x][y] = 0;
+          break;
+          case "R":
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && Map[y][x+i] == 1 && (PieceMap[x+i][y] == 0 || PieceMap[x+i][y].color != piece.color)) {
+                availableSquaresMap[x+i][y] = 1;
+                if(PieceMap[x+i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && Map[y][x-i] == 1 && (PieceMap[x-i][y] == 0 || PieceMap[x-i][y].color != piece.color)) {
+                availableSquaresMap[x-i][y] = 1;
+                if(PieceMap[x-i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y-i >= 0 && Map[y-i][x] == 1 && (PieceMap[x][y-i] == 0 || PieceMap[x][y-i].color != piece.color)) {
+                availableSquaresMap[x][y-i] = 1;
+                if(PieceMap[x][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y+i < sizeY && Map[y+i][x] == 1 && (PieceMap[x][y+i] == 0 || PieceMap[x][y+i].color != piece.color)) {
+                availableSquaresMap[x][y+i] = 1;
+                if(PieceMap[x][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+          break;
+          case "B":
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && y+i < sizeY && Map[y+i][x+i] == 1 && (PieceMap[x+i][y+i] == 0 || PieceMap[x+i][y+i].color != piece.color)) {
+                availableSquaresMap[x+i][y+i] = 1;
+                if(PieceMap[x+i][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && y+i < sizeY && Map[y+i][x-i] == 1 && (PieceMap[x-i][y+i] == 0 || PieceMap[x-i][y+i].color != piece.color)) {
+                availableSquaresMap[x-i][y+i] = 1;
+                if(PieceMap[x-i][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && y-i >= 0 && Map[y-i][x+i] == 1 && (PieceMap[x+i][y-i] == 0 || PieceMap[x+i][y-i].color != piece.color)) {
+                availableSquaresMap[x+i][y-i] = 1;
+                if(PieceMap[x+i][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && y-i >= 0 && Map[y-i][x-i] == 1 && (PieceMap[x-i][y-i] == 0 || PieceMap[x-i][y-i].color != piece.color)) {
+                availableSquaresMap[x-i][y-i] = 1;
+                if(PieceMap[x-i][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }            
+          break;
+          case "Q":
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && Map[y][x+i] == 1 && (PieceMap[x+i][y] == 0 || PieceMap[x+i][y].color != piece.color)) {
+                availableSquaresMap[x+i][y] = 1;
+                if(PieceMap[x+i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && Map[y][x-i] == 1 && (PieceMap[x-i][y] == 0 || PieceMap[x-i][y].color != piece.color)) {
+                availableSquaresMap[x-i][y] = 1;
+                if(PieceMap[x-i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y-i >= 0 && Map[y-i][x] == 1 && (PieceMap[x][y-i] == 0 || PieceMap[x][y-i].color != piece.color)) {
+                availableSquaresMap[x][y-i] = 1;
+                if(PieceMap[x][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y+i < sizeY && Map[y+i][x] == 1 && (PieceMap[x][y+i] == 0 || PieceMap[x][y+i].color != piece.color)) {
+                availableSquaresMap[x][y+i] = 1;
+                if(PieceMap[x][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && y+i < sizeY && Map[y+i][x+i] == 1 && (PieceMap[x+i][y+i] == 0 || PieceMap[x+i][y+i].color != piece.color)) {
+                availableSquaresMap[x+i][y+i] = 1;
+                if(PieceMap[x+i][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && y+i < sizeY && Map[y+i][x-i] == 1 && (PieceMap[x-i][y+i] == 0 || PieceMap[x-i][y+i].color != piece.color)) {
+                availableSquaresMap[x-i][y+i] = 1;
+                if(PieceMap[x-i][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && y-i >= 0 && Map[y-i][x+i] == 1 && (PieceMap[x+i][y-i] == 0 || PieceMap[x+i][y-i].color != piece.color)) {
+                availableSquaresMap[x+i][y-i] = 1;
+                if(PieceMap[x+i][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && y-i >= 0 && Map[y-i][x-i] == 1 && (PieceMap[x-i][y-i] == 0 || PieceMap[x-i][y-i].color != piece.color)) {
+                availableSquaresMap[x-i][y-i] = 1;
+                if(PieceMap[x-i][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }            
+          break;
+          case "N":
+            for(var i = -2; i <= 2; i++) {
+              for(var j = -2; j <= 2; j++) {
+                if(abs(i) + abs(j) == 3 && x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY) {
+                  if((PieceMap[x+i][y+j] == 0 || PieceMap[x+i][y+j].color != piece.color) && Map[y+j][x+i] == 1) {
+                    availableSquaresMap[x+i][y+j] = 1;
+                  }
+                }
+              }
+            }
+          break;
+          case "P":
+            for(var i = -1; i <= 1; i++) {
+              for(var j = -1; j <= 1; j++) {
+                if(abs(j+i) == 1 && x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY) {
+                  if((PieceMap[x+i][y+j] == 0) && Map[y+j][x+i] == 1) {
+                    availableSquaresMap[x+i][y+j] = 1;
+                  }
+                }
+                if(abs(j)+abs(i) == 2 && x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY) {
+                  if((PieceMap[x+i][y+j].color != piece.color) && PieceMap[x+i][y+j] != 0 && Map[y+j][x+i] == 1) {
+                    availableSquaresMap[x+i][y+j] = 1;
+                  }
+                }
+              }
+            }
+          break;
+        }
+      }
+
+      generateSquarePrices = function(){
+        for(var i = 0; i < sizeX; i++) {
+          squaresPriceMap[i] = [];
+          for(var j = 0; j < sizeY; j++) {
+            squaresPriceMap[i][j] = 50; // Empty space
+            for(var k = -2; k <= 2; k++) {
+              for(var l = -2; l <= 2; l++) {
+                if(i+k >= 0 && i+k < sizeX && j+l >= 0 && j+l < sizeY) {
+                  if(BaseMap[i+k][j+l] == 1) {
+                    squaresPriceMap[i][j] -= 5; // Increase price for each base square
+                  }
+                }
+              }
+            }
+            if(squaresPriceMap[i][j] <= 0) {
+              squaresPriceMap[i][j] = 5; // Ensure the price is not negative
+            }
+            if(Map[j][i] == 0 || BaseMap[i][j] == 1 || squaresPriceMap[i][j] == 50) {
+              squaresPriceMap[i][j] = 0; // Set price for water squares
+            }
+
+          }
+        }
+      }
+
+      boardOffsetX = 0;
+      boardOffsetY = 0;
+
+      clickDelay = 0;
+
       mouseClicked = function(){
         if(mouseX > 15 && mouseX < 105 && mouseY > 15 && mouseY < 45) {
           coinMenu = !coinMenu;
-        } else {
-          coinMenu = false;
+          piecesMenu = false;
+        }
+        if(coinMenu && mouseX > 15 && mouseX < 135 && mouseY > 45 && mouseY < 75) {
+          piecesMenu = !piecesMenu;
+        }
+        if(piecesMenu && !squaresMenu){
+          for(var i = 0; i < pieceInventory.length; i++) {
+            if(mouseX > 35 && mouseX < 185 && mouseY > 75 + i*30 && mouseY < 105 + i*30) {
+              if(coins >= pieceInventoryPrices[i] && HeldPiece.type == null) {
+                coins -= pieceInventoryPrices[i];
+                HeldPiece.type = pieceInventory[i];
+                setAvailableSquaresToBase(); // Set available squares to base
+                piecesMenu = false;
+              }
+            }
+          }
+          if(heldPiece.type == null){
+            return;
+          }
+        }
+        if(coinMenu && mouseX > 15 && mouseX < 125 && mouseY > 75 + pieceMenuOffset && mouseY < 105 + pieceMenuOffset && HeldPiece.type == null) {
+          squaresMenu = !squaresMenu;
+          if(squaresMenu) {
+            generateSquarePrices(); // Generate square prices when the menu is opened
+          }
+          return;
+        }
+
+
+        if(!squaresMenu){
+        if(PieceMap[mouseTileX][mouseTileY] != 0 && HeldPiece.type == null && PieceMap[mouseTileX][mouseTileY].color == "W") {
+          HeldPiece.type = PieceMap[mouseTileX][mouseTileY];
+          HeldPiece.origX = mouseTileX;
+          HeldPiece.origY = mouseTileY;
+          PieceMap[mouseTileX][mouseTileY] = 0; // Remove the piece from the map
+          generateAvailableSquaresMap(mouseTileX, mouseTileY, HeldPiece.type);
+        }else{
+          if(availableSquaresMap[mouseTileX][mouseTileY] == 1) {
+            PieceMap[mouseTileX][mouseTileY] = HeldPiece.type; // Place the piece on the map
+            HeldPiece.type = null; // Clear the held piece
+            HeldPiece.origX = null;
+            HeldPiece.origY = null;
+          }else{
+            PieceMap[HeldPiece.origX][HeldPiece.origY] = HeldPiece.type; // Return the piece to its original position
+            HeldPiece.type = null; // Clear the held piece
+            HeldPiece.origX = null;
+            HeldPiece.origY = null;
+          }
+          resetAvailableSquaresMap(); // Reset the available squares map          
+        }
+        }else{
+          if(squaresMenu && squaresPriceMap[mouseTileX][mouseTileY] != 0 && coins >= squaresPriceMap[mouseTileX][mouseTileY]) {
+            coins -= squaresPriceMap[mouseTileX][mouseTileY];
+            BaseMap[mouseTileX][mouseTileY] = 1; // Set the square as a base square
+            squaresPriceMap[mouseTileX][mouseTileY] = 0; // Clear the price for the square
+            generateSquarePrices();
+          }else if(squaresPriceMap[mouseTileX][mouseTileY] == 0){
+            squaresMenu = false;
+          }
         }
       };
+
+      generateSquarePrices();
 
       draw = function() {
         background(255); // Set background to white
 
+        mouseTileX = floor((mouseX - boardOffsetX) / 40);
+        mouseTileY = floor((mouseY - boardOffsetY) / 40);
+
+        if(sizeX*40 > width){
+          if(mouseX > width*5/6){
+            boardOffsetX -= 30;
+          }
+          if(mouseX < width/6){
+            boardOffsetX += 30;
+          }
+          boardOffsetX = constrain(boardOffsetX, -(40*sizeX-width),0);
+        }
+        if(sizeY*40 > height){
+          if(mouseY > height*5/6){
+            boardOffsetY -= 30;
+          }
+          if(mouseY < height/6){
+            boardOffsetY += 30;
+          }
+          boardOffsetY = constrain(boardOffsetY, -(40*sizeY-height),0);
+        }
+
+        pushMatrix();
+        translate(boardOffsetX, boardOffsetY);
         // Draw the grid
         for(var i = 0; i < sizeY; i++) {
           for(var j = 0; j < sizeX; j++) {
@@ -156,14 +566,12 @@
             rect(j * 40, i * 40, 40, 40);
           }
         }
-        fill(0, 255, 0); // Green for the base
-        rect(baseX * 40, baseY * 40, 40, 40);
 
         // Draw the base
         for(var i = 0; i < sizeX; i++) {
           for(var j = 0; j < sizeY; j++) {
             if(BaseMap[i][j] == 1) {
-              fill(255, 0, 0, 75); // Green for the base
+              fill(255, 0, 0, 75);
               rect(i * 40, j * 40, 40, 40);
               pushMatrix();
               translate(i*40,j*40);
@@ -173,21 +581,29 @@
                 if(BaseMap[i-1][j] == 0) {
                   line(0, 0, 0, 40); // Left
                 }
+              }else{
+                line(0, 0, 0, 40); // Left
               }
               if(i < sizeX-1){
                 if(BaseMap[i+1][j] == 0) {
                   line(40, 0, 40, 40); // Left
                 }
+              }else{
+                line(40, 0, 40, 40); // Right
               }
               if(j > 0){
                 if(BaseMap[i][j-1] == 0) {
                   line(0, 0, 40, 0); // Up
                 }
+              }else{
+                line(0, 0, 40, 0); // Up
               }
               if(j < sizeY-1){
                 if(BaseMap[i][j+1] == 0) {
                   line(0, 40, 40, 40); // Down
                 }
+              }else{
+                line(0, 40, 40, 40); // Down
               }
               noStroke();
               strokeWeight(1);
@@ -195,6 +611,43 @@
             }
           }
         }
+
+        //Draw the pieces on the map
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            if(PieceMap[i][j] != 0) {
+              image(PieceMap[i][j].image, i * 40, j * 40, 40, 40);
+            }
+          }
+        }
+
+        // Draw the available squares
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            if(availableSquaresMap[i][j] == 1) {
+              fill(255,255,255,200); // Green for available squares
+              ellipse(i * 40+20, j * 40+20, 10, 10);
+            }
+          }
+        }
+        
+        //Draw square prices
+        for(var i = 0; i < sizeX; i++) {
+          for(var j = 0; j < sizeY; j++) {
+            if(squaresPriceMap[i][j] != 0 && squaresMenu) {
+              fill(0);
+              textSize(17);
+              text(squaresPriceMap[i][j], i * 40 + 10, j * 40 + 37);
+              image(coin, i * 40 + 10, j * 40 + 5, 16, 16);
+            }
+          }
+        }
+
+        fill(0,0,0,70);
+        // Draw the mouse tile
+        rect(mouseTileX * 40, mouseTileY * 40, 40, 40);
+
+        popMatrix();
 
         //draw coin count
 
@@ -213,10 +666,50 @@
           line(90,27,95,32);
         }
 
+        if(piecesMenu){
+          pieceMenuOffset = pieceInventory.length*30;
+        }else{
+          pieceMenuOffset = 0;
+        }
+
         if(coinMenu){
           fill(150);
           rect(15,45,120,30);
-          rect(15,75,120,30);
+          rect(15,75+pieceMenuOffset,110,30);
+          fill(0);
+          textSize(20);
+          text("Pieces",45,68);
+          image(WKimg, 20, 50, 20, 20);
+          text("Squares",45,98+pieceMenuOffset);
+          fill(181,101,29);
+          noStroke();
+          rect(20, 80+pieceMenuOffset, 20, 20);
+          stroke(0);
+          if(!piecesMenu) {
+            line(130,63,125,58);
+            line(120,63,125,58);
+          }else{
+            line(130,57,125,62);
+            line(120,57,125,62);
+          }
+          if(piecesMenu){
+            for(var i = 0; i < pieceInventory.length; i++) {
+              fill(150);
+              rect(35, 75 + i*30, 150, 30);
+              fill(0);
+              textSize(20);
+              text(pieceInventory[i].name, 65, 97 + i*30);
+              image(pieceInventory[i].image, 40, 80 + i*30, 20, 20);
+              image(coin, 133, 80 + i*30, 20, 20);
+              text(pieceInventoryPrices[i], 158, 97 + i*30);
+            }
+          }
+        }
+
+        // Draw the mouse piece
+
+        if(HeldPiece.type != null){
+          image(HeldPiece.type.image,mouseX-20,mouseY-20,40,40);
         }
       };
 
