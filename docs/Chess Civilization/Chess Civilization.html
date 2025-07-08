@@ -26,8 +26,8 @@
 
       var Map = [];
 
-      sizeX = 30;
-      sizeY = 30;
+      sizeX = 40;
+      sizeY = 40;
 
       const generationConstant = 1/8; // Adjust this value to control the density of islands
       
@@ -48,7 +48,7 @@
       }
 
       for(var i = 0; i < sizeY; i++) {
-        Map[i] = [];
+        //Map[i] = [];
         for(var j = 0; j < sizeX; j++) {
           var distance = 1000000;
           for(var k = 0; k < islandX.length; k++) {
@@ -109,21 +109,9 @@
         }
       }
 
-      var WKimg = loadImage("images/WK.png");
-      var WQimg = loadImage("images/WQ.png");
-      var WRimg = loadImage("images/WR.png");
-      var WBimg = loadImage("images/WB.png");
-      var WNimg = loadImage("images/WN.png");
-      var WPimg = loadImage("images/WP.png");
-      var BKimg = loadImage("images/BK.png");
-      var BQimg = loadImage("images/BQ.png");
-      var BRimg = loadImage("images/BR.png");
-      var BBimg = loadImage("images/BB.png");
-      var BNimg = loadImage("images/BN.png");
-      var BPimg = loadImage("images/BP.png");
       var coin = loadImage("images/coin.png");
 
-      var Piece = function(color,type,value) {
+      var Piece = function(color,type,value,reward) {
         this.color = color;
         this.type = type;
         this.image = loadImage("images/" + color + type + ".png");
@@ -147,7 +135,11 @@
           case "P":
             this.name = "Pawn";
             break;
+          case "Sh":
+            this.name = "Ship";
+            break;
         }
+        this.reward = reward || 0; // Reward for capturing the piece
       };
 
       var WK = new Piece("W", "K", 1000);
@@ -156,12 +148,14 @@
       var WB = new Piece("W", "B", 3);
       var WN = new Piece("W", "N", 3);
       var WP = new Piece("W", "P", 1);
+      var WSh = new Piece("W", "Sh", 0);
       var BK = new Piece("B", "K", 1000);
       var BQ = new Piece("B", "Q", 9);
       var BR = new Piece("B", "R", 5);
       var BB = new Piece("B", "B", 3);
       var BN = new Piece("B", "N", 3);
       var BP = new Piece("B", "P", 1);
+      var BS = new Piece("B", "S", 0,3); // Special stone piece
 
       var PieceMap = [];
       for(var i = 0; i < sizeX; i++) {
@@ -170,16 +164,21 @@
           PieceMap[i][j] = 0;
         }
       }
+      for(var i = 0; i < islandX.length; i++){
+        if(BaseMap[islandY[i]][islandX[i]] == 0 && i % 5 < 2) {
+          PieceMap[islandY[i]][islandX[i]] = BS; // Place the special stone piece on the islands  
+        }
+      }
       PieceMap[baseX][baseY] = WK; // Place the king on the base
 
       coinMenu = false;
       piecesMenu = false;
-      pieceInventory = [WQ, WR, WB, WN, WP, BN];
-      pieceInventoryPrices = [20, 15, 5, 7, 3, 1];
+      pieceInventory = [WQ, WR, WB, WN, WP, WSh];
+      pieceInventoryPrices = [20, 15, 5, 7, 3, 25];
       pieceMenuOffset = 0;
       squaresMenu = false;
       squaresPriceMap = [];
-      coins = 40;
+      coins = 100;
 
       mouseTileX = 0;
       mouseTileY = 0;
@@ -417,6 +416,57 @@
                 }
                 if(abs(j)+abs(i) == 2 && x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY) {
                   if((PieceMap[x+i][y+j].color != piece.color) && PieceMap[x+i][y+j] != 0 && Map[y+j][x+i] == 1) {
+                    availableSquaresMap[x+i][y+j] = 1;
+                  }
+                }
+              }
+            }
+          break;
+          case "Sh":
+            for(var i = 1; i < 10; i++){
+              if(x+i < sizeX && Map[y][x+i] == 0 && (PieceMap[x+i][y] == 0 || PieceMap[x+i][y].color != piece.color)) {
+                availableSquaresMap[x+i][y] = 1;
+                if(PieceMap[x+i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(x-i >= 0 && Map[y][x-i] == 0 && (PieceMap[x-i][y] == 0 || PieceMap[x-i][y].color != piece.color)) {
+                availableSquaresMap[x-i][y] = 1;
+                if(PieceMap[x-i][y] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y-i >= 0 && Map[y-i][x] == 0 && (PieceMap[x][y-i] == 0 || PieceMap[x][y-i].color != piece.color)) {
+                availableSquaresMap[x][y-i] = 1;
+                if(PieceMap[x][y-i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = 1; i < 10; i++){
+              if(y+i < sizeY && Map[y+i][x] == 0 && (PieceMap[x][y+i] == 0 || PieceMap[x][y+i].color != piece.color)) {
+                availableSquaresMap[x][y+i] = 1;
+                if(PieceMap[x][y+i] != 0) {
+                  break; // Stop if a piece is encountered
+                }
+              }else{
+                break;
+              }
+            }
+            for(var i = -1; i <= 1; i++) {
+              for(var j = -1; j <= 1; j++) {
+                if(x+i >= 0 && x+i < sizeX && y+j >= 0 && y+j < sizeY && abs(i) + abs(j) == 1) {
+                  if((PieceMap[x+i][y+j] == 0 || PieceMap[x+i][y+j].color != piece.color) && Map[y+j][x+i] == 1) {
                     availableSquaresMap[x+i][y+j] = 1;
                   }
                 }
@@ -679,7 +729,7 @@
           fill(0);
           textSize(20);
           text("Pieces",45,68);
-          image(WKimg, 20, 50, 20, 20);
+          image(WK.image, 20, 50, 20, 20);
           text("Squares",45,98+pieceMenuOffset);
           fill(181,101,29);
           noStroke();
