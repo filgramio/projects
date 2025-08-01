@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Minimal Web Page</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(60);
+        
+      var levelMap = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1],
+      [0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1],
+      [0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1],
+      [0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+      var isSolid = function(n){
+        switch(n) {
+          case 0:
+            return false;
+          case 1:
+            return true;
+        }
+      }
+      var collisionTiles = function(x,y){
+        var tiles = [];
+        tiles.push(levelMap[floor(x/40)][floor(y/40)]);
+        tiles.push(levelMap[floor(x/40)][ceil(y/40)]);
+        tiles.push(levelMap[ceil(x/40)][floor(y/40)]);
+        tiles.push(levelMap[ceil(x/40)][ceil(y/40)]);
+        return tiles;
+      };
+      var hasCollision = function(x, y) {
+        var tiles = collisionTiles(x, y);
+        for (var i = 0; i < tiles.length; i++) {
+          if (isSolid(tiles[i])) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      var x = 100;
+      var y = 100;
+
+      var targetX = 0;
+      var targetY = 0;
+      var targeting = false;
+      var movable = true;
+
+      var keys = [];
+      keyPressed = function() {
+        keys[keyCode] = true;
+      };
+      keyReleased = function() {
+        keys[keyCode] = false;
+      };
+
+      var mouseIsPressed = false;
+      var startMouseX = 0;
+      var startMouseY = 0;
+
+      var cameraX = width/2;
+      var cameraY = height/2;
+      var cameraZoom = 1;
+      
+      var sunAngle = 1;
+
+      mousePressed = function() {
+        mouseIsPressed = true;
+        startMouseX = mouseX;
+        startMouseY = mouseY;
+      };
+      mouseReleased = function() {
+        mouseIsPressed = false;
+      };
+
+      var playerImage = loadImage("images/player.png");
+
+      imageMode(CENTER);
+      draw = function() {
+        background(255);
+        pushMatrix();
+        translate(-cameraX+width/2, -cameraY+height/2);
+        for (var i = levelMap.length-1; i > -1; i--) {
+          for (var j = levelMap[i].length-1; j > -1; j--) {
+            noStroke();
+            switch (levelMap[i][j]) {
+              case 0:
+                fill(50,205,50);
+                rect(j * 40, i * 40, 40, 40);
+              break;
+              case 1:
+                fill(150);
+                rect(j * 40, i * 40, 40, 40);
+                fill(200);
+                rect(j * 40, i * 40, 40, 20);
+                if (i < levelMap.length-1 && levelMap[i+1][j] == 1) {
+                  fill(200);
+                  rect(j * 40, i * 40, 40, 40);
+                }
+                if(j < levelMap[0].length-1 && levelMap[i][j+1] == 0) {
+                  fill(100,100,100,180);
+                  translate(j * 40, i * 40);
+                  quad(40,0,40,40,50,40,50,10);
+                  if(j < levelMap[0].length-1 && i < levelMap.length-1 && levelMap[i+1][j+1] == 0){
+                    triangle(40,40,50,40,50,50);
+                  }
+                  translate(-j * 40, -i * 40);                   
+                }
+                if(i < levelMap.length-1 && levelMap[i+1][j] == 0) {
+                  fill(100,100,100,180);
+                  translate(j * 40, i * 40);
+                  quad(0,40,40,40,40,50,10,50);
+                  if(j < levelMap[0].length-1 && i < levelMap.length-1 && levelMap[i+1][j+1] == 0){
+                    triangle(40,40,40,50,50,50);
+                  }
+                  translate(-j * 40, -i * 40);                   
+                }
+              break;
+            }
+          }
+        }
+
+        //Draw the player
+        image(playerImage, x, y);
+
+        //Camera movement
+        if (mouseIsPressed && mouseButton == LEFT) {
+          var deltaX = mouseX - startMouseX;
+          var deltaY = mouseY - startMouseY;
+          cameraX -= deltaX;
+          cameraY -= deltaY;
+          startMouseX = mouseX;
+          startMouseY = mouseY;
+        }
+        if(width < levelMap[0].length * 40) {
+          cameraX = constrain(cameraX,width/2,levelMap[0].length * 40 - width/2);
+        }
+        if(height < levelMap.length * 40) {
+          cameraY = constrain(cameraY,height/2,levelMap.length * 40 - height/2);
+        }
+        //println("Camera Position: (" + cameraX + ", " + cameraY + ")");
+
+        //movement
+        if(mouseIsPressed && movable && mouseButton == RIGHT) {
+          // If the right mouse button is pressed, set the target position
+          targetX = (mouseX + cameraX - width/2);
+          targetY = (mouseY + cameraY - height/2);
+          targeting = true;
+        }
+
+        //target
+        fill(255, 0, 0, 150);
+        if (targeting) {
+          ellipse(targetX, targetY, 15, 15);
+          if (dist(x, y, targetX, targetY) < 10) {
+            targeting = false;
+          }
+        }
+        
+        //movement
+        if (targeting && movable) {
+          var angle = atan2(targetY - y, targetX - x);
+          if(!hasCollision(x + cos(angle) * 3, y + sin(angle) * 3)) {
+            x += cos(angle) * 3;
+            y += sin(angle) * 3;
+          }
+        }
+
+        popMatrix();
+        println(collisionTiles(x, y));
+      };
+
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
