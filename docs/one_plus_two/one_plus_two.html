@@ -190,31 +190,40 @@
                 pushMatrix();
                 translate(j * 40, i * 40);
                 fill(0,191,255);
-                rect(5,5,30,30,5);
+                rect(0,0,40,40,5);
                 var u = false;
                 var d = false;
                 var l = false;
                 var r = false;
                 if(j < levelMap[0].length-1 && levelMap[i][j+1] == 3){
-                  fill(0,191,255);
-                  rect(30,5,20,30);
                   r = true;
                 }
                 if(j > 0 && levelMap[i][j-1] == 3){
                   l = true;
                 }
                 if(i < levelMap.length-1 && levelMap[i+1][j] == 3){
-                  fill(0,191,255);
-                  rect(5,30,30,20);
                   d = true;
                 }
                 if(i > 0 && levelMap[i-1][j] == 3){
                   u = true;
                 }
-                if(d && r && j < levelMap[0].length-1 && i < levelMap.length-1 && levelMap[i+1][j+1] == 3){
+                if(r || d){
                   fill(0,191,255);
-                  rect(35,35,10,10);
+                  rect(35,35,5,5);
                 }
+                if(r || u){
+                  fill(0,191,255);
+                  rect(35,0,5,5);
+                }
+                if(l || u){
+                  fill(0,191,255);
+                  rect(0,0,5,5);
+                }
+                if(l || d){
+                  fill(0,191,255);
+                  rect(0,35,5,5);
+                }
+
 
                 popMatrix();
               break;
