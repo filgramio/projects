@@ -25,18 +25,18 @@
       var levelMap = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+      [0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1],
       [0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1],
-      [0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1],
-      [0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1],
+      [0,0,0,0,1,0,1,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+      [0,0,0,3,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,3,3,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,3,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -60,14 +60,29 @@
             return false;
           case 1:
             return true;
+          case 2:
+            return true;
+          case 3:
+            return true;
+          default:
+            return false;
         }
       }
       var collisionTiles = function(x,y){
         var tiles = [];
-        tiles.push(levelMap[floor(x/40)][floor(y/40)]);
-        tiles.push(levelMap[floor(x/40)][ceil(y/40)]);
-        tiles.push(levelMap[ceil(x/40)][floor(y/40)]);
-        tiles.push(levelMap[ceil(x/40)][ceil(y/40)]);
+        fill(255, 0, 0, 100);
+        if(x > 15 && x < levelMap[0].length * 40-15 && y > 15 && y < levelMap.length * 40-15) {
+          tiles.push(levelMap[floor((y-15)/40)][floor((x-15)/40)]);
+          //rect(floor((x-15)/40) * 40,floor((y-15)/40) * 40, 40, 40);  
+          tiles.push(levelMap[floor((y-15)/40)][floor((x+15)/40)]);
+          //rect(floor((x+15)/40) * 40,floor((y-15)/40) * 40, 40, 40);  
+          tiles.push(levelMap[floor((y+15)/40)][floor((x-15)/40)]);
+          //rect(floor((x-15)/40) * 40,floor((y+15)/40) * 40, 40, 40);  
+          tiles.push(levelMap[floor((y+15)/40)][floor((x+15)/40)]);
+          //rect(floor((x+15)/40) * 40,floor((y+15)/40) * 40, 40, 40);              
+        }else{
+          return [1,1,1,1];
+        }
         return tiles;
       };
       var hasCollision = function(x, y) {
@@ -83,9 +98,6 @@
       var x = 100;
       var y = 100;
 
-      var targetX = 0;
-      var targetY = 0;
-      var targeting = false;
       var movable = true;
 
       var keys = [];
@@ -158,6 +170,54 @@
                   translate(-j * 40, -i * 40);                   
                 }
               break;
+              case 2:
+                fill(50,205,50);
+                rect(j * 40, i * 40, 40, 40);          
+                pushMatrix();
+                translate(j * 40, i * 40);
+                fill(100,100,100,180);
+                ellipse(25,38,16,16);
+                fill(101,67,33);      
+                ellipse(20,35,6,6);
+                rect(17,20,6,15);
+                fill(34,139,34);  
+                ellipse(20,17,26,26);
+                popMatrix();
+              break;
+              case 3:
+                fill(50, 205, 50);
+                rect(j * 40, i * 40, 40, 40);
+                pushMatrix();
+                translate(j * 40, i * 40);
+                fill(0,191,255);
+                rect(5,5,30,30,5);
+                var u = false;
+                var d = false;
+                var l = false;
+                var r = false;
+                if(j < levelMap[0].length-1 && levelMap[i][j+1] == 3){
+                  fill(0,191,255);
+                  rect(30,5,20,30);
+                  r = true;
+                }
+                if(j > 0 && levelMap[i][j-1] == 3){
+                  l = true;
+                }
+                if(i < levelMap.length-1 && levelMap[i+1][j] == 3){
+                  fill(0,191,255);
+                  rect(5,30,30,20);
+                  d = true;
+                }
+                if(i > 0 && levelMap[i-1][j] == 3){
+                  u = true;
+                }
+                if(d && r && j < levelMap[0].length-1 && i < levelMap.length-1 && levelMap[i+1][j+1] == 3){
+                  fill(0,191,255);
+                  rect(35,35,10,10);
+                }
+
+                popMatrix();
+              break;
             }
           }
         }
@@ -169,8 +229,12 @@
         if (mouseIsPressed && mouseButton == LEFT) {
           var deltaX = mouseX - startMouseX;
           var deltaY = mouseY - startMouseY;
-          cameraX -= deltaX;
-          cameraY -= deltaY;
+          if(width < levelMap[0].length * 40) {
+            cameraX -= deltaX;
+          }
+          if(height < levelMap.length * 40) {
+            cameraY -= deltaY;
+          }
           startMouseX = mouseX;
           startMouseY = mouseY;
         }
@@ -181,35 +245,24 @@
           cameraY = constrain(cameraY,height/2,levelMap.length * 40 - height/2);
         }
         //println("Camera Position: (" + cameraX + ", " + cameraY + ")");
-
-        //movement
-        if(mouseIsPressed && movable && mouseButton == RIGHT) {
-          // If the right mouse button is pressed, set the target position
-          targetX = (mouseX + cameraX - width/2);
-          targetY = (mouseY + cameraY - height/2);
-          targeting = true;
-        }
-
-        //target
-        fill(255, 0, 0, 150);
-        if (targeting) {
-          ellipse(targetX, targetY, 15, 15);
-          if (dist(x, y, targetX, targetY) < 10) {
-            targeting = false;
-          }
-        }
         
         //movement
-        if (targeting && movable) {
-          var angle = atan2(targetY - y, targetX - x);
-          if(!hasCollision(x + cos(angle) * 3, y + sin(angle) * 3)) {
-            x += cos(angle) * 3;
-            y += sin(angle) * 3;
+        if (movable) {
+          if(keys[LEFT] && !hasCollision(x-3, y)) {
+            x -= 4
+          }
+          if(keys[RIGHT] && !hasCollision(x+3, y)) {
+            x += 4
+          }
+          if(keys[UP] && !hasCollision(x, y-3)) {
+            y -= 4
+          }
+          if(keys[DOWN] && !hasCollision(x, y+3)) {
+            y += 4
           }
         }
 
         popMatrix();
-        println(collisionTiles(x, y));
       };
 
 
