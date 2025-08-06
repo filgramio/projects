@@ -273,11 +273,25 @@
       var inventoryOpen = false;
       var inventoryHovered = 0;
       var inventorySelected = 0;
+      var inventoryPageIndex = 1;
       var inventoryPage = inventory.items;
 
       var numberColors = [color(100,255,100),color(255,0,0)];
+      var numberImage = function(num,x,y){
+        fill(numberColors[num]);
+        rect(x,y,40,40);
+        fill(255);  
+        textSize(32);
+        text(num,x+20,y+32);
+        textSize(12);
+        ellipse(x+4,y+4,3,3);
+        ellipse(x+36,y+4,3,3);
+        ellipse(x+4,y+36,3,3);
+        ellipse(x+36,y+36,3,3);
+      }
 
-      var numeratorOpen = false;      
+      var numeratorOpen = false;    
+      var numeratorOutputHovered = false;  
 
       var sunAngle = 1;
 
@@ -527,7 +541,7 @@
         }
 
         //Inventory
-        if(keys[81]) {
+        if(keys[81] && !numeratorOpen) {
           inventoryOpen = !inventoryOpen;
           hideTutorialScreen(inventory_tut);
           movable = !movable; // Toggle movement when inventory is opened
@@ -601,9 +615,22 @@
           rect(0,0, 480, 60);
           rect(0,540, 480, 160);
           fill(0);
-          inventoryHovered = constrain(constrain(floor((mouseX-(width/2-240))/80),0,5)+6*constrain(floor((mouseY-(height/2-370))/80),0,6)-6, 0, 35);
-          if(mouseIsPressed && mouseButton == LEFT) {
-            inventorySelected = inventoryHovered;
+          if(inventoryMouseX > 330 && inventoryMouseX < 390 && inventoryMouseY > 580 && inventoryMouseY < 640){
+            numeratorOutputHovered = true;
+            if(inventoryPage[inventorySelected] != 0 && mouseIsPressed){
+              for(var i = 0; i < 36; i++){
+                if(inventory.numbers[i] == 0){
+                  inventory.numbers[i] = inventorySelected.id;
+                }
+              }
+              inventoryPage[inventorySelected] = 0;
+            }
+          }else{
+            numeratorOutputHovered = false;
+            inventoryHovered = constrain(constrain(floor((mouseX-(width/2-240))/80),0,5)+6*constrain(floor((mouseY-(height/2-370))/80),0,6)-6, 0, 35);
+            if(mouseIsPressed && mouseButton == LEFT) {
+              inventorySelected = inventoryHovered;
+            }
           }
           for(var i = 0; i < 36; i++) {
             if(inventorySelected == i) {
@@ -617,26 +644,47 @@
             if(inventoryPage[i] != 0) {
               image(inventoryPage[i].image, (i%6)*80+40,floor(i/6)*80+100);
             }            
-            if(inventoryHovered == i) {
+            if(inventoryHovered == i && !numeratorOutputHovered) {
               stroke(255);
               fill(255,255,255,100);
               rect((i%6)*80+10,floor(i/6)*80+70,60,60);
               noStroke();
             }
-          }  
+          }
           fill(180,100,40);  
           rect(90,580,60,60);
           rect(330,580,60,60);
           rect(171,600,110,20);
           triangle(280,580,280,640,310,610);
+          if(numeratorOutputHovered){
+            stroke(255);
+            fill(255,255,255,100);
+            rect(330,580,60,60);
+            noStroke();
+          }
           if(inventoryPage[inventorySelected] != 0){
             image(inventoryPage[inventorySelected].image, 120, 610);
-
+            numberImage(inventoryPage[inventorySelected].id,340,590);
           }
           if(keys[32]){
             numeratorOpen = false;
             movable = true;
+            keys[32] = false;
           }
+
+          switch(inventoryPageIndex){
+            case 0: 
+              inventory.numbers = inventoryPage;
+            case 1:
+              inventory.items = inventoryPage;
+            case 2:
+              inventory.armor = inventoryPage;
+            case 3:
+              inventory.weapons = inventoryPage;
+            case 4:
+              inventory.abilities = inventoryPage;
+          }
+
           popMatrix();
           pushMatrix();
           translate(-cameraX+width/2, -cameraY+height/2);
