@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Minimal Web Page</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var keys = [];
+      keyPressed = function(){
+        keys[keyCode] = true;
+      }
+      keyReleased = function(){
+        keys[keyCode] = false;
+      }
+
+      var mapFound = false;
+
+      var tutorialLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$XXXXX.................................$",
+        "$X...X.................................$",
+        "$X...XXXXXXXXXXX.......................$",
+        "$X.............X.......................$",
+        "$X.............X.......................$",
+        "$..............XXXXXX..................$",
+        "$......................................$",
+        "$....XXX...............................$",
+        "$....XXX...............................$",
+        "$....XXX.......i.......................$",
+        "$....XXX...............................$",
+        "$XXXXXXXXXXX...........................$",
+        "$X1....................................$",
+        "$X.....................................$",
+        "$X.....................................$",
+        "$X....X................................$",
+        "$XX%XXX................................$",
+        "$.....X................................$",
+        "$.....X................................$",
+        "$.....X................................$",
+        "$.....X................................$",
+        "$.....X................................$",
+        "$.....X................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "You will have to walk around and find more stuff and try to reach exit.";
+            UItype = "text";
+            if(!questAdded1){
+              quests.push({title:"Explore",description:"Explore and find interesting blocks.",completed:false,seen:false,checkCompletion:function(){}});
+              questAdded1 = true;
+            }
+          }
+        },
+        colorCoding:function(tile){
+          switch(tile) {
+            case "$":
+              return color(255, 0, 255); // Green for walls
+            case ".":
+              return color(255, 255, 255); // Gray for empty spaces
+            case "X":
+              return color(155, 155, 155);
+            case "i":
+              return color(0, 255, 255);
+            case "%":
+              return color(139,69,19);
+            case "1":
+              return color(100,0,255);
+            default:
+              return color(255, 255, 255); // White for unknown tiles
+          }
+        },
+        startX:3,
+        startY:3,
+      };
+
+      var levelMaps = [tutorialLevelMap];
+      var levelMapIndex = 0;
+      var levelMap = levelMaps[levelMapIndex];
+
+      var questAdded1 = false;
+
+      var UIgrid = [
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          "];
+
+      var UItext = "Use arrow keys to move\n\nPress the Q key to display QUESTS\n\n(SPACE to close)";
+
+      var UItype = "text"; // "text" or "grid"
+
+      var isSolid = function(tile) {
+        switch(tile) {
+          case "$":
+            return true; // Wall tiles are solid
+          case ".":
+            return false; // Empty spaces are not solid
+          case "X":
+            return true;
+          case "i":
+            return true;
+          case "1":
+            return true;
+          case "%":
+            return true;
+          default:
+            return true; // Default to not solid for unknown tiles
+        }
+      };
+
+      var isTouching = function(tile) {
+        for(var i = 0; i < 4; i++){
+          var x = playerX + (i == 1 ? 1 : (i == 3 ? -1 : 0));
+          var y = playerY + (i == 0 ? -1 : (i == 2 ? 1 : 0));
+          if(x >= 0 && x < levelMap.tileMap[0].length && y >= 0 && y < levelMap.tileMap.length){
+            if(levelMap.tileMap[y][x] == tile){
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      var quests = [
+        {title: "ESCAPE!",
+        description: "Escape from here.",
+        completed: false,
+        seen: false,
+        checkCompletion: function(){}},
+        {title: "Find more info",
+        description: "find an information block and press I next to it.",
+        completed: false,
+        seen: false,
+        checkCompletion: function(){if(keys[73] && isTouching("i")){this.completed = true;this.seen = true;}}}];
+
+      var sortQuests = function(){
+        //idk yet
+      };
+
+      var spellsLearned = [false,false,false,false,false,false,false,false,false];
+      var spellActive = 0;
+
+      var cameraCornerX = 0;
+      var cameraCornerY = 0;
+
+      var playerX = 3;
+      var playerY = 3;
+
+      var moveDelay = 0;
+
+      textFont(createFont("monospace", 16));
+      textAlign(LEFT, TOP);
+
+      draw = function() {
+        background(0);
+
+        pushMatrix();
+        translate(width/2-300, height/2-300);
+
+        // Draw the level map
+
+        pushMatrix();
+        translate(-cameraCornerX*30, -cameraCornerY*30);
+
+        levelMap = levelMaps[levelMapIndex];
+        textSize(30);
+        for (var y = 0; y < levelMap.tileMap.length; y++) {
+          for (var x = 0; x < levelMap.tileMap[y].length; x++) {
+            if(x >= cameraCornerX && x < cameraCornerX + 20 &&
+               y >= cameraCornerY && y < cameraCornerY + 20) {
+              var tile = levelMap.tileMap[y][x];
+              fill(levelMap.colorCoding(tile));
+              if(!(playerX == x && playerY == y)) {
+                text(tile, x * 30, y * 30);
+              }else{
+                fill(0,255,0);
+                if(spellActive > 0 && spellsLearned[spellActive - 1]){
+                  text(spellActive, x * 30, y * 30);
+                }
+                text("#", x * 30, y * 30);
+              }
+            }
+          }
+        }
+        popMatrix();
+
+
+        //camera movement
+        cameraCornerX = constrain(playerX - 10,0,levelMap.tileMap[0].length - 20);
+        cameraCornerY = constrain(playerY - 10,0,levelMap.tileMap.length - 20);
+
+        // Player movement
+
+        if(moveDelay == 0 && UItype == "none"){
+          if (keys[LEFT] && playerX > 0 && !isSolid(levelMap.tileMap[playerY][playerX - 1])) {
+            playerX--;
+            moveDelay = 3;
+          }
+          if (keys[RIGHT] && playerX < levelMap.tileMap[0].length - 1 && !isSolid(levelMap.tileMap[playerY][playerX + 1])) {
+            playerX++;            
+            moveDelay = 3;
+          }
+          if (keys[UP] && playerY > 0 && !isSolid(levelMap.tileMap[playerY - 1][playerX])) {
+            playerY--;            
+            moveDelay = 3;
+          }
+          if (keys[DOWN] && playerY < levelMap.tileMap.length - 1 && !isSolid(levelMap.tileMap[playerY + 1][playerX])) {
+            playerY++;
+            moveDelay = 3;
+          }
+        }else if(moveDelay > 0){
+          moveDelay--;
+        }
+
+        // UI text
+
+        if(UItype != "none"){
+          UIwidth = 12;
+          UIheight = 12;
+          fill(0);
+          rect(300 - 180, 300 - UIheight*15, UIwidth*30, UIheight*30);
+
+          textSize(30);
+          fill(255);  
+          for (var i = 0; i < UIheight; i++) {
+            if(i > 0 && i < UIheight - 1){              
+              text("|", 300 - 180, 300 - UIheight*15 + i * 30);
+              text("|", 270 + 180, 300 - UIheight*15 + i * 30);
+            }else{
+              text("+", 300 - 180, 300 - UIheight*15 + i * 30);
+              text("+", 270 + 180, 300 - UIheight*15 + i * 30);
+              for(var j = 1; j < UIwidth - 1; j++){
+                text("=", 300 - 180 + j * 30, 300 - UIheight*15 + i * 30);
+              }
+            }
+          }
+
+          if(UItype == "text"){
+            text(UItext, 300 - 180 + 30, 330 - UIheight*15 ,300,300);
+          }else if(UItype == "grid"){
+            for (var i = 0; i < UIgrid.length; i++) {
+              for (var j = 0; j < UIgrid[i].length; j++) {
+                text(UIgrid[i][j], 300 - 180 + j * 30, 300 - UIheight*15 + i * 30);
+              }
+            }
+          }else if(UItype == "quests"){
+            for(var i = 0; i < quests.length; i++){
+              var quest = quests[i];
+              textSize(30);
+              if(!quest.seen){
+                fill(255,255,0);
+                text("!", 330 - 180 + 10, 330 - UIheight*15 + i * 90);
+              }
+              fill(quest.completed ? color(200) : color(255));
+              text(quest.title, 330 - 180 + 30, 330 - UIheight*15 + i * 90);
+              textSize(20);
+              text(quest.description, 330 - 180 + 30, 360 - UIheight*15 + i * 90,270,1000);
+              if(quest.completed){
+                fill(19,136,8);
+                pushMatrix();
+                translate(345 - 180, 330 - UIheight*15 + i * 90);
+                rotate(PI/4);
+                rect(3,0,12,20);
+                fill(0);
+                rect(0,0,10,15);
+                popMatrix();
+              }
+            }            
+          }
+
+          if(keys[32]){
+            if(UItype == "quests"){
+              for(var i = 0; i < quests.length; i++){
+                quests[i].seen = true;
+              }
+            }
+            UItype = "none";
+            UItext = "";
+            UIgrid = ["          ","          ","          ","          ","          ","          ","          ","          ","          ","          "];
+          }
+        }
+
+        //Quests
+
+        if(keys[81]){
+          UItype = "quests";
+        }
+
+        //level function
+
+        if(levelMap.perpetualFunction){
+          levelMap.perpetualFunction();
+        }
+
+        //quests check
+        for(var i = 0; i < quests.length; i++){
+          var quest = quests[i];
+          if(!quest.completed && quest.checkCompletion){
+            quest.checkCompletion();
+          }
+        }
+
+        // 1 Spell
+        
+        if(keys[49] && isTouching("1")){ // 1 key
+          UItype = "text";
+          UItext = "You have learned the bullet spell!\nPress 1 and move to shoot a bullet!\nYou can use it to destroy the block";
+        }
+        //if(){}
+
+        popMatrix();
+
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
