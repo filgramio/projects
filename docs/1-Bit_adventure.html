@@ -158,7 +158,7 @@
         seen: false,
         checkCompletion: function(){}},
         {title: "Find more info",
-        description: "find an information block and press I next to it.",
+        description: "find an information block and press I.",
         completed: false,
         seen: false,
         checkCompletion: function(){if(keys[73] && isTouching("i")){this.completed = true;this.seen = true;}}}];
@@ -167,8 +167,11 @@
         //idk yet
       };
 
-      var spellsLearned = [false,false,false,false,false,false,false,false,false];
+      var spellsLearned = [null,false,false,false,false,false,false,false,false,false];
       var spellActive = 0;
+      var spellX = 0;
+      var spellY = 0;
+      var spellMovement = 0;
 
       var cameraCornerX = 0;
       var cameraCornerY = 0;
@@ -200,14 +203,18 @@
                y >= cameraCornerY && y < cameraCornerY + 20) {
               var tile = levelMap.tileMap[y][x];
               fill(levelMap.colorCoding(tile));
-              if(!(playerX == x && playerY == y)) {
+              if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellActive !== 0)) {
                 text(tile, x * 30, y * 30);
-              }else{
+              }else if(playerX == x && playerY == y){
                 fill(0,255,0);
-                if(spellActive > 0 && spellsLearned[spellActive - 1]){
+                if(spellActive > 0 && spellsLearned[spellActive]){
                   text(spellActive, x * 30, y * 30);
+                }else{
+                  text("#", x * 30, y * 30);
                 }
-                text("#", x * 30, y * 30);
+              }else{
+                fill(levelMap.colorCoding(spellActive));
+                text(spellActive, x * 30, y * 30);
               }
             }
           }
@@ -225,6 +232,12 @@
           if (keys[LEFT] && playerX > 0 && !isSolid(levelMap.tileMap[playerY][playerX - 1])) {
             playerX--;
             moveDelay = 3;
+            switch(spellActive) {
+              case 1:
+                
+              break;
+              // Add cases for other spells if needed
+            }
           }
           if (keys[RIGHT] && playerX < levelMap.tileMap[0].length - 1 && !isSolid(levelMap.tileMap[playerY][playerX + 1])) {
             playerX++;            
@@ -332,10 +345,20 @@
 
         // 1 Spell
         
+        if(keys[49] && spellsLearned[1]){ // 1 key
+          if(!isTouching("1")){            
+            if(spellActive == 0){
+              spellActive = 1;
+            }
+          }
+        }
         if(keys[49] && isTouching("1")){ // 1 key
           UItype = "text";
           UItext = "You have learned the bullet spell!\nPress 1 and move to shoot a bullet!\nYou can use it to destroy the block";
+          spellsLearned[1] = true;
         }
+        
+
         //if(){}
 
         popMatrix();
