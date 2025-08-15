@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Minimal Web Page</title>
+    <title>One Plus Two</title>
 </head>
   <body>
 	<!--This draws the canvas on the webpage -->
@@ -31,12 +31,12 @@
       [1,1,1,1,1,1,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1],
       [0,0,0,1,1,0,1,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
       [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
-      [0,0,0,3,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,3,3,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,3,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,3,3,3,0,3,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -91,8 +91,15 @@
       var itemMap = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,rock,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -102,13 +109,7 @@
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -144,6 +145,8 @@
       var movement_tut = new TutorialScreen("Use the arrow keys\n to move around.", "images/tutorial/movement.png");
       var pickup_tut = new TutorialScreen("Press SPACE to \npick up items.", "images/tutorial/pickup.png");
       var inventory_tut = new TutorialScreen("Press Q to open the \ninventory.", "images/tutorial/inventory.png");
+      var gathering_tut = new TutorialScreen("Collect one more rock\nand head to the gray box.", "images/tutorial/gathering.png");
+      var numerating_tut = new TutorialScreen("Turn your rocks into numbers\nby selecting them.", "images/tutorial/numerating.png");
 
       var isSolid = function(n){
         switch(n) {
@@ -155,6 +158,8 @@
             return true;
           case 3:
             return true;
+          case 4:
+            return false;
           default:
             return false;
         }
@@ -186,6 +191,15 @@
         }
         return false;
       };
+      var hasToolCollision = function(tool_id,x,y){
+        var tiles = collisionTiles(x,y);
+        for (var i = 0; i < tiles.length; i++) {
+          if (tiles[i] === tool_id) {
+            return true;
+          }
+        }
+        return false;
+      }
 
       var itemCollisionTiles = function(x,y){
         var tiles = [];
@@ -255,19 +269,8 @@
       
       var x = 100;
       var y = 100;
-
       var movable = true;
 
-      var inventory = [
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//numbers
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//items
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//armor
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//weapons
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] //abilities
-      ];
-      var inventoryPage = 1; //items
-      var inventoryHovered = 0;
-      var inventorySelected = 0;
 
       var keys = [];
       keyPressed = function() {
@@ -286,6 +289,27 @@
       var cameraZoom = 1;
       
       var inventoryOpen = false;
+      var inventoryHovered = 0;
+      var inventorySelected = 0;
+      var inventoryPageIndex = 1;
+      var inventoryPage = inventory.items;
+
+      var numberColors = [color(100,255,100),color(255,0,0)];
+      var numberImage = function(num,x,y){
+        fill(numberColors[num]);
+        rect(x,y,40,40);
+        fill(255);  
+        textSize(32);
+        text(num,x+20,y+32);
+        textSize(12);
+        ellipse(x+4,y+4,3,3);
+        ellipse(x+36,y+4,3,3);
+        ellipse(x+4,y+36,3,3);
+        ellipse(x+36,y+36,3,3);
+      }
+
+      var numeratorOpen = false;    
+      var numeratorOutputHovered = false;  
 
       var sunAngle = 1;
 
@@ -402,6 +426,11 @@
 
                 popMatrix();
               break;
+              case 4:
+                fill(50, 205, 50);
+                rect(j * 40, i * 40, 40, 40);
+                image(numeratorImage,j*40+20,i*40+20);
+              break;
             }
           }
         }
@@ -422,6 +451,7 @@
         //Draw tutorial screen
         if(currentTutorialScreen != null) {
           fill(0, 0, 0, 150);
+          popMatrix();
           pushMatrix();
           translate(0,height*3/4);
           rect(0, 0, width, height/4);
@@ -431,10 +461,12 @@
           textSize(20);
           text(currentTutorialScreen.text, 350, 100);
           popMatrix();
+          pushMatrix();
+          translate(-cameraX+width/2, -cameraY+height/2);
         }
 
         //Camera movement
-        if (mouseIsPressed && mouseButton == LEFT) {
+        if (mouseIsPressed && mouseButton == LEFT && movable) {
           var deltaX = mouseX - startMouseX;
           var deltaY = mouseY - startMouseY;
           if(width < levelMap[0].length * 40) {
@@ -456,25 +488,25 @@
         
         //movement
         if (movable) {
-          if(keys[LEFT] && !hasCollision(x-3, y)) {
+          if((keys[LEFT] || keys[65]) && !hasCollision(x-3, y)) {
             x -= 4
             if(currentTutorialScreen == movement_tut){
               hideTutorialScreen(movement_tut);
             }
           }
-          if(keys[RIGHT] && !hasCollision(x+3, y)) {
+          if((keys[RIGHT] || keys[68]) && !hasCollision(x+3, y)) {
             x += 4
             if(currentTutorialScreen == movement_tut){
               hideTutorialScreen(movement_tut);
             }
           }
-          if(keys[UP] && !hasCollision(x, y-3)) {
+          if((keys[UP] || keys[87]) && !hasCollision(x, y-3)) {
             y -= 4
             if(currentTutorialScreen == movement_tut){
               hideTutorialScreen(movement_tut);
             }
           }
-          if(keys[DOWN] && !hasCollision(x, y+3)) {
+          if((keys[DOWN] || keys[83]) && !hasCollision(x, y+3)) {
             y += 4
             if(currentTutorialScreen == movement_tut){
               hideTutorialScreen(movement_tut);
@@ -483,21 +515,20 @@
         }
 
         //pick up items
-        if(topCollisionItem(x,y) != 0){
+        fill(255,0,0,100);  
+        rect(topCollisionItemX*40,topCollisionItemY*40,40,40);
+        if(topCollisionItem(x,y) != 0){          
           fill(255);
           rect(x-22, y+16, 44, 12, 6);  
           fill(0,0,0,255);
           textSize(10);
           text("PICK UP", x, y+26);  
           textSize(12);
-          if(keys[32]){
+          if(keys[32] && movable){
             hideTutorialScreen(pickup_tut);
             showTutorialScreen(inventory_tut);
             var item = topCollisionItem(x,y);
-            itemMap[topCollisionItemY(x,y)][topCollisionItemX(x,y)] = 0;
-            for(var i = 0; i < 40; i++){
-              if(inventory[item.page][i] == 0){
-                inventory[item.page][i] = item;
+
                 break;
               }
             }
@@ -505,34 +536,29 @@
           showTutorialScreen(pickup_tut);
         }
 
-        //Inventory
-        if(keys[81]) {
-          if(openUI == null) {
-            openUI = inv;
-          } else {
-            openUI = null;
+        //Use Tools
+
+        //Numerator
+        if(hasToolCollision(4,x,y)){
+          fill(255);
+          rect(x-15, y+16, 30, 12, 6);  
+          fill(0,0,0,255);
+          textSize(10);
+          text("USE", x, y+26);  
+          textSize(12);
+          if(keys[32] && movable){
+            hideTutorialScreen(gathering_tut);
+            showTutorialScreen(numerating_tut);
+            numeratorOpen = true;
+            movable = false;
+            keys[32] = false;
           }
-          hideTutorialScreen(inventory_tut);
-          keys[81] = false; // Reset the key state to prevent toggling every frame
-          movable = !movable; // Toggle movement
         }
+
+
+          hideTutorialScreen(inventory_tut);
+          movable = !movable; // Toggle movement when inventory is opened
+          keys[81] = false; // Reset the key state to prevent toggling every frame
+
 
         //UI
-
-        if(openUI != null) {
-          openUI.program();
-        }
-
-
-        popMatrix();
-      };
-
-
-    }};
-
-  // Get the canvas that ProcessingJS will use
-  var canvas = document.getElementById("mycanvas"); 
-  // Pass the function to ProcessingJS constructor
-  var processingInstance = new Processing(canvas, programCode); 
-  </script>
-</html>
