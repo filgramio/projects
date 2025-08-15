@@ -34,36 +34,48 @@
 
       var mapFound = false;
 
+
+      var rainbowT = 0;
+
+      var rainbow = function() {
+        var r = Math.floor(rainbowT);
+        var g = Math.floor(rainbowT + 128);
+        var b = Math.floor(rainbowT + 64);
+
+        rainbowT = (rainbowT + 8) % 255;
+        return color(r%255, g%255, b%255);
+      };
+
       var tutorialLevelMap = {tileMap:[
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
-        "$XXXXX.................................$",
-        "$X...X.................................$",
-        "$X...XXXXXXXXXXX.......................$",
-        "$X.............X.......................$",
-        "$X.............X.......................$",
-        "$..............XXXXXX..................$",
-        "$......................................$",
-        "$....XXX...............................$",
-        "$....XXX...............................$",
-        "$....XXX.......i.......................$",
-        "$....XXX...............................$",
-        "$XXXXXXXXXXX...........................$",
+        "$XXXXXXXXXXXXXXXXXXXXXXXXX%.~~~~~......@",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...................X~.~~~~~~~~~~.....$",
+        "$XXXXXXX.............X~~~~.~~~.~~X%%%%%$",
+        "$XXXXXXX.............X~~~~~~~~~~~X~~~~~$",
+        "$XXXXXXX.......i.....X~.~~~.~~~~~X~~~~~$",
+        "$XXXXXXX.............X~~~~~.~~.~~X~~~~~$",
+        "$XXXXXXXXXXX.........XXXXXXXXXXXXX~~~~~$",
         "$X1....................................$",
         "$X.....................................$",
         "$X.....................................$",
-        "$X....X................................$",
-        "$XX%XXX................................$",
-        "$.....X................................$",
-        "$.....X................................$",
-        "$.....X................................$",
-        "$.....X................................$",
-        "$.....X................................$",
-        "$.....X................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
+        "$X....XXXXXXXXXXXXXXXX.................$",
+        "$XX.XXX...X.~~~~~~~~~~.................$",
+        "$XX.XXX~~~X............................$",
+        "$XX%XXX.~~~............................$",
+        "$.....X~~~X............................$",
+        "$.....X~~~XXXXXXXXXXXX.................$",
+        "$%%%%%X...~~~~~~~~~~~~.................$",
+        "$%%%%%X...~~~~~~~~~~~~....2............$",
+        "$%%%%%X...~~~~~~~~~~~..................$",
+        "$%%%%%XXXXXXXXXXXXXXXXXXXXXXX..........$",
+        "$%%%%%X.....%....X....X................$",
+        "$%%%%%%.....X....X....%................$",
+        "$%%%%%X.....X....%....X................$",
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
         perpetualFunction:function(){
           if(keys[73] && isTouching("i")){
@@ -73,6 +85,12 @@
               quests.push({title:"Explore",description:"Explore and find interesting blocks.",completed:false,seen:false,checkCompletion:function(){}});
               questAdded1 = true;
             }
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
           }
         },
         colorCoding:function(tile){
@@ -87,7 +105,13 @@
               return color(0, 255, 255);
             case "%":
               return color(139,69,19);
+            case "~":
+              return color(255, 120, 0);
+            case "@":
+              return rainbow(); // Green for player start
             case "1":
+              return color(100,0,255);
+            case "2":
               return color(100,0,255);
             default:
               return color(255, 255, 255); // White for unknown tiles
@@ -97,11 +121,85 @@
         startY:3,
       };
 
-      var levelMaps = [tutorialLevelMap];
+      var secondLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$XXXXXXXXXXXXXXXXXXXXXXXXX%.~~~~~......@",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...................X~.~~~~~~~~~~.....$",
+        "$XXXXXXX.............X~~~~.~~~.~~X%%%%%$",
+        "$XXXXXXX.............X~~~~~~~~~~~X~~~~~$",
+        "$XXXXXXX.......i.....X~.~~~.~~~~~X~~~~~$",
+        "$XXXXXXX.............X~~~~~.~~.~~X~~~~~$",
+        "$XXXXXXXXXXX.........XXXXXXXXXXXXX~~~~~$",
+        "$X1....................................$",
+        "$X.....................................$",
+        "$X.....................................$",
+        "$X....XXXXXXXXXXXXXXXX.................$",
+        "$XX.XXX...X.~~~~~~~~~~.................$",
+        "$XX.XXX~~~X............................$",
+        "$XX%XXX.~~~............................$",
+        "$.....X~~~X............................$",
+        "$.....X~~~XXXXXXXXXXXX.................$",
+        "$%%%%%X...~~~~~~~~~~~~.................$",
+        "$%%%%%X...~~~~~~~~~~~~....2............$",
+        "$%%%%%X...~~~~~~~~~~~..................$",
+        "$%%%%%XXXXXXXXXXXXXXXXXXXXXXX..........$",
+        "$%%%%%X.....%....X....X................$",
+        "$%%%%%%.....X....X....%................$",
+        "$%%%%%X.....X....%....X................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "Congratulations! Explore this area and find the exit to the next area.";
+            UItype = "text";
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        colorCoding:function(tile){
+          switch(tile) {
+            case "$":
+              return color(255, 0, 255); // Green for walls
+            case ".":
+              return color(255, 255, 255); // Gray for empty spaces
+            case "X":
+              return color(155, 155, 155);
+            case "i":
+              return color(0, 255, 255);
+            case "%":
+              return color(139,69,19);
+            case "~":
+              return color(255, 120, 0);
+            case "@":
+              return rainbow(); // Green for player start
+            case "1":
+              return color(100,0,255);
+            case "2":
+              return color(100,0,255);
+            default:
+              return color(255, 255, 255); // White for unknown tiles
+          }
+        },
+        startX:3,
+        startY:3,
+      };
+
+      var levelMaps = [tutorialLevelMap,secondLevelMap];
       var levelMapIndex = 0;
       var levelMap = levelMaps[levelMapIndex];
 
-      var questAdded1 = false;
+      var tips = [
+        "Use the arrow keys to move around.",
+        "Inteact with blocks by pressing the corresponding key.",
+      ];
 
       var UIgrid = [
         "          ",
@@ -115,7 +213,7 @@
         "          ",
         "          "];
 
-      var UItext = "Use arrow keys to move\n\nPress the Q key to display QUESTS\n\n(SPACE to close)";
+      var UItext = "Use arrow keys to move\n\nPress the Q key to show some tips\n\n(SPACE to close)";
 
       var UItype = "text"; // "text" or "grid"
 
@@ -131,8 +229,14 @@
             return true;
           case "1":
             return true;
+          case "2":
+            return true;
           case "%":
             return true;
+          case "~":
+            return true;
+          case "@":
+            return false;
           default:
             return true; // Default to not solid for unknown tiles
         }
@@ -151,27 +255,50 @@
         return false;
       };
 
-      var quests = [
-        {title: "ESCAPE!",
-        description: "Escape from here.",
-        completed: false,
-        seen: false,
-        checkCompletion: function(){}},
-        {title: "Find more info",
-        description: "find an information block and press I.",
-        completed: false,
-        seen: false,
-        checkCompletion: function(){if(keys[73] && isTouching("i")){this.completed = true;this.seen = true;}}}];
-
-      var sortQuests = function(){
-        //idk yet
-      };
-
       var spellsLearned = [null,false,false,false,false,false,false,false,false,false];
+      var spellHitBlock = function(tile){}
       var spellActive = 0;
+      var spellCasted = 0;
       var spellX = 0;
       var spellY = 0;
       var spellMovement = 0;
+      var cast = function(direction){
+        if(spellActive > 0 && spellsLearned[spellActive]){
+          spellCasted = spellActive;
+          spellActive = 0;
+          spellMovement = direction;
+          spellX = playerX;
+          spellY = playerY;
+        }
+      }
+    
+      var BulletBreakable = function(tile){
+        switch(tile) {
+          case "%":
+            return true; // Breakable block
+          default:
+            return false; // Default to not breakable for unknown tiles
+        }
+      };
+      var BulletPassable = function(tile){
+        switch(tile) {
+          case "~":
+            return true; // Passable block
+          case ".":
+            return true; // Empty spaces are passable
+          default:
+            return false; // Default to not passable for unknown tiles
+        }
+      };
+      var HoverPassable = function(tile){
+        switch(tile) {
+          case "~":
+            return true; // Passable block
+          default:
+            return false; // Default to not passable for unknown tiles
+        }
+      };
+
 
       var cameraCornerX = 0;
       var cameraCornerY = 0;
@@ -194,8 +321,7 @@
 
         pushMatrix();
         translate(-cameraCornerX*30, -cameraCornerY*30);
-
-        levelMap = levelMaps[levelMapIndex];
+        
         textSize(30);
         for (var y = 0; y < levelMap.tileMap.length; y++) {
           for (var x = 0; x < levelMap.tileMap[y].length; x++) {
@@ -203,7 +329,7 @@
                y >= cameraCornerY && y < cameraCornerY + 20) {
               var tile = levelMap.tileMap[y][x];
               fill(levelMap.colorCoding(tile));
-              if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellActive !== 0)) {
+              if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellCasted > 0)){
                 text(tile, x * 30, y * 30);
               }else if(playerX == x && playerY == y){
                 fill(0,255,0);
@@ -213,8 +339,8 @@
                   text("#", x * 30, y * 30);
                 }
               }else{
-                fill(levelMap.colorCoding(spellActive));
-                text(spellActive, x * 30, y * 30);
+                fill(255,0,255);
+                text(spellCasted, x * 30, y * 30);
               }
             }
           }
@@ -229,27 +355,33 @@
         // Player movement
 
         if(moveDelay == 0 && UItype == "none"){
-          if (keys[LEFT] && playerX > 0 && !isSolid(levelMap.tileMap[playerY][playerX - 1])) {
-            playerX--;
-            moveDelay = 3;
-            switch(spellActive) {
-              case 1:
-                
-              break;
-              // Add cases for other spells if needed
+          if (keys[LEFT] && playerX > 0) {            
+            cast(LEFT);
+            if(!isSolid(levelMap.tileMap[playerY][playerX - 1])){
+              playerX--;
+              moveDelay = 3;
             }
           }
-          if (keys[RIGHT] && playerX < levelMap.tileMap[0].length - 1 && !isSolid(levelMap.tileMap[playerY][playerX + 1])) {
-            playerX++;            
-            moveDelay = 3;
+          if (keys[RIGHT] && playerX < levelMap.tileMap[0].length - 1) {
+            cast(RIGHT);
+            if(!isSolid(levelMap.tileMap[playerY][playerX + 1])){
+              playerX++;
+              moveDelay = 3;
+            }
           }
-          if (keys[UP] && playerY > 0 && !isSolid(levelMap.tileMap[playerY - 1][playerX])) {
-            playerY--;            
-            moveDelay = 3;
+          if (keys[UP] && playerY > 0) {
+            cast(UP);
+            if(!isSolid(levelMap.tileMap[playerY - 1][playerX])){
+              playerY--;
+              moveDelay = 3;
+            }
           }
-          if (keys[DOWN] && playerY < levelMap.tileMap.length - 1 && !isSolid(levelMap.tileMap[playerY + 1][playerX])) {
-            playerY++;
-            moveDelay = 3;
+          if (keys[DOWN] && playerY < levelMap.tileMap.length - 1) {
+            cast(DOWN);
+            if(!isSolid(levelMap.tileMap[playerY + 1][playerX])){
+              playerY++;
+              moveDelay = 3;
+            }
           }
         }else if(moveDelay > 0){
           moveDelay--;
@@ -286,28 +418,11 @@
                 text(UIgrid[i][j], 300 - 180 + j * 30, 300 - UIheight*15 + i * 30);
               }
             }
-          }else if(UItype == "quests"){
-            for(var i = 0; i < quests.length; i++){
-              var quest = quests[i];
+          }else if(UItype == "tips"){
+            for(var i = 0; i < tips.length; i++){
+              var tip = tips[i];
               textSize(30);
-              if(!quest.seen){
-                fill(255,255,0);
-                text("!", 330 - 180 + 10, 330 - UIheight*15 + i * 90);
-              }
-              fill(quest.completed ? color(200) : color(255));
-              text(quest.title, 330 - 180 + 30, 330 - UIheight*15 + i * 90);
-              textSize(20);
-              text(quest.description, 330 - 180 + 30, 360 - UIheight*15 + i * 90,270,1000);
-              if(quest.completed){
-                fill(19,136,8);
-                pushMatrix();
-                translate(345 - 180, 330 - UIheight*15 + i * 90);
-                rotate(PI/4);
-                rect(3,0,12,20);
-                fill(0);
-                rect(0,0,10,15);
-                popMatrix();
-              }
+              text(tip, 330 - 180 + 30, 330 - UIheight*15 + i * 90);
             }            
           }
 
@@ -323,24 +438,15 @@
           }
         }
 
-        //Quests
-
+        //Tips
         if(keys[81]){
-          UItype = "quests";
+          UItype = "tips";
         }
 
         //level function
 
         if(levelMap.perpetualFunction){
           levelMap.perpetualFunction();
-        }
-
-        //quests check
-        for(var i = 0; i < quests.length; i++){
-          var quest = quests[i];
-          if(!quest.completed && quest.checkCompletion){
-            quest.checkCompletion();
-          }
         }
 
         // 1 Spell
@@ -358,8 +464,117 @@
           spellsLearned[1] = true;
         }
         
+        // 2 Spell
 
-        //if(){}
+        if(keys[50] && spellsLearned[2]){ // 2 key
+          if(!isTouching("2")){            
+            if(spellActive == 0){
+              spellActive = 2;
+            }
+          }
+        }
+        if(keys[50] && isTouching("2")){ // 2 key
+          UItype = "text";
+          UItext = "You have learned the hover spell!\nPress 2 and move next to lava to hover all the way over!";
+          spellsLearned[2] = true;
+        }
+        
+
+        //spell movement
+
+        //1 spell
+        if(spellCasted == 1){
+          if(spellMovement == LEFT && spellX > 0){
+            if(!BulletPassable(levelMap.tileMap[spellY][spellX - 1])){
+              if(BulletBreakable(levelMap.tileMap[spellY][spellX - 1])){
+                var rowArr = levelMap.tileMap[spellY].split("");
+                rowArr[spellX - 1] = ".";
+                levelMap.tileMap[spellY] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellX--;
+            }
+          }else if(spellMovement == RIGHT && spellX < levelMap.tileMap[0].length - 1){
+            if(!BulletPassable(levelMap.tileMap[spellY][spellX + 1])){
+              if(BulletBreakable(levelMap.tileMap[spellY][spellX + 1])){
+                var rowArr = levelMap.tileMap[spellY].split("");
+                rowArr[spellX + 1] = ".";
+                levelMap.tileMap[spellY] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellX++;
+            }
+          }else if(spellMovement == UP && spellY > 0){
+            if(!BulletPassable(levelMap.tileMap[spellY - 1][spellX])){
+              if(BulletBreakable(levelMap.tileMap[spellY - 1][spellX])){
+                var rowArr = levelMap.tileMap[spellY - 1].split("");
+                rowArr[spellX] = ".";
+                levelMap.tileMap[spellY - 1] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellY--;
+            }
+          }else if(spellMovement == DOWN && spellY < levelMap.tileMap.length - 1){
+            if(!BulletPassable(levelMap.tileMap[spellY + 1][spellX])){
+              if(BulletBreakable(levelMap.tileMap[spellY + 1][spellX])){
+                var rowArr = levelMap.tileMap[spellY + 1].split("");
+                rowArr[spellX] = ".";
+                levelMap.tileMap[spellY + 1] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellY++;
+            }
+          }
+        }
+
+        //2 spell
+        if(spellCasted == 2){
+          if(spellMovement == LEFT && spellX > 0){
+            if(!HoverPassable(levelMap.tileMap[spellY][spellX - 1])){
+              if(!isSolid(levelMap.tileMap[spellY][spellX-1])){
+                playerX = spellX - 1;
+                playerY = spellY;
+              }
+              spellCasted = 0;
+            }else{
+              spellX--;
+            }
+          }else if(spellMovement == RIGHT && spellX < levelMap.tileMap[0].length - 1){
+            if(!HoverPassable(levelMap.tileMap[spellY][spellX + 1])){
+              if(!isSolid(levelMap.tileMap[spellY][spellX+1])){
+                playerX = spellX + 1;
+                playerY = spellY;
+              }
+              spellCasted = 0;
+            }else{
+              spellX++;
+            }
+          }else if(spellMovement == UP && spellY > 0){
+            if(!HoverPassable(levelMap.tileMap[spellY - 1][spellX])){
+              if(!isSolid(levelMap.tileMap[spellY-1][spellX])){
+                playerX = spellX;
+                playerY = spellY - 1;
+              }
+              spellCasted = 0;
+            }else{
+              spellY--;
+            }
+          }else if(spellMovement == DOWN && spellY < levelMap.tileMap.length - 1){
+            if(!HoverPassable(levelMap.tileMap[spellY + 1][spellX])){
+              if(!isSolid(levelMap.tileMap[spellY+1][spellX])){
+                playerX = spellX;
+                playerY = spellY + 1;
+              }
+              spellCasted = 0;
+            }else{
+              spellY++;
+            }
+          }
+        }
 
         popMatrix();
 
