@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Minimal Web Page</title>
+    <title>1-Bit Escape</title>
 </head>
   <body>
 	<!--This draws the canvas on the webpage -->
@@ -44,7 +44,9 @@
 
         rainbowT = (rainbowT + 8) % 255;
         return color(r%255, g%255, b%255);
-      };
+      };      
+      
+      var buttonPressed = false;
 
       var tutorialLevelMap = {tileMap:[
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
@@ -81,10 +83,6 @@
           if(keys[73] && isTouching("i")){
             UItext = "You will have to walk around and find more stuff and try to reach exit.";
             UItype = "text";
-            if(!questAdded1){
-              quests.push({title:"Explore",description:"Explore and find interesting blocks.",completed:false,seen:false,checkCompletion:function(){}});
-              questAdded1 = true;
-            }
           }
           if(levelMap.tileMap[playerY][playerX] == "@"){
             levelMapIndex++;
@@ -123,39 +121,55 @@
 
       var secondLevelMap = {tileMap:[
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
-        "$XXXXXXXXXXXXXXXXXXXXXXXXX%.~~~~~......@",
-        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
-        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
-        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
-        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
-        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
-        "$X...................X~.~~~~~~~~~~.....$",
-        "$XXXXXXX.............X~~~~.~~~.~~X%%%%%$",
-        "$XXXXXXX.............X~~~~~~~~~~~X~~~~~$",
-        "$XXXXXXX.......i.....X~.~~~.~~~~~X~~~~~$",
-        "$XXXXXXX.............X~~~~~.~~.~~X~~~~~$",
-        "$XXXXXXXXXXX.........XXXXXXXXXXXXX~~~~~$",
-        "$X1....................................$",
-        "$X.....................................$",
-        "$X.....................................$",
-        "$X....XXXXXXXXXXXXXXXX.................$",
-        "$XX.XXX...X.~~~~~~~~~~.................$",
-        "$XX.XXX~~~X............................$",
-        "$XX%XXX.~~~............................$",
-        "$.....X~~~X............................$",
-        "$.....X~~~XXXXXXXXXXXX.................$",
-        "$%%%%%X...~~~~~~~~~~~~.................$",
-        "$%%%%%X...~~~~~~~~~~~~....2............$",
-        "$%%%%%X...~~~~~~~~~~~..................$",
-        "$%%%%%XXXXXXXXXXXXXXXXXXXXXXX..........$",
-        "$%%%%%X.....%....X....X................$",
-        "$%%%%%%.....X....X....%................$",
-        "$%%%%%X.....X....%....X................$",
+        "$12..i.......rXX.......................$",
+        "$.............XX.......................$",
+        "$.............XX.......................$",
+        "$XXXXXXXXXRRRXXX.......................$",
+        "$X.......*....XX.......................$",
+        "$X.......*....rX.......................$",
+        "$X.......*....XX.......................$",
+        "$X.......XXXXXXX.......................$",
+        "$X.............R.......................$",
+        "$X.............R.......................$",
+        "$X.............R.......................$",
+        "$XXX***XXXXX***X.......................$",
+        "$......XXXXX...X.......................$",
+        "$......rXXXXXrXX.......................$",
+        "$......XXXXXXXXX.......................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$RRRXXXXXXXXXXXXXXX.....X..............$",
+        "$.......................X..............$",
+        "$.....................3.X..............$",
+        "$.......................X..............$",
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
         perpetualFunction:function(){
           if(keys[73] && isTouching("i")){
             UItext = "Congratulations! Explore this area and find the exit to the next area.";
             UItype = "text";
+          }
+          if(keys[82] && isTouching("r") && !buttonPressed){ // R key
+            for(var i = 0; i < levelMap.tileMap.length; i++){
+              var rowArr = levelMap.tileMap[i].split("");
+              for(var j = 0; j < rowArr.length; j++){
+                if(rowArr[j] == "R"){
+                  rowArr[j] = "*";
+                }else if(rowArr[j] == "*"){
+                  rowArr[j] = "R";
+                }
+              }
+              levelMap.tileMap[i] = rowArr.join("");
+            }            
+            buttonPressed = true;
+          }else if(!(keys[82] && isTouching("r"))){
+            buttonPressed = false;
           }
           if(levelMap.tileMap[playerY][playerX] == "@"){
             levelMapIndex++;
@@ -164,7 +178,15 @@
             playerY = levelMap.startY;
           }
         },
-        colorCoding:function(tile){
+        startX:3,
+        startY:3,
+      };
+
+      var levelMaps = [tutorialLevelMap,secondLevelMap];
+      var levelMapIndex = 1;
+      var levelMap = levelMaps[levelMapIndex];
+
+      var colorCoding = function(tile){
           switch(tile) {
             case "$":
               return color(255, 0, 255); // Green for walls
@@ -180,25 +202,26 @@
               return color(255, 120, 0);
             case "@":
               return rainbow(); // Green for player start
+            case "r":
+              return color(255, 0, 0);
+            case "R":
+              return color(255, 0, 0);
+            case "*":
+              return color(255, 0, 0);
             case "1":
               return color(100,0,255);
             case "2":
               return color(100,0,255);
+            case "3":
+              return color(100,0,255);
             default:
               return color(255, 255, 255); // White for unknown tiles
           }
-        },
-        startX:3,
-        startY:3,
-      };
-
-      var levelMaps = [tutorialLevelMap,secondLevelMap];
-      var levelMapIndex = 0;
-      var levelMap = levelMaps[levelMapIndex];
+        }
 
       var tips = [
-        "Use the arrow keys to move around.",
-        "Inteact with blocks by pressing the corresponding key.",
+        "Use the arrow keys to move.",
+        "Interact with blocks by pressing the corresponding key.",
       ];
 
       var UIgrid = [
@@ -236,6 +259,8 @@
           case "~":
             return true;
           case "@":
+            return false;
+          case "*":
             return false;
           default:
             return true; // Default to not solid for unknown tiles
@@ -328,7 +353,7 @@
             if(x >= cameraCornerX && x < cameraCornerX + 20 &&
                y >= cameraCornerY && y < cameraCornerY + 20) {
               var tile = levelMap.tileMap[y][x];
-              fill(levelMap.colorCoding(tile));
+              fill(colorCoding(tile));
               if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellCasted > 0)){
                 text(tile, x * 30, y * 30);
               }else if(playerX == x && playerY == y){
@@ -421,8 +446,8 @@
           }else if(UItype == "tips"){
             for(var i = 0; i < tips.length; i++){
               var tip = tips[i];
-              textSize(30);
-              text(tip, 330 - 180 + 30, 330 - UIheight*15 + i * 90);
+              textSize(20);
+              text(tip, 330 - 180, 330 - UIheight*15 + i * 60,300,100);
             }            
           }
 
@@ -461,6 +486,9 @@
         if(keys[49] && isTouching("1")){ // 1 key
           UItype = "text";
           UItext = "You have learned the bullet spell!\nPress 1 and move to shoot a bullet!\nYou can use it to destroy the block";
+          if(!spellsLearned[1]){
+            tips.push("1 and move to shoot a bullet.");
+          }  
           spellsLearned[1] = true;
         }
         
@@ -476,7 +504,35 @@
         if(keys[50] && isTouching("2")){ // 2 key
           UItype = "text";
           UItext = "You have learned the hover spell!\nPress 2 and move next to lava to hover all the way over!";
+          if(!spellsLearned[2]){
+            tips.push("2 and move next to lava to hover over.");
+          }
           spellsLearned[2] = true;
+        }
+
+        // 3 Spell
+
+        if(keys[51] && spellsLearned[3]){ // 3 key
+          if(!isTouching("3")){            
+            if(spellActive == 0){
+              spellActive = 3;
+            }
+            if(spellCasted == 3){
+              spellCasted = 0;
+              spellActive = 0;
+              playerX = spellX;
+              playerY = spellY;
+              keys[51] = false;
+            }
+          }
+        }
+        if(keys[51] && isTouching("3")){ // 3 key
+          UItype = "text";
+          UItext = "You have learned the hover spell!\nPress 3 to save your position and then press 3 agian to teleport to it!";
+          if(!spellsLearned[3]){
+            tips.push("3 to save your position/telport to saved position.");
+          }
+          spellsLearned[3] = true;
         }
         
 
