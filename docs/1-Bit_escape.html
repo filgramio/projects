@@ -246,7 +246,7 @@
       };
 
       var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap];
-      var levelMapIndex = 2;
+      var levelMapIndex = 0;
       var levelMap = levelMaps[levelMapIndex];
 
       var colorCoding = function(tile){
@@ -365,7 +365,7 @@
         return false;
       };
 
-      var devMode = true;
+      var devMode = false;
       var spellsLearned = [null,false,false,false,false,false,false,false,false,false];
       if(devMode){
         spellsLearned[1] = true; // Bullet spell
