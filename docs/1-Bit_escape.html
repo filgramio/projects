@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>1-Bit Escape</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var keys = [];
+      keyPressed = function(){
+        keys[keyCode] = true;
+      }
+      keyReleased = function(){
+        keys[keyCode] = false;
+      }
+
+      var mapFound = false;
+
+
+      var rainbowT = 0;
+
+      var rainbow = function() {
+        var r = Math.floor(rainbowT);
+        var g = Math.floor(rainbowT + 128);
+        var b = Math.floor(rainbowT + 64);
+
+        rainbowT = (rainbowT + 8) % 255;
+        return color(r%255, g%255, b%255);
+      };      
+      
+      var buttonPressed = false;
+
+      var tutorialLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$XXXXXXXXXXXXXXXXXXXXXXXXX%.~~~~~......@",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...XXXXXXXXXXXXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X.............XXXXXXXXXXX%XXXXXXXXXXXX$",
+        "$X...................X~.~~~~~~~~~~.....$",
+        "$XXXXXXX.............X~~~~.~~~.~~X%%%%%$",
+        "$XXXXXXX.............X~~~~~~~~~~~X~~~~~$",
+        "$XXXXXXX.......i.....X~.~~~.~~~~~X~~~~~$",
+        "$XXXXXXX.............X~~~~~.~~.~~X~~~~~$",
+        "$XXXXXXXXXXX.........XXXXXXXXXXXXX~~~~~$",
+        "$X1....................................$",
+        "$X.....................................$",
+        "$X.....................................$",
+        "$X....XXXXXXXXXXXXXXXX.................$",
+        "$XX.XXX...X.~~~~~~~~~~.................$",
+        "$XX.XXX~~~X............................$",
+        "$XX%XXX.~~~............................$",
+        "$.....X~~~X............................$",
+        "$.....X~~~XXXXXXXXXXXX.................$",
+        "$%%%%%X...~~~~~~~~~~~~.................$",
+        "$%%%%%X...~~~~~~~~~~~~....2............$",
+        "$%%%%%X...~~~~~~~~~~~..................$",
+        "$%%%%%XXXXXXXXXXXXXXXXXXXXXXX..........$",
+        "$%%%%%X.....%....X....X................$",
+        "$%%%%%%.....X....X....%................$",
+        "$%%%%%X.....X....%....X................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "You will have to walk around and find more stuff and try to reach exit.";
+            UItype = "text";
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        colorCoding:function(tile){
+          switch(tile) {
+            case "$":
+              return color(255, 0, 255); // Green for walls
+            case ".":
+              return color(255, 255, 255); // Gray for empty spaces
+            case "X":
+              return color(155, 155, 155);
+            case "i":
+              return color(0, 255, 255);
+            case "%":
+              return color(139,69,19);
+            case "~":
+              return color(255, 120, 0);
+            case "@":
+              return rainbow(); // Green for player start
+            case "1":
+              return color(100,0,255);
+            case "2":
+              return color(100,0,255);
+            default:
+              return color(255, 255, 255); // White for unknown tiles
+          }
+        },
+        startX:3,
+        startY:3,
+      };
+
+      var secondLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$12..i.......rXX.......................$",
+        "$.............XX.......................$",
+        "$.............XX.......................$",
+        "$XXXXXXXXXRRRXXX.......................$",
+        "$X.......*....XX.......................$",
+        "$X.......*....rX.......................$",
+        "$X.......*....XX.......................$",
+        "$X.......XXXXXXX.......................$",
+        "$X.............R.......................$",
+        "$X.............R.......................$",
+        "$X.............R.......................$",
+        "$XXX***XXXXX***X.......................$",
+        "$......XXXXX...X.......................$",
+        "$......rXXXXXrXX.......................$",
+        "$......XXXXXXXXX.......................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$~~~X..X...............................$",
+        "$RRRXXXXXXXXXXXXXXX.....X..............$",
+        "$.......................X..............$",
+        "$.....................3.X..............$",
+        "$.......................X..............$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "Congratulations! Explore this area and find the exit to the next area.";
+            UItype = "text";
+          }
+          if(keys[82] && isTouching("r") && !buttonPressed){ // R key
+            for(var i = 0; i < levelMap.tileMap.length; i++){
+              var rowArr = levelMap.tileMap[i].split("");
+              for(var j = 0; j < rowArr.length; j++){
+                if(rowArr[j] == "R"){
+                  rowArr[j] = "*";
+                }else if(rowArr[j] == "*"){
+                  rowArr[j] = "R";
+                }
+              }
+              levelMap.tileMap[i] = rowArr.join("");
+            }            
+            buttonPressed = true;
+          }else if(!(keys[82] && isTouching("r"))){
+            buttonPressed = false;
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        startX:3,
+        startY:3,
+      };
+
+      var levelMaps = [tutorialLevelMap,secondLevelMap];
+      var levelMapIndex = 1;
+      var levelMap = levelMaps[levelMapIndex];
+
+      var colorCoding = function(tile){
+          switch(tile) {
+            case "$":
+              return color(255, 0, 255); // Green for walls
+            case ".":
+              return color(255, 255, 255); // Gray for empty spaces
+            case "X":
+              return color(155, 155, 155);
+            case "i":
+              return color(0, 255, 255);
+            case "%":
+              return color(139,69,19);
+            case "~":
+              return color(255, 120, 0);
+            case "@":
+              return rainbow(); // Green for player start
+            case "r":
+              return color(255, 0, 0);
+            case "R":
+              return color(255, 0, 0);
+            case "*":
+              return color(255, 0, 0);
+            case "1":
+              return color(100,0,255);
+            case "2":
+              return color(100,0,255);
+            case "3":
+              return color(100,0,255);
+            default:
+              return color(255, 255, 255); // White for unknown tiles
+          }
+        }
+
+      var tips = [
+        "Use the arrow keys to move.",
+        "Interact with blocks by pressing the corresponding key.",
+      ];
+
+      var UIgrid = [
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          "];
+
+      var UItext = "Use arrow keys to move\n\nPress the Q key to show some tips\n\n(SPACE to close)";
+
+      var UItype = "text"; // "text" or "grid"
+
+      var isSolid = function(tile) {
+        switch(tile) {
+          case "$":
+            return true; // Wall tiles are solid
+          case ".":
+            return false; // Empty spaces are not solid
+          case "X":
+            return true;
+          case "i":
+            return true;
+          case "1":
+            return true;
+          case "2":
+            return true;
+          case "%":
+            return true;
+          case "~":
+            return true;
+          case "@":
+            return false;
+          case "*":
+            return false;
+          default:
+            return true; // Default to not solid for unknown tiles
+        }
+      };
+
+      var isTouching = function(tile) {
+        for(var i = 0; i < 4; i++){
+          var x = playerX + (i == 1 ? 1 : (i == 3 ? -1 : 0));
+          var y = playerY + (i == 0 ? -1 : (i == 2 ? 1 : 0));
+          if(x >= 0 && x < levelMap.tileMap[0].length && y >= 0 && y < levelMap.tileMap.length){
+            if(levelMap.tileMap[y][x] == tile){
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      var spellsLearned = [null,false,false,false,false,false,false,false,false,false];
+      var spellHitBlock = function(tile){}
+      var spellActive = 0;
+      var spellCasted = 0;
+      var spellX = 0;
+      var spellY = 0;
+      var spellMovement = 0;
+      var cast = function(direction){
+        if(spellActive > 0 && spellsLearned[spellActive]){
+          spellCasted = spellActive;
+          spellActive = 0;
+          spellMovement = direction;
+          spellX = playerX;
+          spellY = playerY;
+        }
+      }
+    
+      var BulletBreakable = function(tile){
+        switch(tile) {
+          case "%":
+            return true; // Breakable block
+          default:
+            return false; // Default to not breakable for unknown tiles
+        }
+      };
+      var BulletPassable = function(tile){
+        switch(tile) {
+          case "~":
+            return true; // Passable block
+          case ".":
+            return true; // Empty spaces are passable
+          default:
+            return false; // Default to not passable for unknown tiles
+        }
+      };
+      var HoverPassable = function(tile){
+        switch(tile) {
+          case "~":
+            return true; // Passable block
+          default:
+            return false; // Default to not passable for unknown tiles
+        }
+      };
+
+
+      var cameraCornerX = 0;
+      var cameraCornerY = 0;
+
+      var playerX = 3;
+      var playerY = 3;
+
+      var moveDelay = 0;
+
+      textFont(createFont("monospace", 16));
+      textAlign(LEFT, TOP);
+
+      draw = function() {
+        background(0);
+
+        pushMatrix();
+        translate(width/2-300, height/2-300);
+
+        // Draw the level map
+
+        pushMatrix();
+        translate(-cameraCornerX*30, -cameraCornerY*30);
+        
+        textSize(30);
+        for (var y = 0; y < levelMap.tileMap.length; y++) {
+          for (var x = 0; x < levelMap.tileMap[y].length; x++) {
+            if(x >= cameraCornerX && x < cameraCornerX + 20 &&
+               y >= cameraCornerY && y < cameraCornerY + 20) {
+              var tile = levelMap.tileMap[y][x];
+              fill(colorCoding(tile));
+              if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellCasted > 0)){
+                text(tile, x * 30, y * 30);
+              }else if(playerX == x && playerY == y){
+                fill(0,255,0);
+                if(spellActive > 0 && spellsLearned[spellActive]){
+                  text(spellActive, x * 30, y * 30);
+                }else{
+                  text("#", x * 30, y * 30);
+                }
+              }else{
+                fill(255,0,255);
+                text(spellCasted, x * 30, y * 30);
+              }
+            }
+          }
+        }
+        popMatrix();
+
+
+        //camera movement
+        cameraCornerX = constrain(playerX - 10,0,levelMap.tileMap[0].length - 20);
+        cameraCornerY = constrain(playerY - 10,0,levelMap.tileMap.length - 20);
+
+        // Player movement
+
+        if(moveDelay == 0 && UItype == "none"){
+          if (keys[LEFT] && playerX > 0) {            
+            cast(LEFT);
+            if(!isSolid(levelMap.tileMap[playerY][playerX - 1])){
+              playerX--;
+              moveDelay = 3;
+            }
+          }
+          if (keys[RIGHT] && playerX < levelMap.tileMap[0].length - 1) {
+            cast(RIGHT);
+            if(!isSolid(levelMap.tileMap[playerY][playerX + 1])){
+              playerX++;
+              moveDelay = 3;
+            }
+          }
+          if (keys[UP] && playerY > 0) {
+            cast(UP);
+            if(!isSolid(levelMap.tileMap[playerY - 1][playerX])){
+              playerY--;
+              moveDelay = 3;
+            }
+          }
+          if (keys[DOWN] && playerY < levelMap.tileMap.length - 1) {
+            cast(DOWN);
+            if(!isSolid(levelMap.tileMap[playerY + 1][playerX])){
+              playerY++;
+              moveDelay = 3;
+            }
+          }
+        }else if(moveDelay > 0){
+          moveDelay--;
+        }
+
+        // UI text
+
+        if(UItype != "none"){
+          UIwidth = 12;
+          UIheight = 12;
+          fill(0);
+          rect(300 - 180, 300 - UIheight*15, UIwidth*30, UIheight*30);
+
+          textSize(30);
+          fill(255);  
+          for (var i = 0; i < UIheight; i++) {
+            if(i > 0 && i < UIheight - 1){              
+              text("|", 300 - 180, 300 - UIheight*15 + i * 30);
+              text("|", 270 + 180, 300 - UIheight*15 + i * 30);
+            }else{
+              text("+", 300 - 180, 300 - UIheight*15 + i * 30);
+              text("+", 270 + 180, 300 - UIheight*15 + i * 30);
+              for(var j = 1; j < UIwidth - 1; j++){
+                text("=", 300 - 180 + j * 30, 300 - UIheight*15 + i * 30);
+              }
+            }
+          }
+
+          if(UItype == "text"){
+            text(UItext, 300 - 180 + 30, 330 - UIheight*15 ,300,300);
+          }else if(UItype == "grid"){
+            for (var i = 0; i < UIgrid.length; i++) {
+              for (var j = 0; j < UIgrid[i].length; j++) {
+                text(UIgrid[i][j], 300 - 180 + j * 30, 300 - UIheight*15 + i * 30);
+              }
+            }
+          }else if(UItype == "tips"){
+            for(var i = 0; i < tips.length; i++){
+              var tip = tips[i];
+              textSize(20);
+              text(tip, 330 - 180, 330 - UIheight*15 + i * 60,300,100);
+            }            
+          }
+
+          if(keys[32]){
+            if(UItype == "quests"){
+              for(var i = 0; i < quests.length; i++){
+                quests[i].seen = true;
+              }
+            }
+            UItype = "none";
+            UItext = "";
+            UIgrid = ["          ","          ","          ","          ","          ","          ","          ","          ","          ","          "];
+          }
+        }
+
+        //Tips
+        if(keys[81]){
+          UItype = "tips";
+        }
+
+        //level function
+
+        if(levelMap.perpetualFunction){
+          levelMap.perpetualFunction();
+        }
+
+        // 1 Spell
+        
+        if(keys[49] && spellsLearned[1]){ // 1 key
+          if(!isTouching("1")){            
+            if(spellActive == 0){
+              spellActive = 1;
+            }
+          }
+        }
+        if(keys[49] && isTouching("1")){ // 1 key
+          UItype = "text";
+          UItext = "You have learned the bullet spell!\nPress 1 and move to shoot a bullet!\nYou can use it to destroy the block";
+          if(!spellsLearned[1]){
+            tips.push("1 and move to shoot a bullet.");
+          }  
+          spellsLearned[1] = true;
+        }
+        
+        // 2 Spell
+
+        if(keys[50] && spellsLearned[2]){ // 2 key
+          if(!isTouching("2")){            
+            if(spellActive == 0){
+              spellActive = 2;
+            }
+          }
+        }
+        if(keys[50] && isTouching("2")){ // 2 key
+          UItype = "text";
+          UItext = "You have learned the hover spell!\nPress 2 and move next to lava to hover all the way over!";
+          if(!spellsLearned[2]){
+            tips.push("2 and move next to lava to hover over.");
+          }
+          spellsLearned[2] = true;
+        }
+
+        // 3 Spell
+
+        if(keys[51] && spellsLearned[3]){ // 3 key
+          if(!isTouching("3")){            
+            if(spellActive == 0){
+              spellActive = 3;
+            }
+            if(spellCasted == 3){
+              spellCasted = 0;
+              spellActive = 0;
+              playerX = spellX;
+              playerY = spellY;
+              keys[51] = false;
+            }
+          }
+        }
+        if(keys[51] && isTouching("3")){ // 3 key
+          UItype = "text";
+          UItext = "You have learned the hover spell!\nPress 3 to save your position and then press 3 agian to teleport to it!";
+          if(!spellsLearned[3]){
+            tips.push("3 to save your position/telport to saved position.");
+          }
+          spellsLearned[3] = true;
+        }
+        
+
+        //spell movement
+
+        //1 spell
+        if(spellCasted == 1){
+          if(spellMovement == LEFT && spellX > 0){
+            if(!BulletPassable(levelMap.tileMap[spellY][spellX - 1])){
+              if(BulletBreakable(levelMap.tileMap[spellY][spellX - 1])){
+                var rowArr = levelMap.tileMap[spellY].split("");
+                rowArr[spellX - 1] = ".";
+                levelMap.tileMap[spellY] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellX--;
+            }
+          }else if(spellMovement == RIGHT && spellX < levelMap.tileMap[0].length - 1){
+            if(!BulletPassable(levelMap.tileMap[spellY][spellX + 1])){
+              if(BulletBreakable(levelMap.tileMap[spellY][spellX + 1])){
+                var rowArr = levelMap.tileMap[spellY].split("");
+                rowArr[spellX + 1] = ".";
+                levelMap.tileMap[spellY] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellX++;
+            }
+          }else if(spellMovement == UP && spellY > 0){
+            if(!BulletPassable(levelMap.tileMap[spellY - 1][spellX])){
+              if(BulletBreakable(levelMap.tileMap[spellY - 1][spellX])){
+                var rowArr = levelMap.tileMap[spellY - 1].split("");
+                rowArr[spellX] = ".";
+                levelMap.tileMap[spellY - 1] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellY--;
+            }
+          }else if(spellMovement == DOWN && spellY < levelMap.tileMap.length - 1){
+            if(!BulletPassable(levelMap.tileMap[spellY + 1][spellX])){
+              if(BulletBreakable(levelMap.tileMap[spellY + 1][spellX])){
+                var rowArr = levelMap.tileMap[spellY + 1].split("");
+                rowArr[spellX] = ".";
+                levelMap.tileMap[spellY + 1] = rowArr.join("");
+              }
+              spellCasted = 0;
+            }else{
+              spellY++;
+            }
+          }
+        }
+
+        //2 spell
+        if(spellCasted == 2){
+          if(spellMovement == LEFT && spellX > 0){
+            if(!HoverPassable(levelMap.tileMap[spellY][spellX - 1])){
+              if(!isSolid(levelMap.tileMap[spellY][spellX-1])){
+                playerX = spellX - 1;
+                playerY = spellY;
+              }
+              spellCasted = 0;
+            }else{
+              spellX--;
+            }
+          }else if(spellMovement == RIGHT && spellX < levelMap.tileMap[0].length - 1){
+            if(!HoverPassable(levelMap.tileMap[spellY][spellX + 1])){
+              if(!isSolid(levelMap.tileMap[spellY][spellX+1])){
+                playerX = spellX + 1;
+                playerY = spellY;
+              }
+              spellCasted = 0;
+            }else{
+              spellX++;
+            }
+          }else if(spellMovement == UP && spellY > 0){
+            if(!HoverPassable(levelMap.tileMap[spellY - 1][spellX])){
+              if(!isSolid(levelMap.tileMap[spellY-1][spellX])){
+                playerX = spellX;
+                playerY = spellY - 1;
+              }
+              spellCasted = 0;
+            }else{
+              spellY--;
+            }
+          }else if(spellMovement == DOWN && spellY < levelMap.tileMap.length - 1){
+            if(!HoverPassable(levelMap.tileMap[spellY + 1][spellX])){
+              if(!isSolid(levelMap.tileMap[spellY+1][spellX])){
+                playerX = spellX;
+                playerY = spellY + 1;
+              }
+              spellCasted = 0;
+            }else{
+              spellY++;
+            }
+          }
+        }
+
+        popMatrix();
+
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
