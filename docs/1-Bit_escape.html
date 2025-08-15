@@ -127,12 +127,12 @@
         "$XXXXXXXXXRRRXXX.......................$",
         "$X.......*....XX.......................$",
         "$X.......*....rX.......................$",
-        "$X.......*....XX.......................$",
-        "$X.......XXXXXXX.......................$",
-        "$X.............R.......................$",
-        "$X.............R.......................$",
-        "$X.............R.......................$",
-        "$XXX***XXXXX***X.......................$",
+        "$X.......*....XXXXXXXXXX...............$",
+        "$X.......XXXXXXXXXXrXXXXXX.............$",
+        "$X.............R.......*.@X............$",
+        "$X.............R.......*.@X............$",
+        "$X.............R.......*.@X............$",
+        "$XXX***XXXXX***XXXXXXXXXXX.............$",
         "$......XXXXX...X.......................$",
         "$......rXXXXXrXX.......................$",
         "$......XXXXXXXXX.......................$",
@@ -145,10 +145,10 @@
         "$~~~X..X...............................$",
         "$~~~X..X...............................$",
         "$~~~X..X...............................$",
-        "$RRRXXXXXXXXXXXXXXX.....X..............$",
-        "$.......................X..............$",
-        "$.....................3.X..............$",
-        "$.......................X..............$",
+        "$RRRXXXXXXXXXXXXXXXXXXXXX..............$",
+        "$..........%~~%.........X..............$",
+        "$..........%~~%.......3.X..............$",
+        "$..........%~~%.........X..............$",
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
         perpetualFunction:function(){
           if(keys[73] && isTouching("i")){
@@ -178,12 +178,75 @@
             playerY = levelMap.startY;
           }
         },
-        startX:3,
-        startY:3,
+        startX:2,
+        startY:2,
       };
 
-      var levelMaps = [tutorialLevelMap,secondLevelMap];
-      var levelMapIndex = 1;
+      var thirdLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$......i.....X.........................$",
+        "$......>.....X.........................$",
+        "$......>.....X.............XXXXX.......$",
+        "$XXXXXXXvvvvvXXXXXXXXXXXXXXX...X.......$",
+        "$XX....R.....>.......>>>>>>.~~.X.......$",
+        "$XX....R.....>...r...>>>>>>.~~.X.......$",
+        "$XX....R.....>.......>>>>>>.~~XX.......$",
+        "$XX...XX.....XXXXXXXXXXXXXXX~~X........$",
+        "$......X.....X..............~~.........$",
+        "$......X^^^^^X..............~~.........$",
+        "$......X.....XXXXXXXXXXXXXXX~~.........$",
+        "$......X.....<<<<<<<<<<<<<<<<<X........$",
+        "$......XXXXXXXXXXXXXXXXXXXXXXXX........$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "You can walk on the arrows only in the direction they point.";
+            UItype = "text";
+          }
+          if(keys[82] && isTouching("r") && !buttonPressed){ // R key
+            for(var i = 0; i < levelMap.tileMap.length; i++){
+              var rowArr = levelMap.tileMap[i].split("");
+              for(var j = 0; j < rowArr.length; j++){
+                if(rowArr[j] == "R"){
+                  rowArr[j] = "*";
+                }else if(rowArr[j] == "*"){
+                  rowArr[j] = "R";
+                }
+              }
+              levelMap.tileMap[i] = rowArr.join("");
+            }            
+            buttonPressed = true;
+          }else if(!(keys[82] && isTouching("r"))){
+            buttonPressed = false;
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        startX:2,
+        startY:2,
+      };
+
+      var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap];
+      var levelMapIndex = 2;
       var levelMap = levelMaps[levelMapIndex];
 
       var colorCoding = function(tile){
@@ -208,6 +271,14 @@
               return color(255, 0, 0);
             case "*":
               return color(255, 0, 0);
+            case "<":
+              return color(0, 155, 255); // Slopes
+            case ">":
+              return color(0, 155, 255); // Slopes
+            case "^":
+              return color(0, 155, 255); // Slopes
+            case "v":
+              return color(0, 155, 255); // Slopes
             case "1":
               return color(100,0,255);
             case "2":
@@ -254,6 +325,8 @@
             return true;
           case "2":
             return true;
+          case "3":
+            return true;
           case "%":
             return true;
           case "~":
@@ -262,6 +335,18 @@
             return false;
           case "*":
             return false;
+          case "r":
+            return true;
+          case "R":
+            return true;          
+          case "<":
+            return false; // Slopes are not solid
+          case ">":
+            return false; // Slopes are not solid
+          case "^":
+            return false; // Slopes are not solid
+          case "v":
+            return false; // Slopes are not solid
           default:
             return true; // Default to not solid for unknown tiles
         }
@@ -280,7 +365,13 @@
         return false;
       };
 
+      var devMode = true;
       var spellsLearned = [null,false,false,false,false,false,false,false,false,false];
+      if(devMode){
+        spellsLearned[1] = true; // Bullet spell
+        spellsLearned[2] = true; // Hover spell
+        spellsLearned[3] = true; // Teleport spell
+      }
       var spellHitBlock = function(tile){}
       var spellActive = 0;
       var spellCasted = 0;
@@ -473,6 +564,22 @@
         if(levelMap.perpetualFunction){
           levelMap.perpetualFunction();
         }
+
+        //Slopes
+
+        if(levelMap.tileMap[playerY][playerX] == "<"){
+          playerX--;
+        }
+        if(levelMap.tileMap[playerY][playerX] == ">"){
+          playerX++;
+        }
+        if(levelMap.tileMap[playerY][playerX] == "^"){
+          playerY--;
+        }
+        if(levelMap.tileMap[playerY][playerX] == "v"){
+          playerY++;
+        }
+
 
         // 1 Spell
         
