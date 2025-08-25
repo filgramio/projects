@@ -306,9 +306,71 @@
         startX:2,
         startY:2,
       };
+      
+      var fifthLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$......................................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "You can't hover over these spikes.";
+            UItype = "text";
+          }
+          if(keys[82] && isTouching("r") && !buttonPressed){ // R key
+            for(var i = 0; i < levelMap.tileMap.length; i++){
+              var rowArr = levelMap.tileMap[i].split("");
+              for(var j = 0; j < rowArr.length; j++){
+                if(rowArr[j] == "R"){
+                  rowArr[j] = "*";
+                }else if(rowArr[j] == "*"){
+                  rowArr[j] = "R";
+                }
+              }
+              levelMap.tileMap[i] = rowArr.join("");
+            }            
+            buttonPressed = true;
+          }else if(!(keys[82] && isTouching("r"))){
+            buttonPressed = false;
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        startX:3,
+        startY:3,
+      };
 
-      var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap,fourthLevelMap];
-      var levelMapIndex = 3;
+      var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap,fourthLevelMap,fifthLevelMap];
+      var levelMapIndex = 4;
       var levelMap = levelMaps[levelMapIndex];
 
       var colorCoding = function(tile){
@@ -524,12 +586,12 @@
       var cameraCornerY = 0;
 
       var playerX = 3;
-      var playerY = 12;
+      var playerY = 3;
 
-      if(!devMode){
+      //if(!devMode){
         playerX = levelMap.startX;
         playerY = levelMap.startY;
-      }
+      //}
 
       var moveDelay = 0;
 
