@@ -309,15 +309,77 @@
       
       var fifthLevelMap = {tileMap:[
         "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$XXXXXXXXX.............................$",
+        "$X.......X.............................$",
+        "$X.......X.............................$",
+        "$X.......X.............................$",
+        "$X^XXX...X.............................$",
+        "$X~XXXvvvX.............................$",
+        "$X~XXXvvvX.............................$",
+        "$X~XXXvvvX.............................$",
+        "$X~XXXvvvX.............................$",
+        "$X~XXXvvvX.............................$",
+        "$X~XXXvvvX....................XXXXX....$",
+        "$X~XXXvvvXXXXXXXXXXXXXXXXXXXXXX...X....$",
+        "$X~XXXvvv%%%%.......vvvvvvvv....@.X....$",
+        "$X~XXX...XXXX...............XXX...X....$",
+        "$X..........XXXXXXXXXXXXXXXXX.XXXXX....$",
+        "$X..........X......X...................$",
+        "$X..........%......X...................$",
+        "$X..........X......X...................$",
+        "$XXXXXXXXXXXXSSSSX%X...................$",
+        "$........X.......X:X...................$",
+        "$........X..5....X:X...................$",
+        "$........X.......XsX...................$",
+        "$........XXXXXXXXXXX...................$",
         "$......................................$",
         "$......................................$",
         "$......................................$",
         "$......................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
-        "$......................................$",
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"],
+        perpetualFunction:function(){
+          if(keys[73] && isTouching("i")){
+            UItext = "You can't hover over these spikes.";
+            UItype = "text";
+          }
+          if(keys[82] && isTouching("r") && !buttonPressed){ // R key
+            for(var i = 0; i < levelMap.tileMap.length; i++){
+              var rowArr = levelMap.tileMap[i].split("");
+              for(var j = 0; j < rowArr.length; j++){
+                if(rowArr[j] == "R"){
+                  rowArr[j] = "*";
+                }else if(rowArr[j] == "*"){
+                  rowArr[j] = "R";
+                }
+              }
+              levelMap.tileMap[i] = rowArr.join("");
+            }            
+            buttonPressed = true;
+          }else if(!(keys[82] && isTouching("r"))){
+            buttonPressed = false;
+          }
+          if(levelMap.tileMap[playerY][playerX] == "@"){
+            levelMapIndex++;
+            levelMap = levelMaps[levelMapIndex];
+            playerX = levelMap.startX;
+            playerY = levelMap.startY;
+          }
+        },
+        startX:3,
+        startY:3,
+      };
+
+      var sixthLevelMap = {tileMap:[
+        "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",
+        "$XXXXX.................................$",
+        "$X...X.................................$",
+        "$X...X.................................$",
+        "$X...X.................................$",
+        "$X...XXXXXXX...........................$",
+        "$X%%......+X...........................$",
+        "$X...XXXXXXX...........................$",
+        "$X...X.................................$",
+        "$X...X.................................$",
         "$......................................$",
         "$......................................$",
         "$......................................$",
@@ -369,8 +431,8 @@
         startY:3,
       };
 
-      var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap,fourthLevelMap,fifthLevelMap];
-      var levelMapIndex = 4;
+      var levelMaps = [tutorialLevelMap,secondLevelMap,thirdLevelMap,fourthLevelMap,fifthLevelMap,sixthLevelMap];
+      var levelMapIndex = 5;
       var levelMap = levelMaps[levelMapIndex];
 
       var colorCoding = function(tile){
@@ -385,8 +447,12 @@
               return color(0, 255, 255);
             case "%":
               return color(139,69,19);
+            case "/":
+              return color(100,0,255);
             case "~":
               return color(255, 120, 0);
+            case "+": 
+              return color(255, 0, 0);  
             case ":":
               return color(255, 120, 0);
             case "@":
@@ -419,6 +485,8 @@
               return color(100,0,255);
             case "4":
               return color(100,0,255);
+            case "5":
+              return color(100,0,255);
             default:
               return color(255, 255, 255); // White for unknown tiles
           }
@@ -426,7 +494,7 @@
 
       var tips = [
         "Use the arrow keys to move.",
-        "Interact with blocks by pressing the corresponding key.",
+        "Interact with unique blocks by pressing the corresponding key.",
       ];
 
       var UIgrid = [
@@ -455,6 +523,14 @@
             return true;
           case "i":
             return true;
+          case "%":
+            return true;
+          case "/ ":
+            return true;          
+          case "~":
+            return true;
+          case "+":
+            return true;            
           case "1":
             return true;
           case "2":
@@ -462,6 +538,8 @@
           case "3":
             return true;
           case "4":
+            return true;
+          case "5":
             return true;
           case "%":
             return true;
@@ -516,6 +594,7 @@
         spellsLearned[2] = true; // Hover spell
         spellsLearned[3] = true; // Teleport spell
         spellsLearned[4] = true; // Activator spell
+        spellsLearned[5] = true; // Block spell
       }
       var spellHitBlock = function(tile){}
       var spellActive = 0;
@@ -536,6 +615,8 @@
       var BulletBreakable = function(tile){
         switch(tile) {
           case "%":
+            return true; // Breakable block
+          case "/":
             return true; // Breakable block
           default:
             return false; // Default to not breakable for unknown tiles
@@ -588,12 +669,19 @@
       var playerX = 3;
       var playerY = 3;
 
+      var BulletsX = [];
+      var BulletsY = [];
+      var BulletsDir = [];
+
       //if(!devMode){
         playerX = levelMap.startX;
         playerY = levelMap.startY;
       //}
 
       var moveDelay = 0;
+      var bulletDelay = 0;
+      var shootDelay = 0;
+      var shootDelayMax = 10;
 
       textFont(createFont("monospace", 16));
       textAlign(LEFT, TOP);
@@ -615,19 +703,22 @@
             if(x >= cameraCornerX && x < cameraCornerX + 20 &&
                y >= cameraCornerY && y < cameraCornerY + 20) {
               var tile = levelMap.tileMap[y][x];
-              fill(colorCoding(tile));
-              if(!(playerX == x && playerY == y) && !(spellX == x && spellY == y && spellCasted > 0)){
-                text(tile, x * 30, y * 30);
-              }else if(playerX == x && playerY == y){
+              if(playerX == x && playerY == y){
                 fill(0,255,0);
                 if(spellActive > 0 && spellsLearned[spellActive]){
                   text(spellActive, x * 30, y * 30);
                 }else{
                   text("#", x * 30, y * 30);
                 }
-              }else{
+              }else if(spellCasted > 0 && spellX == x && spellY == y){
                 fill(255,0,255);
                 text(spellCasted, x * 30, y * 30);
+              }else if(BulletsX.includes(x) && BulletsY.includes(y)){
+                fill(255,255,0);
+                text("o", x * 30, y * 30);
+              }else{
+                fill(colorCoding(tile));  
+                text(tile, x * 30, y * 30);
               }
             }
           }
@@ -738,17 +829,77 @@
 
         //Slopes
 
-        if(levelMap.tileMap[playerY][playerX] == "<"){
+        if(levelMap.tileMap[playerY][playerX] == "<" && playerX > 0 && !isSolid(levelMap.tileMap[playerY][playerX - 1])){
           playerX--;
         }
-        if(levelMap.tileMap[playerY][playerX] == ">"){
+        if(levelMap.tileMap[playerY][playerX] == ">" && playerX < levelMap.tileMap[0].length - 1 && !isSolid(levelMap.tileMap[playerY][playerX + 1])){
           playerX++;
         }
-        if(levelMap.tileMap[playerY][playerX] == "^"){
+        if(levelMap.tileMap[playerY][playerX] == "^" && playerY > 0 && !isSolid(levelMap.tileMap[playerY - 1][playerX])){
           playerY--;
         }
-        if(levelMap.tileMap[playerY][playerX] == "v"){
+        if(levelMap.tileMap[playerY][playerX] == "v" && playerY < levelMap.tileMap.length - 1 && !isSolid(levelMap.tileMap[playerY + 1][playerX])){
           playerY++;
+        }
+
+        //Shooters
+
+        if(shootDelay > 0){
+          shootDelay--;
+        }else{
+          for(var i = 0; i < levelMap.tileMap.length; i++){
+            for(var j = 0; j < levelMap.tileMap[i].length; j++){
+              if(levelMap.tileMap[i][j] == "+"){
+                if(j < playerX && BulletPassable(levelMap.tileMap[i][j + 1])){
+                  BulletsX.push(j + 1);
+                  BulletsY.push(i);
+                  BulletsDir.push(RIGHT);
+                }else if(j > playerX && BulletPassable(levelMap.tileMap[i][j - 1])){
+                  BulletsX.push(j - 1);
+                  BulletsY.push(i);
+                  BulletsDir.push(LEFT);
+                }else if(i < playerY && BulletPassable(levelMap.tileMap[i + 1][j])){
+                  BulletsX.push(j);
+                  BulletsY.push(i + 1);
+                  BulletsDir.push(DOWN);
+                }else if(i > playerY && BulletPassable(levelMap.tileMap[i - 1][j])){
+                  BulletsX.push(j);
+                  BulletsY.push(i - 1);
+                  BulletsDir.push(UP);
+                }
+              }
+            }
+          }
+          shootDelay = shootDelayMax;
+        }
+
+        //Bullets
+
+        for(var i = 0; i < BulletsX.length; i++){
+          switch(BulletsDir[i]){
+            case LEFT:
+              if(BulletsX[i] > 0){
+                if(BulletPassable(levelMap.tileMap[BulletsY[i]][BulletsX[i] - 1])){
+                  BulletsX[i]--;
+                }else{
+                  if(BulletBreakable(levelMap.tileMap[BulletsY[i]][BulletsX[i] - 1])){
+                    var rowArr = levelMap.tileMap[BulletsY[i]].split("");
+                    rowArr[BulletsX[i] - 1] = ".";
+                    levelMap.tileMap[BulletsY[i]] = rowArr.join("");
+                  }
+                  BulletsX.splice(i,1);
+                  BulletsY.splice(i,1);
+                  BulletsDir.splice(i,1);
+                  i--;
+                }
+              }else{
+                BulletsX.splice(i,1);
+                BulletsY.splice(i,1);
+                BulletsDir.splice(i,1);
+                i--;
+              }
+            break;
+          }
         }
 
 
@@ -830,6 +981,32 @@
           }
           spellsLearned[4] = true;
         }         
+
+        // 5 Spell
+
+        if(keys[53] && spellsLearned[5]){ // 5 key
+          if(!isTouching("5")){            
+            if(spellActive == 0){
+              spellActive = 5;
+            }
+          }
+        }
+        if(keys[53] && isTouching("5")){ // 5 key
+          UItype = "text";
+          UItext = "You have learned the block spell!\nPress 5 and move to place a block on the place you were standing on!";
+          if(!spellsLearned[5]){
+            tips.push("5 to place a block.");
+          }
+          spellsLearned[5] = true;
+        }         
+        if(spellCasted == 5){
+          if(levelMap.tileMap[spellY][spellX] == "."){
+            var rowArr = levelMap.tileMap[spellY].split("");
+            rowArr[spellX] = "/";
+            levelMap.tileMap[spellY] = rowArr.join("");
+          }
+          spellCasted = 0;
+        }
 
         //spell movement
 
