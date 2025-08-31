@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Tanky</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(800*(min(min((window.innerWidth-15) / 800, (window.innerHeight-15) / 1200),1)), 1200*(min(min((window.innerWidth-15) / 800, (window.innerHeight-15) / 1200),1))); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      scale(min(min((window.innerWidth-15) / 800, (window.innerHeight-15) / 1200),1));
+
+      var arena = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0]];
+
+      var draw_ball = function(value,x, y) {
+        pushMatrix();
+        translate(x,y);
+        rotate(PI/4);
+        switch(value){
+          case 0:
+            fill(193,154,107);
+            ellipse(0, 0, 20, 20);
+          break;
+          case 1:
+            fill(70,225,70);
+            ellipse(0, 0, 30, 30);
+            fill(90,245,90);
+            ellipse(0,-6,18,11);
+          break;
+          case 2:
+            fill(60,60,255);
+            ellipse(0, 0, 30, 30);
+            fill(120,120,255);
+            ellipse(0,-6,18,11);
+          break;
+          case 3:
+            fill(255,60,60);
+            ellipse(0, 0, 30, 30);
+            fill(255,120,120);
+            ellipse(0,-6,18,11);
+        }
+        popMatrix();
+      };
+
+      var Machine = function(config){
+        this.name = config.name;
+        this.grid = config.grid;
+        this.width = config.width;
+        this.height = config.height;
+        this.effect_grid = config.effect_grid;
+      }
+
+      var mach1 = new Machine({
+        name: "Creator",
+        grid: [
+          [0,1,0],
+          [1,9,1]
+        ],
+        width: 3,
+        height: 2,
+        effect_grid: [
+          [0,0,0],
+          [0,2,0]
+        ]
+      });
+      var mach2 = new Machine({
+        name: "Tank",
+        grid: [
+          [0,2,0],
+          [1,1,1]
+        ],
+        width: 3,
+        height: 2,
+        effect_grid: [
+          [0,1,0],
+          [0,0,0]
+        ]
+      });
+      var mach3 = new Machine({
+        name: "Downgrade",
+        grid: [
+          [2]
+        ],
+        width: 1,
+        height: 1,
+        effect_grid: [
+          [3]
+        ]
+      });
+
+      var machineList = [mach1,mach2,mach3];
+
+      var machineListShow = true;
+
+      var machineListUnlocked = [mach1];
+
+      var draw_machine = function(machine, x, y){
+        pushMatrix();
+        var ballSize = 140/machine.height;
+        translate(x-(machine.width)*ballSize,y);
+        for(var i = 0; i < machine.height; i++){
+          for(var j = 0; j < machine.width; j++){
+            draw_ball(machine.grid[i][j], j*40, i*40);
+          }
+        }
+        popMatrix();
+      };
+
+      noStroke();
+
+      draw = function() {
+        background(233,194,147);
+        
+        // Draw the arena
+
+        for (var i = 0; i < arena.length; i++) {
+          for (var j = 0; j < arena[i].length; j++) {            
+            draw_ball(arena[i][j], j*40+20, i*40+20);
+          }
+        }
+
+        // Draw the machine list
+
+        if(machineListShow){
+          background(233,194,147);
+          for(var i = 0; i < machineListUnlocked.length; i++){
+            pushMatrix();
+            translate(200*(i%4),200*floor(i/4));
+            fill(193,154,107);
+            rect(20,20,160,160,20);
+            fill(0);
+            textAlign(CENTER);
+            textSize(20);
+            text(machineListUnlocked[i].name, 100, 50);
+            draw_machine (machineListUnlocked[i], 100, 100);
+            popMatrix();
+          }
+        }
+
+      }
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
