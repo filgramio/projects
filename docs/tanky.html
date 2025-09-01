@@ -24,7 +24,18 @@
         
       // Paste code from Khan Academy here:
 
-      scale(min(min((window.innerWidth-15) / 800, (window.innerHeight-15) / 1200),1));
+      var generalScale = min(min((window.innerWidth-15) / 800, (window.innerHeight-15) / 1200),1);
+
+      scale(generalScale);
+
+      var keys = [];
+
+      keyPressed = function(){
+        keys[keyCode] = true;
+      }
+      keyReleased = function(){
+        keys[keyCode] = false;
+      }
 
       var arena = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -78,22 +89,155 @@
         popMatrix();
       };
 
+      var draw_effect = function(value,x,y){
+        pushMatrix();
+        translate(x,y);
+        switch(value){
+          case 1:
+            stroke(0);
+            fill(70,225,70);
+            beginShape();
+            vertex(-9,-3);
+            vertex(-3,-3);
+            vertex(-3,-9);
+            vertex(3,-9);
+            vertex(3,-3);
+            vertex(9,-3);
+            vertex(9,3);
+            vertex(3,3);
+            vertex(3,9);
+            vertex(-3,9);
+            vertex(-3,3);
+            vertex(-9,3);
+            endShape(CLOSE);
+            noStroke();
+          break;
+          case 2:
+            stroke(0);
+            fill(60,60,255);
+            beginShape();
+            vertex(-9,-3);
+            vertex(-3,-3);
+            vertex(-3,-9);
+            vertex(3,-9);
+            vertex(3,-3);
+            vertex(9,-3);
+            vertex(9,3);
+            vertex(3,3);
+            vertex(3,9);
+            vertex(-3,9);
+            vertex(-3,3);
+            vertex(-9,3);
+            endShape(CLOSE);
+            noStroke();
+          break;
+          case 3:
+            stroke(0);
+            fill(255,60,60);
+            beginShape();
+            vertex(-9,-3);
+            vertex(-3,-3);
+            vertex(-3,-9);
+            vertex(3,-9);
+            vertex(3,-3);
+            vertex(9,-3);
+            vertex(9,3);
+            vertex(3,3);
+            vertex(3,9);
+            vertex(-3,9);
+            vertex(-3,3);
+            vertex(-9,3);
+            endShape(CLOSE);
+            noStroke();
+          break;
+          case 4:
+            stroke(0);
+            fill(255,0,0);
+            quad(0,-12, 5, 0 ,0, 6,-5,0);
+            noStroke();
+          break;
+        }
+        popMatrix();
+      };
+
+      var draw_action = function(x,y){
+        pushMatrix();
+        translate(x,y);
+        fill(150);
+        ellipse(0,0,100,100);
+        fill(233,194,147);
+        ellipse(0,0,70,70);
+        fill(150);
+        for(var i = 0; i < 8; i++){
+          pushMatrix();
+          rotate(i*PI/4);
+          rect(-12,-60,24,20);
+          popMatrix();
+        }
+        popMatrix();
+      }
+
+      var draw_move = function(x,y){
+        pushMatrix();
+        translate(x,y);
+        for(var i = 0; i < 4; i++){
+          pushMatrix();
+          rotate(PI/2*i);
+          fill(70,205,70);
+          rect(-12,-40,24,40);
+          triangle(-24,-40,0,-64,24,-40);
+          popMatrix();
+        }
+        popMatrix();
+      }
+
+      var draw_book = function(x,y){
+        pushMatrix();
+        translate(x,y);
+        fill(193,154,107);
+        ellipse(-30,-30,30,30);
+        ellipse(-30,30,30,30);
+        rect(-45,-30,16,60);
+        rect(-30,-45,70,90);
+        fill(233,194,147);
+        rect(-30,-38,71,12);
+        fill(193,154,107);
+        rect(-26,-36,66,3);
+        rect(-26,-31,66,3);
+
+        pushMatrix();
+        translate(0,10);
+        scale(0.4);
+        fill(233,194,147);
+        ellipse(0,0,100,100);
+        fill(193,154,107);
+        ellipse(0,0,70,70);
+        fill(233,194,147);
+        for(var i = 0; i < 8; i++){
+          pushMatrix();
+          rotate(i*PI/4);
+          rect(-12,-60,24,20);
+          popMatrix();
+        }
+        popMatrix();
+
+        popMatrix();
+      }
+
       var Machine = function(config){
         this.name = config.name;
         this.grid = config.grid;
-        this.width = config.width;
-        this.height = config.height;
+        this.width = this.grid[0].length;
+        this.height = this.grid.length;
         this.effect_grid = config.effect_grid;
       }
 
-      var mach1 = new Machine({
+      var mach1 = new Machine({ 
         name: "Creator",
         grid: [
           [0,1,0],
           [1,9,1]
         ],
-        width: 3,
-        height: 2,
         effect_grid: [
           [0,0,0],
           [0,2,0]
@@ -105,10 +249,8 @@
           [0,2,0],
           [1,1,1]
         ],
-        width: 3,
-        height: 2,
         effect_grid: [
-          [0,1,0],
+          [0,4,0],
           [0,0,0]
         ]
       });
@@ -117,36 +259,87 @@
         grid: [
           [2]
         ],
-        width: 1,
-        height: 1,
         effect_grid: [
-          [3]
+          [1]
         ]
       });
 
       var machineList = [mach1,mach2,mach3];
 
-      var machineListShow = true;
+      var machineListShow = false;
 
-      var machineListUnlocked = [mach1];
+      var machineListHover = 0;
+
+      var machineChosen = mach1;
+
+      var machineListUnlocked = [mach1,mach2,mach3];
+
+      var MX = mouseX*generalScale;
+      var BallX = 0;
+      var BallToMoveX = 0;
+
+      var MY = mouseY*generalScale;
+      var BallY = 0;
+      var BallToMoveY = 0;
 
       var draw_machine = function(machine, x, y){
         pushMatrix();
-        var ballSize = 140/machine.height;
-        translate(x-(machine.width)*ballSize,y);
+        translate(x,y);
         for(var i = 0; i < machine.height; i++){
           for(var j = 0; j < machine.width; j++){
-            draw_ball(machine.grid[i][j], j*40, i*40);
+            if(machine.grid[i][j] != 0){
+              draw_ball(machine.grid[i][j], j*40, i*40);
+            }
+            draw_effect(machine.effect_grid[i][j], j*40, i*40);
           }
         }
         popMatrix();
       };
+
+      var move_type = 0; // 0 = move; 1 = action;
+
+      var current_move = 0;
+
+      var debugScreen = true;
+
+      var isMouseInRange = function(start_x,start_y,end_x,end_y){
+        if(MX > start_x && MX < end_x && MY > start_y && MY < end_y){
+          return true;
+        }else{
+          return false;
+        }
+      }
+
+      var toggleFrame = false;
+
+      mouseClicked = function(){
+        toggleFrame = true;
+      }
 
       noStroke();
 
       draw = function() {
         background(233,194,147);
         
+        //setup
+
+        MX = mouseX/generalScale;
+        BallX = floor(MX/40);
+        MY = mouseY/generalScale;
+        if(MY > 800){
+          BallY = 0;
+        }else{
+          BallY = floor(MY/40);
+        }
+        
+        //println(mouseX+","+MX);
+
+        if(machineListShow){
+          machineListHover = floor(MX/200)+4*floor(MY/200);
+          fill(0);
+          text(machineListHover,10,10); 
+        }
+
         // Draw the arena
 
         for (var i = 0; i < arena.length; i++) {
@@ -162,17 +355,148 @@
           for(var i = 0; i < machineListUnlocked.length; i++){
             pushMatrix();
             translate(200*(i%4),200*floor(i/4));
-            fill(193,154,107);
+            if(machineListHover == i){
+              fill(213,174,127);
+              if(isMouseInRange(0,0,800,800) && toggleFrame){
+                machineChosen = machineListUnlocked[i];
+                machineListShow = false;
+              }
+            }else{
+              fill(193,154,107);
+            }
             rect(20,20,160,160,20);
             fill(0);
             textAlign(CENTER);
             textSize(20);
             text(machineListUnlocked[i].name, 100, 50);
-            draw_machine (machineListUnlocked[i], 100, 100);
+            pushMatrix();
+            translate(100-(100/machineListUnlocked[i].height)*(machineListUnlocked[i].width-1)/2, 100);
+            scale(100/machineListUnlocked[i].height/40);
+            draw_machine(machineListUnlocked[i], 0, 0);
+            popMatrix();
             popMatrix();
           }
         }
 
+        //Machine list close
+
+        if(keys[32]){
+          machineListShow = false;
+        }
+
+        //The Panel
+
+        /*panel code*/{
+        fill(193,154,107);
+        rect(0,800,800,400);
+        stroke(153,114,67);
+        strokeWeight(5);
+
+        fill(233,194,147);
+        if(isMouseInRange(180,850,270,950)){
+          fill(253,224,177);
+          if(toggleFrame){
+            move_type = 1-move_type;
+          }
+        }
+        rect(150,850,120,100,20);
+        fill(233,194,147);
+        rect(20,820,160,160,20);
+        noStroke();
+        if(move_type == 0){
+          draw_move(100,900);          
+          pushMatrix();
+          translate(220,900);
+          scale(0.5);
+          draw_action(0,0);
+          popMatrix();
+        }else{
+          draw_action(100,900);          
+          pushMatrix();
+          translate(220,900);
+          scale(0.5);
+          draw_move(0,0);
+          popMatrix();
+        }
+        stroke(153,114,67);
+
+        strokeWeight(1);
+        noStroke();
+
+        stroke(153,114,67);
+        strokeWeight(5);
+
+        fill(233,194,147);
+        if(isMouseInRange(650,820,750,920)){
+          fill(253,224,177);
+          if(toggleFrame){
+            machineListShow = !machineListShow;
+          }
+        }
+        rect(650,820,100,140,20);
+        pushMatrix();
+        translate(700,870);
+        scale(0.7);
+        noStroke();
+        draw_book(0,0);
+        stroke(153,114,67);
+        popMatrix();
+        rect(620,920,160,160,20);
+        fill(0);
+        textAlign(CENTER);
+        textSize(20);
+        text(machineChosen.name,700,950);
+        pushMatrix();
+        noStroke();
+        strokeWeight(1);
+        translate(700-(100/machineChosen.height)*(machineChosen.width-1)/2, 1000);
+        scale(100/machineChosen.height/40);
+        draw_machine(machineChosen, 0, 0);
+        strokeWeight(5);
+        popMatrix();
+
+
+        strokeWeight(1);
+        noStroke();
+
+        }
+
+        //Move
+
+        if(move_type == 0){
+          if(arena[BallY][BallX] != 0){
+            fill(255,255,255,150);
+            ellipse(BallX*40+20,BallY*40+20,30,30);
+            if(toggleFrame){
+              BallToMoveX = BallX;
+              BallToMoveY = BallY;
+            }
+          }else{
+            if(toggleFrame && abs(BallToMoveX-BallX)+abs(BallToMoveY-BallY) == 1){
+              arena[BallY][BallX] = arena[BallToMoveY][BallToMoveY];
+              arena[BallToMoveY][BallToMoveX] = 0;
+            }
+          }
+        }
+
+        //Draw the debug screen
+
+        if(debugScreen){
+          fill(0);
+          textSize(20);
+          textAlign(LEFT,CENTER);
+          text("MX: "+floor(MX),110,20); 
+          text("MY: "+floor(MY),110,40); 
+          text("MachListSlot: "+machineListHover,110,60); 
+          text("toggleFrame: "+toggleFrame,110,80); 
+          text("BallX: "+BallX,110,100);
+          text("BallY: "+BallY,110,120);
+          text("BallTMX: "+BallToMoveX,110,140);
+          text("BallTMY: "+BallToMoveY,110,160);
+          text("distToMove: "+(abs(BallToMoveX-BallX)+abs(BallToMoveY-BallY)),110,180);
+        }
+
+        toggleFrame = false;
       }
 
     }};
