@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Pathmaker</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      textAlign(CENTER,CENTER);
+
+      var inventoryHoverTile = 0;
+      var inventoryChosenTile = 0;
+      var chosenTile = null;
+
+      var isInTiles = false;
+      var tileX = 0;
+      var tileY = 0;
+
+      var drawTile = function(type,x,y){
+        pushMatrix();
+        translate(x,y);
+        switch(type){
+          case 1:
+            fill(230);
+            rect(0,0,40,40,5);
+          break;
+          case 2:
+            fill(150);
+            rect(0,0,40,40,5);
+          break;
+        }
+        popMatrix();
+      };
+
+      var isMouseInRange = function(start_x,start_y,end_x,end_y){
+        if(MX > start_x && MX < end_x && MY > start_y && MY < end_y){
+          return true;
+        }else{
+          return false;
+        }
+      }
+
+      var mouseClicked = function(){
+        if(mouseButton == LEFT){
+          if(mouseX <= 100){
+            inventoryChosenTile = inventoryHoverTile;
+            chosenTile = currentLevel.inventory[inventoryChosenTile];
+          }
+        }
+      };
+
+      var Level = function(config){
+        this.grid = config.grid;
+        this.width = config.grid[0].length;
+        this.height = config.grid.length;
+        this.inventory = config.inventory;
+        this.inventoryQuantity = config.inventoryQuantity;
+        this.path = config.path;
+      };
+
+      Level.prototype.draw = function(){
+        pushMatrix();
+        translate(width/2,height/2);
+        pushMatrix();
+        translate(-this.width/2*40,-this.height/2*40);
+        fill(180);
+        rect(0,0,this.width*40,this.height*40,5);
+        for(var i = 0; i < this.width; i++){
+          for(var j = 0; j < this.height; j++){
+            pushMatrix();
+            translate(i*40,j*40);
+            drawTile(this.grid[j][i],0,0);
+            if(isInTiles && tileX == i && tileY == j){
+              noStroke();
+              fill(255,255,255,50);
+              rect(0,0,40,40,5);
+              stroke(0);
+            }
+            popMatrix();
+          }
+        }
+        popMatrix();
+        popMatrix();
+        fill(80,80,80,150);
+        noStroke();
+        rect(0,0,100,height);
+        stroke(0);
+        for(var i = 0; i < this.inventory.length; i++){
+          if(i == inventoryChosenTile){
+            noStroke();
+            fill(220);
+            rect(0,100*i,100,100);
+            stroke(0); 
+          }else if(i == inventoryHoverTile){
+            noStroke();
+            fill(255,255,255,100);
+            rect(0,100*i,100,100);
+            stroke(0);
+          }
+          drawTile(this.inventory[i],30,30+100*i);
+          fill(0);
+          textSize(25);
+          text(this.inventoryQuantity[i],85,50+100*i);
+        }
+      }
+
+      var tutorial = new Level({
+        grid:[
+        [1,0,0],
+        [0,0,0],
+        [0,0,1]],
+        inventory:[1,1],
+        inventoryQuantity:[3,2]
+      });
+
+      var currentLevel = tutorial;
+
+      draw = function(){
+        background(220);
+        if(mouseX <= 100 && mouseY <= currentLevel.inventory.length*100){
+          inventoryHoverTile = floor(mouseY/100);
+        }else{
+          inventoryHoverTile = -1;
+        }
+        if(mouseX >= width/2-(currentLevel.width*40/2) && mouseX < width/2+(currentLevel.width*40/2) && mouseY >= height/2-(currentLevel.height*40/2) && mouseY < height/2+(currentLevel.height*40/2)){
+          isInTiles = true;
+          tileX = floor((mouseX - (width/2-(currentLevel.width*40/2)))/40);
+          tileY = floor((mouseY - (height/2-(currentLevel.height*40/2)))/40);
+        }else{
+          isInTiles = false;
+        }
+        println(tileX+" "+tileY+" "+isInTiles);
+
+
+        tutorial.draw();
+        
+        
+        //mouse hold
+
+        drawTile(chosenTile,mouseX-20,mouseY-20);
+
+      }
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>

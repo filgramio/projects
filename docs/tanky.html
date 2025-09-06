@@ -232,6 +232,10 @@
         this.effect_grid = config.effect_grid;
       }
 
+      var orthoDist = function(x1,y1,x2,y2){
+        return abs(x1-x2)+abs(y1-y2);
+      };
+
       var mach1 = new Machine({ 
         name: "Creator",
         grid: [
@@ -385,7 +389,7 @@
         }
 
         //The Panel
-
+          
         /*panel code*/{
         fill(193,154,107);
         rect(0,800,800,400);
@@ -472,8 +476,10 @@
               BallToMoveY = BallY;
             }
           }else{
-            if(toggleFrame && abs(BallToMoveX-BallX)+abs(BallToMoveY-BallY) == 1){
-              arena[BallY][BallX] = arena[BallToMoveY][BallToMoveY];
+            if(toggleFrame && orthoDist(BallToMoveX,BallToMoveY,BallX,BallY) == 1){
+              println(BallToMoveX+" "+BallToMoveY+" "+BallX+" "+BallY+" "+orthoDist(BallToMoveX,BallToMoveY,BallX,BallY));
+              arena[BallY][BallX] = arena[BallToMoveY][BallToMoveX];
+              println(arena[BallToMoveY][BallToMoveX]);
               arena[BallToMoveY][BallToMoveX] = 0;
             }
           }
