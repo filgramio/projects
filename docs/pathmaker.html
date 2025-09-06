@@ -26,28 +26,106 @@
 
       textAlign(CENTER,CENTER);
 
-      var inventoryHoverTile = 0;
-      var inventoryChosenTile = 0;
+      var U = UP;
+      var D = DOWN;
+      var L = LEFT;
+      var R = RIGHT;
+
+      var inventoryHoverTile = -1;
+      var inventoryChosenTile = -1;
       var chosenTile = null;
 
       var isInTiles = false;
       var tileX = 0;
       var tileY = 0;
 
+      var play = false;
+
+      var toggleCheck = false;
+      
+      var currentMoveAnim = {dir:U,able:false};
+      var moveAnimGoing = true;
+      var moveAnimFrame = 0;
+
+      var player = {
+        x:0,
+        y:0,
+        niceX:0,
+        niceY:0,
+        pathActive:0
+      };
+
       var drawTile = function(type,x,y){
         pushMatrix();
         translate(x,y);
         switch(type){
+          case R:
+            fill(50,170,255);
+            rect(0,0,40,40,5);
+            fill(50,100,150);
+            noStroke();
+            rect(10,17,20,6);
+            triangle(20,6,34,20,20,34);
+            stroke(0);
+          break;
+          case L:
+            fill(50,170,255);
+            rect(0,0,40,40,5);
+            fill(50,100,150);
+            noStroke();
+            rect(10,17,20,6);
+            triangle(20,6,6,20,20,34);
+            stroke(0);
+          break;
+          case U:
+            fill(50,170,255);
+            rect(0,0,40,40,5);
+            fill(50,100,150);
+            noStroke();
+            rect(17,10,6,20);
+            triangle(6,20,20,6,34,20);
+            stroke(0);
+          break;
+          case D:
+            fill(50,170,255);
+            rect(0,0,40,40,5);
+            fill(50,100,150);
+            noStroke();
+            rect(17,10,6,20);
+            triangle(6,20,20,34,34,20);
+            stroke(0);
+          break;
           case 1:
             fill(230);
             rect(0,0,40,40,5);
           break;
           case 2:
-            fill(150);
+            fill(100);
+            rect(0,0,40,40,5);
+          break;
+          case 3:
+            fill(120,220,120);
             rect(0,0,40,40,5);
           break;
         }
         popMatrix();
+      };
+
+      var ableToWalk = function(tile){
+        switch(tile){
+          case 0:
+            return false;
+          break;
+          case 1:
+            return true;
+          break;
+          case 2:
+            return false;
+          break;
+          case 3:
+            return true;
+          break;
+        }
       };
 
       var isMouseInRange = function(start_x,start_y,end_x,end_y){
@@ -59,11 +137,45 @@
       }
 
       var mouseClicked = function(){
+        if(!play){
         if(mouseButton == LEFT){
-          if(mouseX <= 100){
+          if(mouseX <= 100 && currentLevel.inventoryQuantity[inventoryHoverTile] > 0){
             inventoryChosenTile = inventoryHoverTile;
             chosenTile = currentLevel.inventory[inventoryChosenTile];
           }
+          if(isInTiles && currentLevel.grid[tileY][tileX] != chosenTile && currentLevel.grid[tileY][tileX] != 3 && currentLevel.inventoryQuantity[inventoryChosenTile] > 0 && chosenTile != null){
+            currentLevel.grid[tileY][tileX] = chosenTile;
+            currentLevel.inventoryQuantity[inventoryChosenTile]--;
+            if(currentLevel.inventoryQuantity[inventoryChosenTile] == 0){
+              inventoryChosenTile = -1;
+              inventoryHoverTile = -1;
+              chosenTile = null;
+            }
+          }
+        }
+        }
+      };
+
+      var keyPressed = function(){
+        if(keyCode == 32 && !toggleCheck){
+          toggleCheck = true;
+          play = !play;
+          if(play){
+            player.pathActive = -1;
+            moveAnimGoing = false;
+          }else{
+            player.pathActive = 0;
+            moveAnimGoing = false;
+            player.x = currentLevel.startX;
+            player.y = currentLevel.startY;
+            player.niceX = currentLevel.startX*40;
+            player.niceY = currentLevel.startY*40;
+          }
+        }
+      };
+      var keyReleased = function(){
+        if(keyCode == 32){
+          toggleCheck = false;
         }
       };
 
@@ -73,7 +185,10 @@
         this.height = config.grid.length;
         this.inventory = config.inventory;
         this.inventoryQuantity = config.inventoryQuantity;
+        this.startX = config.x;
+        this.startY = config.y;
         this.path = config.path;
+        this.pathLength = config.path.length;
       };
 
       Level.prototype.draw = function(){
@@ -122,16 +237,129 @@
         }
       }
 
+      Level.prototype.drawPath = function(){
+        pushMatrix();
+        translate(width/2,height/4*3);
+        fill(255,0,0);
+        ellipse(0,0,20,20);
+        pushMatrix();
+        translate(-this.pathLength/2*40,30);
+        for(var i = 0; i < this.pathLength; i++){
+          drawTile(this.path[i],40*i,0);
+          if(player.pathActive == i){
+            fill(100,200,255);
+            triangle(40*i,45,40+40*i,45,20+40*i,55);
+          }
+        }
+        popMatrix();
+        pushMatrix();
+        noStroke();
+        translate(0,120);
+        fill(30,144,255);
+        ellipse(0,0,15,15);
+        stroke(30,144,255);
+        strokeWeight(3);
+        for(var i = 0; i < this.pathLength; i++){
+          switch(this.path[i]){
+            case U:
+              line(0,0,0,-40);
+              translate(0,-40);
+            break;
+            case D:
+              line(0,0,0,40);
+              translate(0,40);
+            break;
+            case R:
+              line(0,0,40,0);
+              translate(40,0);
+            break;
+            case L:
+              line(0,0,-40,0);
+              translate(-40,0);
+            break;
+          }
+          ellipse(0,0,5,5);
+        }
+        strokeWeight(1);
+        stroke(0);
+        popMatrix();
+        popMatrix();
+      };
+
       var tutorial = new Level({
         grid:[
         [1,0,0],
         [0,0,0],
-        [0,0,1]],
-        inventory:[1,1],
-        inventoryQuantity:[3,2]
+        [0,0,3]],
+        inventory:[1],
+        inventoryQuantity:[3],
+        x:0,
+        y:0,
+        path:[R,R,D,D]
       });
 
-      var currentLevel = tutorial;
+      var level1 = new Level({
+        grid:[
+        [1,1,1,1,1],
+        [0,0,1,0,0],
+        [0,0,3,0,0]],
+        inventory:[2],
+        inventoryQuantity:[1],
+        x:0,
+        y:0,
+        path:[R,R,R,R,D,D]
+      });
+      var level2 = new Level({
+        grid:[
+        [1,1,1],
+        [3,1,1],
+        [0,0,0]],
+        inventory:[2],
+        inventoryQuantity:[1],
+        x:0,
+        y:0,
+        path:[R,R,D,L,U,L]
+      });
+      var level3 = new Level({
+        grid:[
+        [1,1,1,0],
+        [1,1,1,1],
+        [0,0,3,0]],
+        inventory:[2],
+        inventoryQuantity:[1],
+        x:0,
+        y:0,
+        path:[R,R,D]
+      });
+      var level4 = new Level({
+        grid:[
+        [1,1,1,0,0],
+        [1,0,1,0,0],
+        [1,1,1,1,3]],
+        inventory:[2],
+        inventoryQuantity:[1],
+        x:0,
+        y:0,
+        path:[D,D,R,R,U,U,L,L]
+      });
+
+
+      var levels = [tutorial,level1,level2,level3,level4];
+
+      var currentLevelID = 0;
+      var currentLevel = levels[currentLevelID];
+
+      var newLevel = function(){
+        currentLevelID++;
+        currentLevel = levels[currentLevelID];
+        play = false;
+        player.pathActive = 0;
+        moveAnimGoing = false;
+        player.x = currentLevel.startX;
+        player.y = currentLevel.startY;
+        player.niceX = currentLevel.startX*40;
+        player.niceY = currentLevel.startY*40;
+      };
 
       draw = function(){
         background(220);
@@ -147,16 +375,123 @@
         }else{
           isInTiles = false;
         }
-        println(tileX+" "+tileY+" "+isInTiles);
 
 
-        tutorial.draw();
-        
-        
+        currentLevel.draw();
+        currentLevel.drawPath();
+
+        //player draw
+
+        if(!play){
+          pushMatrix();
+          translate(width/2-(currentLevel.width*40/2),height/2-(currentLevel.height*40/2));
+          translate(40*player.x,40*player.y);
+          fill(255,0,0);
+          ellipse(20,20,20,20);
+          popMatrix();
+        }else{
+          pushMatrix();
+          translate(width/2-(currentLevel.width*40/2),height/2-(currentLevel.height*40/2));
+          translate(player.niceX,player.niceY);
+          fill(255,0,0);
+          ellipse(20,20,20,20);
+          popMatrix();
+        }      
+
         //mouse hold
 
         drawTile(chosenTile,mouseX-20,mouseY-20);
 
+        //play
+
+        if(play){
+          if(!moveAnimGoing){
+            if(currentLevel.grid[player.y][player.x] == 3){
+              play = false;
+              newLevel();
+              return;
+            }
+            moveAnimGoing = true;
+            player.pathActive++;
+            if(player.pathActive >= currentLevel.path.length){
+              player.pathActive -= currentLevel.path.length;
+            }
+            currentMoveAnim.dir = currentLevel.path[player.pathActive];
+            switch(currentMoveAnim.dir){
+              case U:
+                player.y--;
+              break;
+              case D:
+                player.y++;
+              break;
+              case L:
+                player.x--;
+              break;
+              case R:
+                player.x++;
+              break;
+            }
+            if(player.x < 0 || player.x >= currentLevel.width || player.y < 0 || player.y >= currentLevel.height){
+              currentMoveAnim.able = false;
+            }else{
+              currentMoveAnim.able = ableToWalk(currentLevel.grid[player.y][player.x]);
+            }
+            if(!currentMoveAnim.able){
+              switch(currentMoveAnim.dir){
+              case U:
+                player.y++;
+              break;
+              case D:
+                player.y--;
+              break;
+              case L:
+                player.x++;
+              break;
+              case R:
+                player.x--;
+              break;
+            }
+            }
+            moveAnimFrame=0;
+          }else{
+            if(currentMoveAnim.able){
+              switch(currentMoveAnim.dir){              
+                case U:
+                  player.niceY-=4;
+                break;
+                case D:
+                  player.niceY+=4;
+                break;
+                case L:
+                  player.niceX-=4;
+                break;
+                case R:
+                  player.niceX+=4;
+                break;
+              }
+            }
+            moveAnimFrame++;
+            if(moveAnimFrame >= 10){
+              moveAnimGoing=false;
+            }
+          }
+        }
+
+        //play icon
+
+        pushMatrix();
+        translate(width-120,0);
+        noStroke();
+        if(play){
+          fill(255,120,0);
+          rect(20,15,30,90);
+          rect(70,15,30,90);
+        }else{
+          fill(0,200,0);
+          triangle(25,20,95,60,25,100);
+        }
+        stroke(0);
+        popMatrix();
       }
 
     }};
