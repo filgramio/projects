@@ -44,13 +44,40 @@
       var imgs = {
         player: loadImage("images/player.png"),
         highlight: loadImage("images/highlight.png"),
+        laser_vertical: loadImage("images/laser_vertical.png"),
+        laser_horizontal: loadImage("images/laser_horizontal.png"),
         floor_tile: loadImage("images/floor_tile.png"),
         finish_tile: loadImage("images/finish_tile.png"),
         wall_tile: loadImage("images/wall_tile.png"),
         toggle_tile: loadImage("images/toggle_tile.png"),
-        locked_tile: loadImage("images/locked_tile.png"),
-        unlocked_tile: loadImage("images/unlocked_tile.png")
+        locked_tile: loadImage("images/locked_tile.png"),        
+        unlocked_tile: loadImage("images/unlocked_tile.png"),        
+        laser_shooter_tile:{
+          U: loadImage("images/laser_shooter_tile_up.png"),
+          D: loadImage("images/laser_shooter_tile_down.png"),
+          L: loadImage("images/laser_shooter_tile_left.png"),
+          R: loadImage("images/laser_shooter_tile_right.png")
+        },
+        jump_pad_tile: loadImage("images/jump_pad_tile.png")
       };
+
+      var walkable = function(tile){
+        switch(tile){
+          case 0: return false; break;
+          case 1: return true; break;
+          case 2: return true; break;
+          case 3: return false; break;
+          case 4: return true; break;
+          case 5: return false; break;
+          case 6: return true; break;
+          case 7: return false; break;
+          case 8: return false; break;
+          case 9: return false; break;
+          case 10: return false; break;
+          case 11: return true; break;
+        }
+        return false;
+      }
 
       var Level = function(config){
         this.grid = config.grid;
@@ -60,7 +87,15 @@
         this.startX = config.x;
         this.startY = config.y;
         this.cornerX = width/2-this.width*25;
-        this.cornerY = height/2-this.height*25;
+        this.cornerY = height/2-this.height*25;        
+        if(this.movable_grid.length !== this.height || this.movable_grid[0].length !== this.width){
+          for(var y=0; y<this.height; y++){
+            this.movable_grid.push([]);
+            for(var x=0; x<this.width; x++){
+              this.movable_grid[y].push(0);
+            }
+          }
+        }
       };
 
 
@@ -189,23 +224,158 @@
         y:1
       });
 
+      var level15 = new Level({
+        grid: [
+          [2,3,1,3,1],
+          [5,3,3,3,3],
+          [1,1,1,3,4]],
+        movable_grid: [
+          [0,0,0,1,0],
+          [0,0,1,0,1],
+          [0,1,0,0,0]],
+        x:0,
+        y:2
+      });
 
-      var levels = [level1,level2,level3,level4,level5,level11,level12,level13,level14];
-      var currentLevelID = 0;
-      var currentLevel = levels[currentLevelID];
+      var level21 = new Level({
+        grid: [
+          [4,3,8,3,0],
+          [1,3,1,3,3],
+          [1,3,6,3,2],
+          [1,1,1,1,1],
+          [1,3,3,3,3]],
+        movable_grid: [
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0]],
+        x:0,
+        y:4
+      });
 
-      var walkable = function(tile){
-        switch(tile){
-          case 0: return false; break;
-          case 1: return true; break;
-          case 2: return true; break;
-          case 3: return false; break;
-          case 4: return true; break;
-          case 5: return false; break;
-          case 6: return true; break;
-        }
-        return false;
-      }
+      var level22 = new Level({
+        grid: [
+          [3,1,3,8,3,0],
+          [4,1,3,5,3,3],
+          [3,1,6,1,6,9],
+          [3,1,3,5,3,3],
+          [3,1,1,1,1,2],
+          [3,4,3,3,3,3]],
+        movable_grid: [
+          [0,0,0,0,0,0],
+          [0,0,0,0,0,0],
+          [0,0,0,0,0,0],
+          [0,0,0,0,0,0],
+          [0,0,0,0,0,0],
+          [0,0,0,0,0,0]],
+        x:1,
+        y:0
+      });
+
+      var level23 = new Level({
+        grid: [
+          [3,8,3,8,3,8,3],
+          [3,1,3,1,3,1,3],
+          [1,1,1,1,1,1,1],
+          [3,3,3,3,3,3,1],
+          [2,1,1,1,1,1,1],
+          [3,3,3,1,3,1,3],
+          [3,7,3,7,3,7,3]],
+        movable_grid: [
+          [0,0,0,0,0,0,0],
+          [0,1,0,1,0,1,0],
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0],
+          [0,1,0,1,0,1,0],
+          [0,0,0,0,0,0,0]],
+        x:0,
+        y:2
+      });
+
+      var level24 = new Level({
+        grid: [
+          [3,3,8,3,8,3,8,3,8,3,8,3],
+          [3,3,5,3,5,3,6,3,5,3,6,3],
+          [3,4,1,4,1,4,1,4,1,4,1,3],
+          [1,1,1,1,1,1,1,1,1,1,1,2],
+          [3,1,1,1,1,1,1,1,1,1,1,3],
+          [3,3,1,3,1,3,1,3,1,3,3,3],
+          [3,3,7,3,7,3,7,3,7,3,7,3]],
+        movable_grid: [
+          [0,0,0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0,0,0],
+          [0,0,1,0,1,0,1,0,1,0,1,0],
+          [0,0,0,0,0,0,0,0,0,0,0,0]],
+        x:0,
+        y:3
+      });
+
+      var level25 = new Level({
+        grid: [
+          [3,3,3,1,3,3,3],
+          [3,1,1,1,1,1,9],
+          [3,1,1,1,1,1,9],
+          [3,1,1,1,1,1,9],
+          [3,1,1,1,1,1,9],
+          [3,1,1,1,1,1,1],
+          [3,3,3,2,3,3,3]],
+        movable_grid: [
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,0]],
+        x:3,
+        y:0
+      });
+
+      var level31 = new Level({
+        grid: [
+          [1,1,1 ,3,1,1 ,1],
+          [1,1,11,3,1,1 ,1],
+          [1,1,1 ,3,1,11,1],
+          [3,3,3 ,3,3,3 ,3],
+          [3,3,3 ,3,1,1 ,1],
+          [3,3,3 ,3,1,1 ,1],
+          [3,3,3 ,3,1,2 ,1]],
+        movable_grid: [
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0]],
+        x:0,
+        y:1
+      });
+
+      var level32 = new Level({
+        grid: [
+          [3,3,3,3,3,3,3,3,3,3,3,3,3],
+          [1,11,11,11,11,11,11,11,11,11,11,1,3],
+          [1,1,1,1,1,1,1,1,1,1,1,1,3],
+          [4,3,1,1,1,1,1,1,1,1,1,1,3],
+          [3,3,5,6,6,5,3,5,6,3,1,1,3],
+          [3,3,7,7,7,7,7,7,7,7,7,2,3]],
+        movable_grid: [
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0]],
+        x:0,
+        y:1
+      });
+
+      
+
+      var levels = [level1,level2,level3,level4,level5,level11,level12,level13,level14,level15,level21,level22,level23,level24,level25,level31,level32];
+      var currentLevelID = 16;
+      var currentLevel = levels[currentLevelID];      
+
+      var currentLaserMap = []; // 0 = no laser, 1 = vertical laser, 2 = horizontal laser
 
       var player = {
         x: currentLevel.startX,
@@ -232,6 +402,21 @@
           case 6:
             image(imgs.unlocked_tile, x, y, 50, 50);
           break;
+          case 7 :
+            image(imgs.laser_shooter_tile.U, x, y, 50, 50);
+          break;
+          case 8 :
+            image(imgs.laser_shooter_tile.D, x, y, 50, 50);
+          break;
+          case 9 :
+            image(imgs.laser_shooter_tile.L, x, y, 50, 50);
+          break;
+          case 10 :
+            image(imgs.laser_shooter_tile.R, x, y, 50, 50);
+          break;
+          case 11 :
+            image(imgs.jump_pad_tile, x, y, 50, 50);
+          break;
         }
       };
 
@@ -244,6 +429,12 @@
             drawTile(x*50, y*50, tile);
             if(level.movable_grid[y][x] === 1){
               image(imgs.highlight, x*50, y*50, 50, 50);
+            }
+            if(currentLaserMap[y][x] === 1){
+              image(imgs.laser_vertical, x*50, y*50-1, 50, 51);
+            }
+            if(currentLaserMap[y][x] === 2){
+              image(imgs.laser_horizontal, x*50-1, y*50, 51, 50);
             }
           }
         }
@@ -270,15 +461,71 @@
 
       var tileX = 0;
       var tileY = 0;
+
+      var heldX = 0;
+      var heldY = 0;
       var holdingTile = false;
       var holdedTile;
 
+      //laser map setup
+
+      for(var y=0; y<currentLevel.height; y++){        
+        currentLaserMap.push([]);
+        for(var x=0; x<currentLevel.width; x++){
+          currentLaserMap[y].push(0);
+        }
+      }
+      
       draw = function() {
         background(20);        
 
         //setup
         tileX = floor((mouseX-(width/2-currentLevel.width*25))/50);
         tileY = floor((mouseY-(height/2-currentLevel.height*25))/50);
+
+        //laser setup
+        for(var y=0; y<currentLevel.height; y++){
+          for(var x=0; x<currentLevel.width; x++){
+            currentLaserMap[y][x] = 0;
+          }
+        }
+        for(var y=0; y<currentLevel.height; y++){
+          for(var x=0; x<currentLevel.width; x++){
+            if(currentLevel.grid[y][x] == 7){
+              for(var ly=y-1; ly>=0; ly--){
+                if(walkable(currentLevel.grid[ly][x])){
+                  currentLaserMap[ly][x] = 1;
+                } else {
+                  break;
+                }
+              }
+            } else if(currentLevel.grid[y][x] == 8){
+              for(var ly=y+1; ly<currentLevel.height; ly++){
+                if(walkable(currentLevel.grid[ly][x])){
+                  currentLaserMap[ly][x] = 1;
+                } else {
+                  break;
+                }
+              }
+            } else if(currentLevel.grid[y][x] == 9){
+              for(var lx=x-1; lx>=0; lx--){
+                if(walkable(currentLevel.grid[y][lx])){
+                  currentLaserMap[y][lx] = 2;
+                } else {
+                  break;
+                }
+              }
+            } else if(currentLevel.grid[y][x] == 10){
+              for(var lx=x+1; lx<currentLevel.width; lx++){
+                if(walkable(currentLevel.grid[y][lx])){
+                  currentLaserMap[y][lx] = 2;
+                } else {
+                  break;
+                }
+              }
+            }
+          }
+        }
 
         //draw level
         drawMap(currentLevel,width/2,height/2);
@@ -290,23 +537,44 @@
         //move player
 
         if(!holdingTile){
-          if(keys[UP] && currentLevel.grid[player.y-1] && walkable(currentLevel.grid[player.y-1][player.x])){
+          if(currentLevel.grid[player.y][player.x] !== 11){          
+          if(keys[UP] && currentLevel.grid[player.y-1] && walkable(currentLevel.grid[player.y-1][player.x]) && currentLaserMap[player.y-1][player.x] == 0){
             player.y--;
             keys[UP] = false;
           }
-          if(keys[DOWN] && currentLevel.grid[player.y+1] && walkable(currentLevel.grid[player.y+1][player.x])){
+          if(keys[DOWN] && currentLevel.grid[player.y+1] && walkable(currentLevel.grid[player.y+1][player.x] ) && currentLaserMap[player.y+1][player.x] == 0){
             player.y++;
             keys[DOWN] = false;
           }
-          if(keys[LEFT] && walkable(currentLevel.grid[player.y][player.x-1])){
+          if(keys[LEFT] && walkable(currentLevel.grid[player.y][player.x-1]) && currentLaserMap[player.y][player.x-1] == 0){
             player.x--;
             keys[LEFT] = false;
           }
-          if(keys[RIGHT] && walkable(currentLevel.grid[player.y][player.x+1])){
+          if(keys[RIGHT] && walkable(currentLevel.grid[player.y][player.x+1]) && currentLaserMap[player.y][player.x+1] == 0){
             player.x++;
             keys[RIGHT] = false;
           }
+          }else{
+            //jump pad
+            if(keys[UP] && currentLevel.grid[player.y-2] && walkable(currentLevel.grid[player.y-2][player.x]) && currentLaserMap[player.y-2][player.x] == 0){
+              player.y-=2;
+              keys[UP] = false;
+            }
+            if(keys[DOWN] && currentLevel.grid[player.y+2] && walkable(currentLevel.grid[player.y+2][player.x] ) && currentLaserMap[player.y+2][player.x] == 0){
+              player.y+=2;
+              keys[DOWN] = false;
+            }
+            if(keys[LEFT] && walkable(currentLevel.grid[player.y][player.x-2]) && currentLaserMap[player.y][player.x-2] == 0){
+              player.x-=2;
+              keys[LEFT] = false;
+            }
+            if(keys[RIGHT] && walkable(currentLevel.grid[player.y][player.x+2]) && currentLaserMap[player.y][player.x+2] == 0){
+              player.x+=2;
+              keys[RIGHT] = false;
+            }
+          }
         }
+
 
         //Toggle lock
 
@@ -325,6 +593,12 @@
             currentLevel = levels[currentLevelID];
             player.x = currentLevel.startX;
             player.y = currentLevel.startY;
+            for(var y=0; y<currentLevel.height; y++){
+              for(var x=0; x<currentLevel.width; x++){
+                currentLaserMap[y].push(0);
+              }
+              currentLaserMap.push([]);
+            }
           } else {
             //no more levels
             textAlign(CENTER);
@@ -339,9 +613,10 @@
         if(!holdingTile){
           if(tileX >= 0 && tileX < currentLevel.width && tileY >= 0 && tileY < currentLevel.height){
             if(currentLevel.movable_grid[tileY][tileX] == 1){
-              if(mouseIsPressed){
-                mouseIsPressed = false;
+              if(mouseIsPressed && !holdingTile){
                 if(currentLevel.grid[tileY][tileX] !== 1 && !(player.x == tileX && player.y == tileY)){
+                  heldX = tileX;
+                  heldY = tileY;
                   holdedTile = currentLevel.grid[tileY][tileX];
                   currentLevel.grid[tileY][tileX] = 1;
                   holdingTile = true;
@@ -354,16 +629,27 @@
         //drop
 
         if(holdingTile){
-          if(tileX >= 0 && tileX < currentLevel.width && tileY >= 0 && tileY < currentLevel.height){
-            if(currentLevel.movable_grid[tileY][tileX] == 1){
-              if(mouseIsPressed){
-                mouseIsPressed = false;
+          if(!mouseIsPressed){
+            if(tileX >= 0 && tileX < currentLevel.width && tileY >= 0 && tileY < currentLevel.height){
+              if(currentLevel.movable_grid[tileY][tileX] == 1){
                 if(currentLevel.grid[tileY][tileX] == 1 && !(player.x == tileX && player.y == tileY)){
                   currentLevel.grid[tileY][tileX] = holdedTile;
                   holdedTile = null;
                   holdingTile = false;
-                }
-              }
+                }else{
+                  currentLevel.grid[heldY][heldX] = holdedTile;
+                  holdedTile = null;
+                  holdingTile = false;
+                }                
+              }else{
+                currentLevel.grid[heldY][heldX] = holdedTile;
+                holdedTile = null;
+                holdingTile = false;
+              }              
+            }else{
+              currentLevel.grid[heldY][heldX] = holdedTile;
+              holdedTile = null;
+              holdingTile = false;
             }
           }
         }
