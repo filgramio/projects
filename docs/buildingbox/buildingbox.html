@@ -559,17 +559,29 @@
             if(keys[UP] && currentLevel.grid[player.y-2] && walkable(currentLevel.grid[player.y-2][player.x]) && currentLaserMap[player.y-2][player.x] == 0){
               player.y-=2;
               keys[UP] = false;
+            }else if(keys[UP] && currentLevel.grid[player.y-1] && walkable(currentLevel.grid[player.y-1][player.x]) && currentLaserMap[player.y-1][player.x] == 0){
+              player.y--;
+              keys[UP] = false;
             }
             if(keys[DOWN] && currentLevel.grid[player.y+2] && walkable(currentLevel.grid[player.y+2][player.x] ) && currentLaserMap[player.y+2][player.x] == 0){
               player.y+=2;
+              keys[DOWN] = false;
+            }else if(keys[DOWN] && currentLevel.grid[player.y+1] && walkable(currentLevel.grid[player.y+1][player.x] ) && currentLaserMap[player.y+1][player.x] == 0){
+              player.y++;
               keys[DOWN] = false;
             }
             if(keys[LEFT] && walkable(currentLevel.grid[player.y][player.x-2]) && currentLaserMap[player.y][player.x-2] == 0){
               player.x-=2;
               keys[LEFT] = false;
+            }else if(keys[LEFT] && walkable(currentLevel.grid[player.y][player.x-1]) && currentLaserMap[player.y][player.x-1] == 0){
+              player.x--;
+              keys[LEFT] = false;
             }
             if(keys[RIGHT] && walkable(currentLevel.grid[player.y][player.x+2]) && currentLaserMap[player.y][player.x+2] == 0){
               player.x+=2;
+              keys[RIGHT] = false;
+            }else if(keys[RIGHT] && walkable(currentLevel.grid[player.y][player.x+1]) && currentLaserMap[player.y][player.x+1] == 0){
+              player.x++;
               keys[RIGHT] = false;
             }
           }
