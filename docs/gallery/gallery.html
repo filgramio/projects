@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Building Box</title>
+    <title>Minimal Web Page</title>
 </head>
   <body>
 	<!--This draws the canvas on the webpage -->
@@ -19,7 +19,7 @@
   <script>
   var programCode = function(processingInstance) {
     with (processingInstance) {
-      size(400, 400); 
+      size(window.innerWidth-15, window.innerHeight-15); 
       frameRate(30);
         
       // Paste code from Khan Academy here:
