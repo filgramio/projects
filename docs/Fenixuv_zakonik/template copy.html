@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Pátrání po Fénixově zákoníku</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-20); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var keys = [];
+
+      keyPressed = function() {
+        keys[keyCode] = true;
+      };
+      keyReleased = function() {
+        keys[keyCode] = false;
+      };
+
+      var playerImgs = {stand:{u:loadImage("images/stand_back.png"),d:loadImage("images/stand_front.png"),l:loadImage("images/stand_left.png"),r:loadImage("images/stand_right.png")},
+                        walk1:{u:loadImage("images/walk_back1.png"),d:loadImage("images/walk_front1.png"),l:loadImage("images/stand_left.png"),r:loadImage("images/stand_right.png")},
+                        walk2:{u:loadImage("images/walk_back2.png"),d:loadImage("images/walk_front2.png"),l:loadImage("images/stand_left.png"),r:loadImage("images/stand_right.png")}};
+
+      var camera = {x:0,y:0}; //camera center
+
+      var player = {x:140,y:140,speed:4,img:playerImgs.stand.d,dir:"r",walking:false,sprinting:false};
+
+      var frameCount = 0;
+
+      var cityTranslate = [loadImage("images/city_floor.png"),loadImage("images/city_wall.png")];
+      var citySolid = [0,1];
+
+      var level1 = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      ];
+
+      var currentMap = level1;
+      var mapWidth = currentMap[0].length;
+      var mapHeight = currentMap.length;
+      var currentTranslateArray = cityTranslate;
+      var currentSolidArray = citySolid;
+
+      var wouldCollide = function(x,y){
+        var tileX = Math.floor(x / 40);
+        var tileY = Math.floor(y / 40);
+        var checks = [
+          [tileX, tileY],
+          [tileX + 1, tileY],
+          [tileX, tileY + 1],
+          [tileX + 1, tileY + 1]
+        ];
+        for (var i = 0; i < checks.length; i++) {
+          var cx = checks[i][0];
+          var cy = checks[i][1];
+          if (
+            cx >= 0 && cx < mapWidth &&
+            cy >= 0 && cy < mapHeight &&
+            currentSolidArray[currentMap[cy][cx]] === 1
+          ) {
+            return true;
+          }else if(cx < 0 || cx >= mapWidth || cy < 0 || cy >= mapHeight){ //out of bounds
+            return true;
+          }
+        }
+        return false;
+      }
+
+      draw = function(){
+        background(255,255,255);
+        pushMatrix();
+        translate(-camera.x + width/2, -camera.y + height/2);
+
+        //setup camera
+
+        camera.x = constrain(player.x,width/2,mapWidth*40-width/2);
+        camera.y = constrain(player.y,height/2,mapHeight*40-height/2);
+
+
+        //player image set up
+
+        switch(player.dir){
+          case "u":
+            if(player.walking){
+              if(frameCount % 20 < 10){
+                player.img = playerImgs.walk1.u;
+              }
+              else{
+                player.img = playerImgs.walk2.u;
+              }
+            }
+            else{
+              player.img = playerImgs.stand.u;
+            }
+            break;
+          case "d":
+            if(player.walking){
+              if(frameCount % 20 < 10){
+                player.img = playerImgs.walk1.d;
+              }
+              else{
+                player.img = playerImgs.walk2.d;
+              }
+            }
+            else{
+              player.img = playerImgs.stand.d;
+            }
+            break;
+          case "l":
+            if(player.walking){
+              if(frameCount % 20 < 10){
+                player.img = playerImgs.walk1.l;
+              }
+              else{
+                player.img = playerImgs.walk2.l;
+              }
+            }
+            else{
+              player.img = playerImgs.stand.l;
+            }
+            break;
+          case "r":
+            if(player.walking){
+              if(frameCount % 20 < 10){
+                player.img = playerImgs.walk1.r;
+              }
+              else{
+                player.img = playerImgs.walk2.r;
+              }
+            }
+            else{
+              player.img = playerImgs.stand.r;
+            }
+            break;
+        }
+
+        //draw map
+
+        for(var i = 0; i < currentMap.length; i++){
+          for(var j = 0; j < currentMap[i].length; j++){
+            image(currentTranslateArray[currentMap[i][j]], j*40, i*40,40,40);
+          }
+        }
+
+        //draw player
+
+        image(player.img, player.x - 20, player.y - 20,40,40);
+
+        //sprinting
+
+        if(keys[16]){ //shift
+          player.sprinting = true;
+          player.speed = 8;
+        }
+        else{
+          player.sprinting = false;
+          player.speed = 4;
+        }
+
+        //player movement
+
+        player.walking = false;
+
+        if(keys[UP] || keys[87]){ //up arrow or w
+          player.dir = "u";
+          if(!wouldCollide(player.x,player.y - player.speed)){
+            player.y -= player.speed;
+          }
+          player.walking = true;
+        }
+        if(keys[DOWN] || keys[83]){ //down arrow or s
+          player.dir = "d";
+          if(!wouldCollide(player.x,player.y + player.speed)){
+            player.y += player.speed;
+          }
+          player.walking = true;
+        }
+        if(keys[LEFT] || keys[65]){ //left arrow or a
+          player.dir = "l";
+          if(!wouldCollide(player.x - player.speed,player.y)){
+            player.x -= player.speed;
+          }
+          player.walking = true;
+        }
+        if(keys[RIGHT] || keys[68]){ //right arrow or d
+          player.dir = "r";
+          if(!wouldCollide(player.x + player.speed,player.y)){
+            player.x += player.speed;
+          }
+          player.walking = true;
+        }
+
+        popMatrix();
+        frameCount++;
+      }
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
