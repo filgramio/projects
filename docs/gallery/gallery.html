@@ -54,11 +54,14 @@
           this.completed.push(false);
         }
         this.isCompleted = isCompleted;
-        this.active = true;
+        this.active = false;
       }
 
       var numbers1 = new Level("images/numbers1.png",7539);
       var numbers2 = new Level("images/numbers2.png",1246);
+      var numbers3 = new Level("images/numbers3.png",3548);
+      var numbers4 = new Level("images/numbers4.png",5917);
+      var numbers5 = new Level("images/numbers5.png",6017);
 
       var balls1 = new Level("images/balls1.png",5346);
       var balls2 = new Level("images/balls2.png",2431);
@@ -67,9 +70,9 @@
       var bars1 = new Level("images/bars1.png",6481);
       var bars2 = new Level("images/bars2.png",3629);
 
-      var numbers = new Section("Numbers",[numbers1,numbers2],loadImage("images/shelf_numbers.png"),loadImage("images/logo_numbers.png"),false);
-      var balls = new Section("Holes",[balls1,balls2],loadImage("images/shelf_balls.png"),loadImage("images/logo_balls.png"));
-      var bars = new Section("Bars",[bars1,bars2],loadImage("images/shelf_numbers.png"),loadImage("images/logo_numbers.png"));
+      var numbers = new Section("Numbers",[numbers1,numbers2,numbers3,numbers4,numbers5],loadImage("images/shelf_numbers.png"),loadImage("images/logo_numbers.png"),false);
+      var balls = new Section("Holes",[balls1,balls2,balls3],loadImage("images/shelf_balls.png"),loadImage("images/logo_balls.png"));
+      var bars = new Section("Bars",[bars1,bars2],loadImage("images/shelf_numbers.png"),loadImage("images/logo_balls.png"));
 
       var currentSection = numbers;
       var levelNumber = 0;
@@ -81,7 +84,7 @@
       imageMode(CENTER);
 
       var keyPressed = function(){
-        if(keyCode >= 97 && keyCode <= 105 && scene == "play"){
+        if(keyCode >= 96 && keyCode <= 105 && scene == "play"){
           workedInput[inputSlot] = keyCode-96;
           inputSlot = (inputSlot+1)%4;
         }
@@ -263,13 +266,14 @@
             popMatrix();
             stroke(150);
             for(var i = 0; i < currentSection.levels.length; i++){
-              translate(i%5*80,floor(i/5)*80);
+              pushMatrix();
+              translate(i%4*80,floor(i/4)*80);
               fill(230);
               rect(0,0,60,60);
               if(currentSection.completed[i]){
                 fill(100,220,40);
               }
-              if(isMouseInRect(width/2-190+i%5*80,height/2-190+floor(i/5)*80,60,60)){
+              if(isMouseInRect(width/2-190+i%4*80,height/2-190+floor(i/4)*80,60,60)){
                 fill(225);
                 if(mouseIsPressed){
                   scene= "play";
@@ -280,6 +284,7 @@
               fill(180);
               textSize(40);
               text(i+1,30,30);
+              popMatrix();
             }
             popMatrix();
           break;
@@ -342,11 +347,21 @@
 
           break;
         }
-        popMatrix();        
-        if(backButton){
+        popMatrix();    
+        
+        //back button
+
+        if(backButton && scene != "sections"){
           stroke(150);
           fill(230);
+          if(isMouseInRect(20,20,80,50)){
+            fill(240);
+          }
           rect(20,20,80,50,10);
+          fill(180);
+          noStroke();
+          triangle(35,45,50,30,50,60);
+          rect(50,40,30,10);
           if(mouseIsPressed && !backButtonCheck && isMouseInRect(20,20,80,50)){
             switch(scene){
               case "play":
