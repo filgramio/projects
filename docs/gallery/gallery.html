@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Minimal Web Page</title>
+    <title>The Gallery</title>
 </head>
   <body>
 	<!--This draws the canvas on the webpage -->
@@ -24,7 +24,353 @@
         
       // Paste code from Khan Academy here:
 
+      var scene = "sections";
+
+      var isMouseInRect = function(x,y,w,h){
+        return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+      }
+
+      var mouseIsPressed = false;
+      mousePressed = function() {
+        mouseIsPressed = true;
+      };
+      mouseReleased = function() {
+        mouseIsPressed = false;
+        backButtonCheck = false;
+      };
+
+      var Level = function(img,code){
+        this.img = loadImage(img);
+        this.code = code;
+      };
+
+      var Section = function(name,levels,shelf,logo,isCompleted){
+        this.name = name;
+        this.levels = levels;
+        this.shelf = shelf;
+        this.logo = logo;
+        this.completed = [];
+        for(var i = 0; i < levels.length; i++){
+          this.completed.push(false);
+        }
+        this.isCompleted = isCompleted;
+        this.active = true;
+      }
+
+      var numbers1 = new Level("images/numbers1.png",7539);
+      var numbers2 = new Level("images/numbers2.png",1246);
+
+      var balls1 = new Level("images/balls1.png",5346);
+      var balls2 = new Level("images/balls2.png",2431);
+      var balls3 = new Level("images/balls3.png",4247);
+
+      var bars1 = new Level("images/bars1.png",6481);
+      var bars2 = new Level("images/bars2.png",3629);
+
+      var numbers = new Section("Numbers",[numbers1,numbers2],loadImage("images/shelf_numbers.png"),loadImage("images/logo_numbers.png"),false);
+      var balls = new Section("Holes",[balls1,balls2],loadImage("images/shelf_balls.png"),loadImage("images/logo_balls.png"));
+      var bars = new Section("Bars",[bars1,bars2],loadImage("images/shelf_numbers.png"),loadImage("images/logo_numbers.png"));
+
+      var currentSection = numbers;
+      var levelNumber = 0;
       
+      var workedInput = [0,0,0,0];
+      var inputSlot = 0;
+
+      textAlign(CENTER,CENTER);
+      imageMode(CENTER);
+
+      var keyPressed = function(){
+        if(keyCode >= 97 && keyCode <= 105 && scene == "play"){
+          workedInput[inputSlot] = keyCode-96;
+          inputSlot = (inputSlot+1)%4;
+        }
+      }
+
+      var sectionsMap = [
+        [1,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,0],
+        [0,0,0,1,1,1,bars,0,0,0,0],
+        [0,0,0,0,balls,0,0,0,0,0,0],
+        [0,0,0,0,1,numbers,0,0,0,0,0],
+        [0,0,0,0,0,2,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0]
+      ];
+
+
+      var sectionsTileX = 5;
+      var sectionsTileY = 5;
+
+      var check_symbol = loadImage("images/check_symbol.png");
+      var deny_symbol = loadImage("images/deny_symbol.png");
+
+      var denyAnimFrame = 0;
+
+      var backButton = true;
+      var backButtonCheck = false;
+
+      var drawSections = function(x,y){
+        pushMatrix();
+        translate(x,y);
+        for(var i = 0; i < sectionsMap.length; i++){
+          for(var j = 0; j < sectionsMap[i].length; j++){
+            if (sectionsMap[i][j] instanceof Section) {
+              if(isMouseInRect(width/2 + x + j*120-60, height/2 + y + i*120-60, 120,120) && sectionsMap[i][j].active){
+                fill(255);
+                noStroke();
+                rect(j*120-60,i*120-60,120,120);
+                stroke(150);
+                if(mouseIsPressed){
+                  scene = "levels";
+                  currentSection = sectionsMap[i][j];
+                  mouseIsPressed = false;
+                }
+              }
+              image(sectionsMap[i][j].logo, j * 120, i * 120,120,120);
+              if(sectionsMap[i][j].isCompleted){
+                fill(255,255,255,100);
+                noStroke();
+                rect(j*120-60,i*120-60,120,120);
+                stroke(150);
+              }
+            }else if(sectionsMap[i][j] == 1){
+              pushMatrix();
+              translate(j*120,i*120);
+              stroke(150);
+              strokeWeight(5);
+              if(i > 0 && sectionsMap[i-1][j] !== 0){
+                line(0,0,0,-60);
+              }
+              if(i < sectionsMap.length-1 && sectionsMap[i+1][j] !== 0){
+                line(0,0,0,60);
+              }
+              if(j > 0 && sectionsMap[i][j-1] !== 0){
+                line(0,0,-60,0);
+              }
+              if(j < sectionsMap[i].length && sectionsMap[i][j+1] !== 0){
+                line(0,0,60,0);
+              }
+              strokeWeight(1);
+              popMatrix();
+            }else if(sectionsMap[i][j] == 2){
+              pushMatrix();
+              translate(j*120,i*120);
+              stroke(255);
+              strokeWeight(5);
+              if(i > 0 && sectionsMap[i-1][j] !== 0){
+                line(0,0,0,-60);
+              }
+              if(i < sectionsMap.length-1 && sectionsMap[i+1][j] !== 0){
+                line(0,0,0,60);
+              }
+              if(j > 0 && sectionsMap[i][j-1] !== 0){
+                line(0,0,-60,0);
+              }
+              if(j < sectionsMap[i].length && sectionsMap[i][j+1] !== 0){
+                line(0,0,60,0);
+              }
+              strokeWeight(1);
+              popMatrix();
+            }
+          }
+        }
+        popMatrix();
+      };
+
+      var updatePaths = function(){
+        var changed = true;
+        while(changed){
+          changed = false;
+          for(var i = 0; i < sectionsMap.length; i++){
+            for(var j = 0; j < sectionsMap[i].length; j++){
+              if (sectionsMap[i][j] === 1) {
+                // Up
+                if (i > 0 && (sectionsMap[i-1][j] === 2 || (sectionsMap[i-1][j] instanceof Section && sectionsMap[i-1][j].isCompleted))) {
+                  sectionsMap[i][j] = 2;
+                  changed = true;
+                }
+                // Down
+                if (i < sectionsMap.length - 1 && (sectionsMap[i+1][j] === 2 || (sectionsMap[i+1][j] instanceof Section && sectionsMap[i+1][j].isCompleted))) {
+                  sectionsMap[i][j] = 2;
+                  changed = true;
+                }
+                // Left
+                if (j > 0 && (sectionsMap[i][j-1] === 2 || (sectionsMap[i][j-1] instanceof Section && sectionsMap[i][j-1].isCompleted))) {
+                  sectionsMap[i][j] = 2;
+                  changed = true;
+                }
+                // Right
+                if (j < sectionsMap[i].length - 1 && (sectionsMap[i][j+1] === 2 || (sectionsMap[i][j+1] instanceof Section && sectionsMap[i][j+1].isCompleted))) {
+                    sectionsMap[i][j] = 2;
+                    changed = true;
+                }
+              }
+              if (sectionsMap[i][j] instanceof Section) {
+                var active = false;
+                // Up
+                if (i > 0 && (sectionsMap[i-1][j] === 2 || (sectionsMap[i-1][j] instanceof Section && sectionsMap[i-1][j].isCompleted))) {
+                  active = true;
+                }
+                // Down
+                if (i < sectionsMap.length - 1 && (sectionsMap[i+1][j] === 2 || (sectionsMap[i+1][j] instanceof Section && sectionsMap[i+1][j].isCompleted))) {
+                  active = true;
+                }
+                // Left
+                if (j > 0 && (sectionsMap[i][j-1] === 2 || (sectionsMap[i][j-1] instanceof Section && sectionsMap[i][j-1].isCompleted))) {
+                  active = true;
+                }
+                // Right
+                if (j < sectionsMap[i].length - 1 && (sectionsMap[i][j+1] === 2 || (sectionsMap[i][j+1] instanceof Section && sectionsMap[i][j+1].isCompleted))) {
+                  active = true;
+                }
+                sectionsMap[i][j].active = (active || sectionsMap[i][j].active);
+              }
+            }
+          }
+        }
+      };
+
+      updatePaths();
+
+      draw = function(){
+        stroke(150);
+        pushMatrix();
+        translate(width/2,height/2);
+        background(240);
+        switch(scene){
+          case "sections":
+            drawSections(-120*sectionsTileX,-120*sectionsTileY);
+          break;
+          case "levels":
+            pushMatrix();
+            translate(-190,-190);
+            pushMatrix();
+            translate(0,-120);
+            noStroke();
+            for(var i = 0; i < 76; i++){
+              for(var j = 0; j < 20; j++){
+                fill(currentSection.shelf.get(i,j));
+                if(currentSection.shelf.get(i,j) == color(1,1,1)){
+                  noFill();
+                }
+                rect(i*4,j*4,5,4);
+              }
+            }
+            popMatrix();
+            stroke(150);
+            for(var i = 0; i < currentSection.levels.length; i++){
+              translate(i%5*80,floor(i/5)*80);
+              fill(230);
+              rect(0,0,60,60);
+              if(currentSection.completed[i]){
+                fill(100,220,40);
+              }
+              if(isMouseInRect(width/2-190+i%5*80,height/2-190+floor(i/5)*80,60,60)){
+                fill(225);
+                if(mouseIsPressed){
+                  scene= "play";
+                  levelNumber = i;                
+                }                
+              }
+              rect(0,0,60,60);
+              fill(180);
+              textSize(40);
+              text(i+1,30,30);
+            }
+            popMatrix();
+          break;
+          case "play":
+            var painting = currentSection.levels[levelNumber].img;
+            pushMatrix();
+            translate(-160,-160);
+            fill(200);  
+            rect(-10,-10,340,340);
+            for(var i = 0; i < painting.width; i++){
+              for(var j = 0; j < painting.height; j++){
+                noStroke();
+                fill(painting.get(i,j));
+                rect(i*5,j*5,6,5);
+              }  
+            }
+            popMatrix();
+
+            //input
+
+            pushMatrix();
+            translate(-150,180);
+            stroke(150);
+            for(var i = 0; i < 4; i++){
+              fill(230);
+              if(isMouseInRect(width/2-150+80*i,height/2+180,60,80) && mouseIsPressed){
+                inputSlot = i;
+              }
+              if(inputSlot == i){
+                fill(190);
+              }
+              rect(80*i,0,60,80,10);   
+              fill(160);  
+              textSize(55);
+              text(workedInput[i],80*i+30,40);         
+            }
+
+
+            if(denyAnimFrame > 0){
+              fill(255,0,0);               
+              rect(0,100,300,80,10);
+              image(deny_symbol,150,140,50,50);
+              denyAnimFrame--;
+            }else{
+              fill(100,220,40);              
+              rect(0,100,300,80,10);
+              image(check_symbol,150,140,50,50);
+            }                        
+            if(isMouseInRect(width/2-150,height/2+280,300,80) && mouseIsPressed && denyAnimFrame >= 0){
+              if(workedInput[0]*1000+workedInput[1]*100+workedInput[2]*10+workedInput[3] == currentSection.levels[levelNumber].code){
+                scene = "levels";
+                currentSection.completed[levelNumber] = true;
+                workedInput = [0,0,0,0];
+              }else{
+                denyAnimFrame = 10;
+              }
+            }
+
+            popMatrix();
+
+          break;
+        }
+        popMatrix();        
+        if(backButton){
+          stroke(150);
+          fill(230);
+          rect(20,20,80,50,10);
+          if(mouseIsPressed && !backButtonCheck && isMouseInRect(20,20,80,50)){
+            switch(scene){
+              case "play":
+                scene = "levels";
+              break;
+              case "levels":
+                scene = "sections";
+                var incomplete = false;
+                for(var i = 0; i < currentSection.levels.length; i++){
+                  if(!currentSection.completed[i]){
+                    incomplete = true;
+                  }
+                }
+                if(!incomplete){                    
+                  currentSection.isCompleted = true;
+                }
+                updatePaths();
+              break;
+            }
+            mouseIsPressed = false;
+            backButtonCheck = true;
+          }
+        }
+      };
 
     }};
 

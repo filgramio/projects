@@ -48,12 +48,12 @@
 
       var level1 = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -79,24 +79,21 @@
       var currentSolidArray = citySolid;
 
       var wouldCollide = function(x,y){
-        var tileX = Math.floor(x / 40);
-        var tileY = Math.floor(y / 40);
-        var checks = [
-          [tileX, tileY],
-          [tileX + 1, tileY],
-          [tileX, tileY + 1],
-          [tileX + 1, tileY + 1]
+        var halfSize = 15;
+        var corners = [
+          {x: x - halfSize, y: y - halfSize}, // top-left
+          {x: x + halfSize, y: y - halfSize}, // top-right
+          {x: x - halfSize, y: y + halfSize}, // bottom-left
+          {x: x + halfSize, y: y + halfSize}  // bottom-right
         ];
-        for (var i = 0; i < checks.length; i++) {
-          var cx = checks[i][0];
-          var cy = checks[i][1];
+        for (var i = 0; i < corners.length; i++) {
+          var cx = Math.floor(corners[i].x / 40);
+          var cy = Math.floor(corners[i].y / 40);
           if (
-            cx >= 0 && cx < mapWidth &&
-            cy >= 0 && cy < mapHeight &&
-            currentSolidArray[currentMap[cy][cx]] === 1
+            cx < 0 || cy < 0 ||
+            cx >= mapWidth || cy >= mapHeight ||
+            currentSolidArray[currentMap[cy][cx]]
           ) {
-            return true;
-          }else if(cx < 0 || cx >= mapWidth || cy < 0 || cy >= mapHeight){ //out of bounds
             return true;
           }
         }
@@ -198,20 +195,6 @@
 
         player.walking = false;
 
-        if(keys[UP] || keys[87]){ //up arrow or w
-          player.dir = "u";
-          if(!wouldCollide(player.x,player.y - player.speed)){
-            player.y -= player.speed;
-          }
-          player.walking = true;
-        }
-        if(keys[DOWN] || keys[83]){ //down arrow or s
-          player.dir = "d";
-          if(!wouldCollide(player.x,player.y + player.speed)){
-            player.y += player.speed;
-          }
-          player.walking = true;
-        }
         if(keys[LEFT] || keys[65]){ //left arrow or a
           player.dir = "l";
           if(!wouldCollide(player.x - player.speed,player.y)){
@@ -226,7 +209,21 @@
           }
           player.walking = true;
         }
-
+        if(keys[UP] || keys[87]){ //up arrow or w
+          player.dir = "u";
+          if(!wouldCollide(player.x,player.y - player.speed)){
+            player.y -= player.speed;
+          }
+          player.walking = true;
+        }
+        if(keys[DOWN] || keys[83]){ //down arrow or s
+          player.dir = "d";
+          if(!wouldCollide(player.x,player.y + player.speed)){
+            player.y += player.speed;
+          }
+          player.walking = true;
+        }
+        
         popMatrix();
         frameCount++;
       }
