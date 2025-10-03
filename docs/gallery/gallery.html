@@ -88,6 +88,10 @@
           workedInput[inputSlot] = keyCode-96;
           inputSlot = (inputSlot+1)%4;
         }
+		if(keyCode >= 48 && keyCode <= 57 && scene == "play"){
+          workedInput[inputSlot] = keyCode-48;
+          inputSlot = (inputSlot+1)%4;
+        }
       }
 
       var sectionsMap = [
