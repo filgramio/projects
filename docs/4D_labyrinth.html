@@ -95,6 +95,9 @@
         if(keyCode === 48 && scene === 2){
           skinEditorColor = 9;
         }
+        if(keyCode == 67){  //C key
+          generateCustomLevel();
+        }
       }
 
       keyReleased = function(){
@@ -681,7 +684,73 @@
         start: [2,15],
         locked: [0,0]
       });
+      var customLevel = new Level({
+        dimensions: [[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,2,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],[
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,10,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,9,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1]],],
+        start: [2,15],
+        locked: [0,0]
+      });
 
+      var generateCustomLevel = function(){
+        levelString = prompt("Enter level string:");
+        levelString = levelString.split("|");
+        
+        var dimensions = [];        
+
+        for(var i = 0; i < levelString[0]; i++){
+          dimensionCode = levelString[1+i].split(";");  
+          var dimension = [];
+          for(var j = 0; j < dimensionCode.length; j++){
+            dimensionRow = dimensionCode[j].split(",");
+            var row = [];
+            for(var k = 0; k < dimensionCode[j].length; k++){
+              row.push(parseInt(dimensionCode[j][k]));
+            }
+            dimension.push(row);
+          }
+          dimensions.push(dimension);
+        }
+        currentLevel = new Level({
+          dimensions: dimensions,
+          start: [parseInt(levelString[1+levelString[0]]),parseInt(levelString[2+levelString[0]])],
+          locked: [0,0]
+        });
+      };
 
       var scene = 0;
       var levels = [level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11];
