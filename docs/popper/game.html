@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Popper Game</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #1e122c;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(600, 400); 
+      frameRate(60);
+      background(30,30,80);   
+      strokeWeight(2);   
+
+      var Bar = function(x,y,deg,rotSpeed,speedX,speedY){
+        this.x = x;
+        this.y = y;
+        this.deg = deg;
+        this.rotSpeed = rotSpeed;
+        this.speedX = speedX;
+        this.speedY = speedY;
+      };
+
+      Bar.prototype.update = function(){
+        this.deg += this.rotSpeed;
+        this.x += this.speedX;
+        this.y += this.speedY;
+      };
+
+      var Bubble = function(x,y,radius,speedX,speedY,required,color){
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.required = required || 1;
+        this.entered = false;
+      };
+
+      Bubble.prototype.update = function(){
+        this.x += this.speedX;
+        this.y += this.speedY;
+      };
+
+      Level = function(bar,bubbleSet,bgColor,defaultBubbleColor){
+        this.bar = bar;
+        this.bubbleSet = bubbleSet;
+        this.bgColor = bgColor;
+        this.defaultBubbleColor = defaultBubbleColor;
+        for(var i=0;i<this.bubbleSet.length;i++){
+          if(this.bubbleSet[i].color === undefined){
+            this.bubbleSet[i].color = this.defaultBubbleColor;
+          }
+        }
+      };
+
+      Level.prototype.popBubble = function(index){
+        this.bubbleSet.splice(index,1);
+      };
+
+      var isBubbleOnBar = function(bubble, bar) {
+        var cos = Math.cos(bar.deg * Math.PI / 180);
+        var sin = Math.sin(bar.deg * Math.PI / 180);
+        
+        var dx = bubble.x - bar.x;
+        var dy = bubble.y - bar.y;
+        
+        var projection = dx * cos + dy * sin;
+        var perpDistance = Math.abs(-dx * sin + dy * cos);
+        
+        return perpDistance <= bubble.radius;
+      };
+
+      var isMouseOnBubble = function(bubble){
+        var d = dist(mouseX,mouseY,bubble.x,bubble.y);
+        return d <= bubble.radius;
+      };
+
+      //Bubble Day
+      bubbleDayBar = new Bar(0,300,0,0,0,0);
+      bubbleDayBubbles = [
+        new Bubble(300,-50,50,0,2),
+        new Bubble(150,-350,50,0,2),
+        new Bubble(450,-550,50,0,2),
+        new Bubble(100,-850,50,0,2),
+        new Bubble(200,-950,50,0,2),
+        new Bubble(300,-1050,50,0,2),
+        new Bubble(400,-1150,50,0,2),
+        new Bubble(500,-1250,50,0,2),
+        new Bubble(400,-1350,50,0,2),
+        new Bubble(300,-1450,50,0,2),
+        new Bubble(200,-1550,50,0,2),
+        new Bubble(100,-1650,50,0,2),
+        new Bubble(300,-2050,15,0,2),
+        new Bubble(300,-2100,15,0,2),
+        new Bubble(300,-2150,15,0,2),
+        new Bubble(300,-2200,15,0,2),
+        new Bubble(300,-2250,15,0,2)
+      ];
+      bubbleDay = new Level(bubbleDayBar,bubbleDayBubbles,color(100,100,255),color(200,230,255));
+
+      //Stronger
+      strongerBar = new Bar(300,300,0,0,0,0);
+      strongerBubbles = [
+        new Bubble(300,0,60,0,2,3),
+        new Bubble(300,-150,60,0,2,3),
+        new Bubble(300,-300,60,0,2,3),
+        new Bubble(100,-500,60,0,2,2),
+        new Bubble(500,-500,60,0,2,2),
+        new Bubble(300,-1000,200,0,2,20),
+      ];
+      stronger = new Level(strongerBar,strongerBubbles,color(220,100,0),color(150));
+
+      //Spinned
+      spinnedBar = new Bar(300,200,0,0.5,0,0);
+      spinnedBubbles = [
+        new Bubble(300,300,40,0,0),
+        new Bubble(450,300,40,0,0),
+        new Bubble(450,100,40,0,0),
+        new Bubble(300,-180,40,0,0.5),
+        new Bubble(300,580,40,0,-0.5),
+        new Bubble(500,-2680,40,0,4,3),
+        new Bubble(4000,300,40,-4,0,3),
+      ];
+      spinned = new Level(spinnedBar,spinnedBubbles,color(100,0,100),color(200,150,150));
+
+
+      var firstFrameOfClick = false;
+      mousePressed = function(){
+        firstFrameOfClick = true;
+      };
+      mouseReleased = function(){
+        firstFrameOfClick = false;
+      };
+
+      var currentLevel = spinned;
+
+      var playing = true;
+
+      draw = function() {
+        background(100,30,80);
+
+        if(playing){
+          background(currentLevel.bgColor);
+          //update bar and bubbles
+          currentLevel.bar.update();
+          for(var i=0;i<currentLevel.bubbleSet.length;i++){
+            var bubble = currentLevel.bubbleSet[i];
+            bubble.update();
+            if(isBubbleOnBar(bubble,currentLevel.bar) && bubble.x > 0 && bubble.x < 600 && bubble.y > 0 && bubble.y < 400){
+              bubble.entered = true;
+            }
+            if(!isBubbleOnBar(bubble,currentLevel.bar)){
+              if(bubble.entered){
+                //missed bubble
+                playing = false;
+              }
+            }
+            if(isBubbleOnBar(bubble,currentLevel.bar) && isMouseOnBubble(bubble) && firstFrameOfClick){
+              if(bubble.required > 1){
+                bubble.required -= 1;
+              } else {
+                currentLevel.popBubble(i);
+              }
+            }
+          }
+
+          //draw bar
+          pushMatrix();
+          translate(currentLevel.bar.x,currentLevel.bar.y);
+          rotate(radians(currentLevel.bar.deg));
+          stroke(255);
+          line(-5000,0,5000,0);
+          popMatrix();
+
+          //draw bubbles
+          for(var j=0;j<currentLevel.bubbleSet.length;j++){
+            var b = currentLevel.bubbleSet[j];
+            fill(red(b.color),green(b.color),blue(b.color),100);
+            if(isBubbleOnBar(b,currentLevel.bar)){
+              fill(red(b.color)+50,green(b.color)+50,blue(b.color)+50,100);
+            }
+            stroke(255);
+            ellipse(b.x,b.y,b.radius*2,b.radius*2);
+            fill(red(b.color),green(b.color),blue(b.color),50);
+            noStroke();
+            ellipse(b.x+b.radius/3,b.y-b.radius/3,b.radius,b.radius);
+            if(b.required > 1){
+              fill(255);
+              textAlign(CENTER,CENTER);
+              textSize(b.radius);
+              text(b.required,b.x,b.y);
+            }
+          }
+        }
+        firstFrameOfClick = false;
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
