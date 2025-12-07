@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Walls</title>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth-15, window.innerHeight-15); 
+      frameRate(30);
+      
+      var degToRad = function(deg) {
+        return deg * (PI / 180);
+      };
+
+      // Paste code from Khan Academy here:
+
+      var images = {
+        road: loadImage("images/tiles/road.png"),
+        car: loadImage("images/car.png"),
+        wall_h: loadImage("images/tiles/wall_front.png"),
+        wall_v: loadImage("images/tiles/wall_side.png")};
+
+      imageMode(CENTER);
+
+      //drive
+
+      var carX = 0;
+      var carY = 3;
+      var carFacing = 0; //0=up,1=right,2=down,3=left
+
+      var drawCar = function(x,y,facing,w,h){
+        pushMatrix();
+        translate(x-w*20+x*40+20,y-h*20+y*40+20);
+        rotate(degToRad(facing*90));
+        image(images.car, 0, 0, 40, 40);
+        popMatrix();
+      };
+
+      var Level = function(games,tiles,wallsH,wallsV,startX,startY){
+        this.games = games;
+        this.currentGame = games[0];
+        this.tiles = tiles;
+        this.wallsH = wallsH;
+        this.wallsV = wallsV;
+        this.startX = startX;
+        this.startY = startY;
+      };
+
+      Level.prototype.draw = function(){
+        pushMatrix();
+        translate(-this.tiles[0].length*20,-this.tiles.length*20);
+        for(var i=0;i<this.tiles.length;i++){
+          for(var j=0;j<this.tiles[i].length;j++){
+            var tile = this.tiles[i][j];
+            if(tile===0){
+              //road
+              image(images.road,j*40+20,i*40+20,40,40);
+            }
+          }
+        }
+        for(var i = 0; i < this.wallsV.length; i++) {
+          for(var j = 0; j < this.wallsV[i].length; j++) {
+            if(this.wallsV[i][j] === 1){
+              image(images.wall_v, j*40, i*40+20, 40, 40); 
+            }             
+          }
+        }
+        for(var i = 0; i < this.wallsH.length; i++) {
+          for(var j = 0; j < this.wallsH[i].length; j++) {
+            if(this.wallsH[i][j] === 1){
+              image(images.wall_h, j*40+20, i*40, 40, 40); 
+            }             
+          }
+        }
+        
+
+        popMatrix();
+        drawCar(carX,carY,carFacing,this.tiles[0].length,this.tiles.length);
+      };
+
+      var level1 = new Level(
+        ["drive"],[
+
+        [0,0,0,2],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0]],[
+
+        [0,0,0,0],
+        [1,0,0,0],
+        [0,0,0,1],
+        [0,0,0,0],
+        [0,0,0,0]],[
+
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,1,0,0,0]], 0, 3
+      );
+
+      
+
+
+      draw = function() {
+        pushMatrix();
+        translate(width/2, height/2);
+        level1.draw();
+        popMatrix();
+      }
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
