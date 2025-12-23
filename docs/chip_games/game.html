@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Chip Games</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #1e122c;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(600, 600); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      chips = [0,0,0,0,0,10]; // black, purple, orange, blue, green, red
+
+      drawChip = function(x, y, color, size) {
+        pushMatrix();
+        translate(x,y);
+        scale(size);
+        noStroke();
+        fill(color);
+        ellipse(0,0,50,50);
+        fill(255,255,255,180);
+        ellipse(0,0,35,35);
+        fill(color);
+        ellipse(-3,3,38,38);
+        popMatrix();
+      };
+
+      drawChip(200,200,color(255,0,0));
+
+      person_imgs = {
+        front: loadImage("images/front.png"),
+        back: loadImage("images/back.png"),
+        left: loadImage("images/left.png"),
+        right: loadImage("images/right.png")  
+      };
+
+      person_img = person_imgs.front;
+
+      draw = function() {
+        image(person_img, 400, 400, 40, 40);        
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>

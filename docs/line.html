@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>LINE</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #1e122c;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400,600); 
+      frameRate(60);
+        
+      strokeWeight(3);
+      textAlign(CENTER, CENTER);
+
+      var mouseIsPressed = false;
+
+      mousePressed = function(){
+        mouseIsPressed = true;
+      };
+      mouseReleased = function(){
+        mouseIsPressed = false;
+      };
+
+      // Paste code from Khan Academy here:
+
+      var Block = function(x,y,width,height,clicks,lose){
+        this.x = x; // 8 segments
+        this.y = y; // from bottom, quarter the size of a segment
+        this.width = width; // to the right of x, in segments
+        this.height = height; // downwards from y, in quarters of segments
+        this.clicks = clicks || 1; // clicks to destroy
+        this.lose = lose || false; // lose on click
+      };
+
+      var Portal = function(y,mode){
+        this.y = y; // from bottom, quarter the size of a segment
+        this.mode = mode; 
+        this.active = true;
+      }
+
+      var Level = function(config){
+        this.blocks = config.blocks;
+        this.portals = config.portals || [];
+        this.speed = config.speed || 2;
+        this.blockColor = config.blockColor || color(255);
+        this.bgColor = config.bgColor || color(0);
+        this.lineY = 0;
+      };
+
+      Level.prototype.draw = function(){
+        background(this.bgColor);
+        stroke(this.blockColor);
+        line(0,500,400,500);
+        for(var i=0; i<this.blocks.length; i++){
+          var b = this.blocks[i];
+          if(b.lose && b.y*12.5 <= this.lineY - 100){
+            this.blocks.splice(i, 1);
+            i--;
+          }
+          fill(this.blockColor,100);
+          stroke(this.blockColor);
+          if(b.lose){
+            stroke(255,0,0);
+          }
+          if(b.lose){
+            fill(255,0,0,100);
+          }
+          rect(b.x*50, 500 - (b.y*12.5) + this.lineY, b.width*50, b.height*12.5);
+          if(b.clicks > 1 && !b.lose){
+            fill(this.blockColor);
+            if(b.lose){
+              fill(255,0,0);
+            }
+            textSize(40);
+            text(b.clicks, b.x*50 + (b.width*25), 500 - (b.y*12.5) + (b.height*6.25) + this.lineY);
+          }
+        }
+        for(var j=0; j<this.portals.length; j++){
+          var p = this.portals[j];
+          fill(150,0,200,100);
+          noStroke();
+          rect(0, 500 - (p.y*12.5) + this.lineY, 400, 20);
+          if(p.active && p.y*12.5 <= this.lineY){
+            mode = p.mode;
+            p.active = false;
+          }
+        }
+        //draw line deco
+        switch(mode){
+          case "slider":
+            fill(this.blockColor);
+            ellipse(mouseX,500,15,15);
+          break;
+        };
+      };
+
+      Level.prototype.update = function(){
+        this.lineY += this.speed;
+      };
+
+      Level.prototype.click = function(mode){
+        switch(mode){
+          case "line":
+            for(var i=0; i<this.blocks.length; i++){
+              var b = this.blocks[i];
+              if(b.y*12.5 >= this.lineY && b.y*12.5 - b.height*12.5 < this.lineY){
+                if(b.lose){
+                  this.gameOver();
+                } else {
+                  b.clicks -= 1;
+                  if(b.clicks <= 0){
+                    this.blocks.splice(i,1);
+                    i--;
+                  }
+                }
+              }
+            }
+          break;
+          case "slider":
+            for(var i=0; i<this.blocks.length; i++){
+              var b = this.blocks[i];
+              if(b.y*12.5 >= this.lineY && b.y*12.5 - b.height*12.5 < this.lineY && mouseX >= b.x*50 && mouseX <= (b.x + b.width)*50){
+                if(b.lose){
+                  this.gameOver();
+                } else {
+                  b.clicks -= 1;
+                  if(b.clicks <= 0){
+                    this.blocks.splice(i,1);
+                    i--;
+                  }
+                }
+              }
+            }
+          break;
+        };
+      };
+
+      Level.prototype.isGameOver = function(){
+        for(var i=0; i<this.blocks.length; i++){
+          if(this.blocks[i].y*12.5 < this.lineY && !this.blocks[i].lose){
+            return true;
+          }
+        }
+        return false;
+      };
+
+      Level.prototype.gameOver = function(){
+        // Game over handling could go here
+        println("Game Over");
+      };
+
+      var deserted = new Level({
+        blocks: [
+          new Block(3,12,2,8,3,true),
+          new Block(4,24,1,6,3),
+          new Block(4,60,1,6,3),
+        ],
+        portals:[
+          new Portal(50,"slider")
+        ],
+        blockColor: color(50,150,50),
+        bgColor: color(200,200,100)
+      });
+
+      var levels = [deserted];
+      var currentLevel = 1;
+
+      var mouseClickFrame = false;
+      var mouseReady = true;
+      var mode = "line";
+
+      var stringToLevel = function(str){
+        array = str.split('|');
+        temp = array[0].split(',');
+        bgCol = color(parseInt(temp[0]),parseInt(temp[1]),parseInt(temp[2]));
+        temp = array[1].split(',');
+        blockCol = color(parseInt(temp[0]),parseInt(temp[1]),parseInt(temp[2]));
+        speed = parseInt(array[2]);
+        temp = array[3].split(';');
+        blocks = [];
+        for(var i=0; i<temp.length; i++){
+          bdata = temp[i].split(',');
+          blocks.push(new Block(parseInt(bdata[0]),parseInt(bdata[1]),parseInt(bdata[2]),parseInt(bdata[3]),parseInt(bdata[4]),bdata[5] === '1'));
+        }
+        temp = array[4].split(';');
+        portals = [];
+        for(var j=0; j<temp.length; j++){
+          pdata = temp[j].split(',');
+          portals.push(new Portal(parseInt(pdata[0]),pdata[1]));
+        }
+        return new Level({
+          blocks: blocks,
+          portals: portals,
+          speed: speed,
+          blockColor: blockCol,
+          bgColor: bgCol
+        });        
+      };
+
+      levels.push(stringToLevel("0,0,255|0,255,255|2|0,3,8,3;2,14,4,6|50,line"));
+
+      draw = function(){
+        if(!mouseIsPressed){
+          mouseReady = true;
+        }
+        if(mouseIsPressed && !mouseClickFrame && mouseReady){
+          mouseClickFrame = true;
+          mouseReady = false;
+        }
+        levels[currentLevel].draw();
+        levels[currentLevel].update();
+        if(mouseClickFrame){
+          levels[currentLevel].click(mode);
+        }
+        if(levels[currentLevel].isGameOver()){
+          levels[currentLevel].gameOver();
+        }
+
+        mouseClickFrame = false;
+      };
+
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>

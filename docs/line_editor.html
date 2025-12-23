@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>LINE Editor</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #1e122c;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400, 600); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var colToString = function(col){
+        return red(col) + "," + green(col) + "," + blue(col);
+      };
+      var levelToString = function(){
+        var str = "";
+        str += colToString(bgColor) + "|";
+        str += colToString(blockColor) + "|";
+        str += speed + "|";
+        for(var i = 0; i < blocks.length; i++){
+          if(i > 0) str += ";";
+          str += blocks[i].x + "," + blocks[i].y + "," + blocks[i].width + "," + blocks[i].height;
+        }
+        str += "|";
+        for(var j = 0; j < portals.length; j++){
+          if(j > 0) str += ";";
+          str += portals[j].y + "," + portals[j].type;
+        }
+        return str;
+      };
+
+      var scrolled = 0;
+      var y_unlocked = 200;
+      var holdingBlock = null;
+      var readyToPlace = false;
+      var cornerX = 0;
+      var cornerY = 0;
+      var dropX = 0;
+      var dropY = 0;
+
+      var holdingBlock = null;
+      var createBlock = function(){
+        holdingBlock = {
+          x: 0,
+          y: 0,
+          width: 1,
+          height: 1
+        };
+      };
+
+      var blocks = [{x:5,y:17,width:2,height:8}];
+      var speed = 2;
+      var bgColor = color(0,0,255);
+      var blockColor = color(0,255,255);
+      var portals = [{y:50,type:"line"}];
+
+      mousePressed = function(){
+        if(holdingBlock === null){
+          createBlock();
+        }else{
+          cornerX = floor(mouseX/50);
+          cornerY = floor((600 - mouseY + scrolled)/12.5+1);
+          readyToPlace = true;
+        }
+      };
+      mouseReleased = function(){
+        if(holdingBlock !== null && readyToPlace){
+          holdingBlock.x = cornerX;
+          holdingBlock.y = cornerY;
+          blocks.push(holdingBlock);
+          holdingBlock = null;
+          readyToPlace = false;
+        }
+      };
+
+      
+
+      draw = function(){
+        background(220);
+
+        //draw grid
+        fill(bgColor);
+        for(var i = 0; i < 8; i++){
+          for(var j = 0; j < y_unlocked; j++){
+            rect(i*50,600 - (j*12.5)-12.5 + scrolled,50,12.5);
+          }
+        }
+
+        //draw existing blocks
+        fill(blockColor);
+        for(var k = 0; k < blocks.length; k++){
+          rect(blocks[k].x*50,600 - (blocks[k].y*12.5) + scrolled,blocks[k].width*50,blocks[k].height*12.5);
+        }
+        //draw held block
+        if(holdingBlock !== null){
+          if(mouseY < 600 && mouseY > 0){
+            holdingBlock.x = floor(mouseX/50);
+            holdingBlock.y = floor((600 - mouseY + scrolled)/12.5);
+          }
+          fill(blockColor,150);
+          rect(holdingBlock.x*50,600 - (holdingBlock.y*12.5) + scrolled-12.5,holdingBlock.width*50,holdingBlock.height*12.5);
+        }
+
+      }
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>

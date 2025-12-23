@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Cursor</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #414141;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(600, 600); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+
+      var tileImages = {
+        bricks: loadImage("tiles/bricks.png"),
+        lava: loadImage("tiles/lava.png"),
+        grass: loadImage("tiles/grass.png"),
+        question_mark: loadImage("tiles/question_mark.png"),
+        exclamation_mark: loadImage("tiles/exclamation_mark.png"),
+        tree: loadImage("tiles/tree.png"),
+        button: loadImage("tiles/button.png"),
+        floor: loadImage("tiles/floor.png"),
+        small_bricks: loadImage("tiles/small_bricks.png"),
+        toggle_on: loadImage("tiles/toggle_on.png"),
+        toggle_off: loadImage("tiles/toggle_off.png")
+      };
+
+      var Tile = function(img,solid,breakable,deadly,onClick){
+        this.img = img;
+        this.solid = solid;
+        this.breakable = breakable;
+        this.deadly = deadly || false;
+        this.onClick = onClick || function(){};
+      };
+
+      var tiles = {
+        bricks: new Tile(tileImages.bricks,true,false),
+        lava: new Tile(tileImages.lava,false,false,true),
+        grass: new Tile(tileImages.grass,false,false),
+        question_mark: new Tile(tileImages.question_mark,false,false),
+        exclamation_mark: new Tile(tileImages.exclamation_mark,false,false),
+        tree: new Tile(tileImages.tree,true,false),
+        button: new Tile(tileImages.button,false,false, false, function(){
+          println("Button clicked!");
+        }),
+        floor: new Tile(tileImages.floor,false,false),
+        toggle_on: new Tile(tileImages.toggle_on,true,false),
+        toggle_off: new Tile(tileImages.toggle_off,false,false),
+        small_bricks: new Tile(tileImages.small_bricks,false,false)
+      };
+
+      var Level = function(array,grid,x,y){
+        this.array = array;
+        this.grid = grid;     
+        this.x = x;
+        this.y = y;
+        this.objectGrid = [];
+        for(var y=0; y<grid.length; y++){
+          this.objectGrid[y] = [];
+          for(var x=0; x<grid[y].length; x++){
+            var tileIndex = grid[y][x];
+            if(tileIndex === null){
+              this.objectGrid[y][x] = null;
+            } else {
+              this.objectGrid[y][x] = this.array[tileIndex];
+            }
+          }
+        }
+      };
+
+      Level.prototype.draw = function(){
+        for(var y=0; y<this.objectGrid.length; y++){
+          for(var x=0; x<this.objectGrid[y].length; x++){
+            if(this.objectGrid[y][x] !== null){
+              image(this.objectGrid[y][x].img,x*40,y*40,40,40);
+            }
+          }
+        }
+      };
+
+      var tutorial = new Level([tiles.grass,tiles.bricks,tiles.small_bricks,tiles.button,tiles.toggle_on],[
+        [2,2,2,1,0,0,0,0,0,0,0,0,0,0,0],
+        [2,2,2,1,0,0,0,0,0,0,0,0,0,0,0],
+        [2,2,2,1,0,0,0,0,0,0,3,0,0,0,0],
+        [2,2,2,1,0,0,0,0,0,0,0,0,0,0,0],
+        [2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+        [2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+        [2,2,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+      ],1,1);
+
+      var currentLevel = tutorial;
+
+      println(tutorial.objectGrid);
+
+      draw = function(){
+        background(255);
+        currentLevel.draw();
+      };
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
