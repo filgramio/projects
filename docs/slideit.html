@@ -34,6 +34,17 @@
   <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
   <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
   <script>
+  var mouseLeftCanvas = false;
+  var canvas = document.getElementById("mycanvas");
+  
+  canvas.addEventListener('mouseleave', function() {
+    mouseLeftCanvas = true;
+  });
+  
+  canvas.addEventListener('mouseenter', function() {
+    mouseLeftCanvas = false;
+  });
+
   var programCode = function(processingInstance) {
     with (processingInstance) {
       size(400, 600); 
@@ -60,14 +71,16 @@
         this.remaining = clicks;
       };
 
-      var Door = function(channel){
+      var Door = function(channel,invert){
         this.type = "door";
         this.channel = channel;
+        this.invert = invert || false;
       };
 
       Level.prototype.draw = function(){
         pushMatrix();
         translate(0, this.scrolled);
+        background(this.bgCol);
         for(var i=0; i<this.area.length; i++){
           for(var j=0; j<this.area[i].length; j++){
             var cell = this.area[i][j];
@@ -87,7 +100,7 @@
                 if(j<this.area[i].length-1 && this.area[i][j+1] !== 1){
                   line(j*40+40, i*40 - this.area.length*40 + height, j*40+40, i*40 - this.area.length*40 + height +40);
                 }
-                if(i<this.area.length-1 && this.area[i+1][j] !== 1){
+              if((i<this.area.length-1 && this.area[i+1][j] !== 1) || i === this.area.length-1){
                   line(j*40, i*40+40 - this.area.length*40 + height, j*40+40, i*40+40 - this.area.length*40 + height);
                 }
                 if(i>0 && this.area[i-1][j] !== 1){
@@ -100,57 +113,104 @@
                     stroke(50);
                     fill(this.channelColors[cell.channel-1]);
                     ellipse(j*40+20, i*40 - this.area.length*40 + height +20, 30,30);
-                    fill(255);
-                    textAlign(CENTER, CENTER);
-                    text(cell.remaining, j*40+20, i*40 - this.area.length*40 + height +20);
+                    if(cell.remaining > 1){
+                      fill(255-red(this.channelColors[cell.channel-1]),255-green(this.channelColors[cell.channel-1]),255-blue(this.channelColors[cell.channel-1]));
+                      textAlign(CENTER, CENTER);
+                      text(cell.remaining, j*40+20, i*40 - this.area.length*40 + height +20);
+                    }
                   break;
                   case "door":
-                    stroke(50);
                     var doorCol = this.channelColors[cell.channel-1] || this.channelColors[cell.channel];
+                    if(this.channels[cell.channel] !== cell.invert){
+                      // open door
+                      noStroke();
+                      fill(doorCol,100);
+                      rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
+                      break;
+                    }
+                    noStroke();                    
                     fill(doorCol);
                     rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
+                    stroke(50);
+
+                    // Draw borders except where adjacent doors exist
+                    if(j>0 && (this.area[i][j-1] === undefined || this.area[i][j-1].type !== "door")){
+                      line(j*40, i*40 - this.area.length*40 + height, j*40, i*40 - this.area.length*40 + height +40);
+                    }
+                    if(j<this.area[i].length-1 && (this.area[i][j+1] === undefined || this.area[i][j+1].type !== "door")){
+                      line(j*40+40, i*40 - this.area.length*40 + height, j*40+40, i*40 - this.area.length*40 + height +40);
+                    }
+                    if(i>0 && (this.area[i-1][j] === undefined || this.area[i-1][j].type !== "door")){
+                      line(j*40, i*40 - this.area.length*40 + height, j*40+40, i*40 - this.area.length*40 + height);
+                    }
+                    if(i<this.area.length-1 && (this.area[i+1][j] === undefined || this.area[i+1][j].type !== "door")){
+                      line(j*40, i*40+40 - this.area.length*40 + height, j*40+40, i*40+40 - this.area.length*40 + height);
+                    }
                   break;
                 }
             }
+
             /*if(i === gridMouseY && j === gridMouseX){
               noFill();
               stroke(255,0,0);
               rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
             }*/ //debug
           }
+
         } 
+        stroke(0,255,0);
+        line(0,-this.area.length*40 + height,400,-this.area.length*40 + height);
         popMatrix();
       };
       Level.prototype.update = function(){
+        this.doneScrolling = true;
         this.scrolled += this.speed;
       };
 
 
       var a = new Button(1,1);
       var A = new Door(1);
+      var b = new Button(2,5);
+      var B = new Door(2);
       var level1 = new Level("The first",[
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,1,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,1,1,1,1,1,1],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
+        [B,B,B,B,B,B,B,B,B,B],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,b,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,1,1,1,0,0,0,0,0,0],
-        [0,1,0,0,0,0,0,0,0,0],
-        [0,a,1,0,A,0,0,0,0,0],
-        [0,0,0,0,0,0,0,1,0,0],
-        [0,0,0,1,1,0,1,1,0,0],
-        [1,0,1,1,0,0,0,1,1,0],
-        [0,0,0,0,0,1,0,0,0,0]],2, color(255,100,255),color(100,100,255),[color(255,0,0)]);
+        [1,0,0,1,1,1,1,1,1,1],
+        [1,0,0,1,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,0,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,A,A,1,1,1,1,1,1],
+        [1,1,A,A,1,1,1,1,1,1],
+        [1,1,0,0,0,0,0,0,1,1],
+        [1,1,0,0,0,0,a,0,1,1],
+        [1,1,0,0,0,0,0,0,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,1,1,1,1,1,1],
+        [1,1,0,0,0,0,0,0,1,1],
+        [1,1,0,0,0,0,0,0,1,1],
+        [1,1,1,1,1,1,0,0,1,1],
+        [1,1,1,1,1,1,0,0,1,1]],2, color(230,230,230),color(100,100,255),[color(255,0,0),color(0,255,0)]);
 
       var currentLevel = level1;
 
@@ -159,6 +219,11 @@
       var playing = false;
 
       var checkDeathCollision = function(){
+        // Check if mouse left the canvas
+        if(mouseLeftCanvas){
+          return true;
+        }
+        
         if(gridMouseX >= 0 && gridMouseX < currentLevel.area[0].length && gridMouseY >=0 && gridMouseY < currentLevel.area.length){
           var cell = currentLevel.area[gridMouseY][gridMouseX];
           switch(cell){
@@ -171,16 +236,42 @@
                 case "button":
                   return false;
                 case "door":
-                  return currentLevel.channels[cell.channel-1] === false;
+                  return currentLevel.channels[cell.channel] === cell.invert;
               }
           }
         }else{
+          if(gridMouseY >= currentLevel.area.length || gridMouseY < 0){
+            return false;
+          }
+          return true;
+        }
+      };
+
+      var checkButtonClick = function(){
+        if(gridMouseX >= 0 && gridMouseX < currentLevel.area[0].length && gridMouseY >=0 && gridMouseY < currentLevel.area.length){
+          var cell = currentLevel.area[gridMouseY][gridMouseX];
+          if(cell.type === "button"){
+            if(cell.remaining > 0){
+              cell.remaining -= 1;
+              if(cell.remaining === 0){
+                currentLevel.channels[cell.channel] = true;
+              }
+            }
+          }
+        }
+      };
+
+      var checkWin = function(){
+        if(mouseY < currentLevel.scrolled - currentLevel.area.length*40 + height){
           return true;
         }
       };
 
       mousePressed = function(){
-        playing = true;
+        if(mouseY > height - 120){
+          playing = true;
+        }
+        checkButtonClick();
       }
 
       draw = function(){
@@ -194,6 +285,22 @@
         if(checkDeathCollision()){
           playing = false;
           currentLevel.scrolled = -120;
+          for(var i=0; i<currentLevel.channels.length; i++){
+            currentLevel.channels[i] = false;
+          }
+          for(var i=0; i<currentLevel.area.length; i++){
+            for(var j=0; j<currentLevel.area[i].length; j++){
+              var cell = currentLevel.area[i][j];
+              if(cell.type === "button"){
+                cell.remaining = cell.clicks;
+              }
+            }
+          }
+        }
+        if(checkWin()){
+          playing = false;
+          println("You win!");
+          // You win!
         }
       }
 
@@ -201,7 +308,7 @@
     }};
 
   // Get the canvas that ProcessingJS will use
-  var canvas = document.getElementById("mycanvas"); 
+  // var canvas = document.getElementById("mycanvas");  // Already defined above
   // Pass the function to ProcessingJS constructor
   var processingInstance = new Processing(canvas, programCode); 
   </script>
