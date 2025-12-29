@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Slide It</title>
+
+    <style>
+      /* center canvas horizontally and vertically */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        align-items: center;      /* vertical center */
+        justify-content: center;  /* horizontal center */
+        background: #1e122c;         /* optional */
+      }
+      /* keep canvas responsive */
+      canvas#mycanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+</head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400, 600); 
+      frameRate(60);
+      strokeWeight(4);
+        
+      // Paste code from Khan Academy here:
+
+      var Level = function(name, area, speed, bgCol, blockCol, channelColors){
+        this.name = name;
+        this.area = area; // array of arrays from top left // 1 = block, 0 = empty, or an object
+        this.speed = speed;
+        this.scrolled = 0;
+        this.bgCol = bgCol;
+        this.blockCol = blockCol;
+        this.channelColors = channelColors; // map from channel number to color
+        this.channels = [false,false,false,false,false,false,false,false,false,false];
+      }
+
+      var Button = function(channel,clicks){
+        this.type = "button";
+        this.channel = channel;
+        this.clicks = clicks;
+        this.remaining = clicks;
+      };
+
+      var Door = function(channel){
+        this.type = "door";
+        this.channel = channel;
+      };
+
+      Level.prototype.draw = function(){
+        pushMatrix();
+        translate(0, this.scrolled);
+        for(var i=0; i<this.area.length; i++){
+          for(var j=0; j<this.area[i].length; j++){
+            var cell = this.area[i][j];
+            switch(cell){
+              case 0:
+                // empty
+                break;
+              case 1:
+                // block
+                fill(this.blockCol);
+                noStroke();
+                rect(j*40, i*40 - this.area.length*40 + height, 40, 40); //draw it aligned bottom to bottom
+                stroke(50);
+                if(j>0 && this.area[i][j-1] !== 1){
+                  line(j*40, i*40 - this.area.length*40 + height, j*40, i*40 - this.area.length*40 + height +40);
+                }
+                if(j<this.area[i].length-1 && this.area[i][j+1] !== 1){
+                  line(j*40+40, i*40 - this.area.length*40 + height, j*40+40, i*40 - this.area.length*40 + height +40);
+                }
+                if(i<this.area.length-1 && this.area[i+1][j] !== 1){
+                  line(j*40, i*40+40 - this.area.length*40 + height, j*40+40, i*40+40 - this.area.length*40 + height);
+                }
+                if(i>0 && this.area[i-1][j] !== 1){
+                  line(j*40, i*40 - this.area.length*40 + height, j*40+40, i*40 - this.area.length*40 + height);
+                }
+              break;
+              default:
+                switch(cell.type){
+                  case "button":
+                    stroke(50);
+                    fill(this.channelColors[cell.channel-1]);
+                    ellipse(j*40+20, i*40 - this.area.length*40 + height +20, 30,30);
+                    fill(255);
+                    textAlign(CENTER, CENTER);
+                    text(cell.remaining, j*40+20, i*40 - this.area.length*40 + height +20);
+                  break;
+                  case "door":
+                    stroke(50);
+                    var doorCol = this.channelColors[cell.channel-1] || this.channelColors[cell.channel];
+                    fill(doorCol);
+                    rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
+                  break;
+                }
+            }
+            /*if(i === gridMouseY && j === gridMouseX){
+              noFill();
+              stroke(255,0,0);
+              rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
+            }*/ //debug
+          }
+        } 
+        popMatrix();
+      };
+      Level.prototype.update = function(){
+        this.scrolled += this.speed;
+      };
+
+
+      var a = new Button(1,1);
+      var A = new Door(1);
+      var level1 = new Level("The first",[
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,1,1,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0,0,0,0],
+        [0,a,1,0,A,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,0,0],
+        [0,0,0,1,1,0,1,1,0,0],
+        [1,0,1,1,0,0,0,1,1,0],
+        [0,0,0,0,0,1,0,0,0,0]],2, color(255,100,255),color(100,100,255),[color(255,0,0)]);
+
+      var currentLevel = level1;
+
+      var gridMouseX = 0;
+      var gridMouseY = 0;
+      var playing = false;
+
+      var checkDeathCollision = function(){
+        if(gridMouseX >= 0 && gridMouseX < currentLevel.area[0].length && gridMouseY >=0 && gridMouseY < currentLevel.area.length){
+          var cell = currentLevel.area[gridMouseY][gridMouseX];
+          switch(cell){
+            case 0:
+              return false;
+            case 1:
+              return true;
+            default:
+              switch(cell.type){
+                case "button":
+                  return false;
+                case "door":
+                  return currentLevel.channels[cell.channel-1] === false;
+              }
+          }
+        }else{
+          return true;
+        }
+      };
+
+      mousePressed = function(){
+        playing = true;
+      }
+
+      draw = function(){
+        gridMouseX = floor(mouseX/40);
+        gridMouseY = floor((mouseY - currentLevel.scrolled - height)/40 + currentLevel.area.length);
+        background(255);
+        currentLevel.draw();
+        if(playing){
+          currentLevel.update();
+        }
+        if(checkDeathCollision()){
+          playing = false;
+          currentLevel.scrolled = 0;
+        }
+      }
+
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
