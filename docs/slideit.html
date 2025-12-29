@@ -46,7 +46,7 @@
         this.name = name;
         this.area = area; // array of arrays from top left // 1 = block, 0 = empty, or an object
         this.speed = speed;
-        this.scrolled = 0;
+        this.scrolled = -120;
         this.bgCol = bgCol;
         this.blockCol = blockCol;
         this.channelColors = channelColors; // map from channel number to color
@@ -193,7 +193,7 @@
         }
         if(checkDeathCollision()){
           playing = false;
-          currentLevel.scrolled = 0;
+          currentLevel.scrolled = -120;
         }
       }
 
