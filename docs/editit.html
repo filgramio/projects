@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Slide It</title>
+    <title>Slide It Editor</title>
 
     <style>
       /* center canvas horizontally and vertically */
@@ -53,11 +53,19 @@
         
       // Paste code from Khan Academy here:
 
+      mouseIsPressed = false;
+      mousePressed = function(){
+        mouseIsPressed = true;
+      };
+      mouseReleased = function(){
+        mouseIsPressed = false;
+      };
+
       var Level = function(name, area, speed, bgCol, blockCol, channelColors){
         this.name = name;
         this.area = area; // array of arrays from top left // 1 = block, 0 = empty, or an object
         this.speed = speed;
-        this.scrolled = -120;
+        this.scrolled = 0;
         this.bgCol = bgCol;
         this.blockCol = blockCol;
         this.channelColors = channelColors; // map from channel number to color
@@ -150,11 +158,11 @@
                 }
             }
 
-            /*if(i === gridMouseY && j === gridMouseX){
+            if(i === gridMouseY && j === gridMouseX){
               noFill();
               stroke(255,0,0);
               rect(j*40, i*40 - this.area.length*40 + height, 40, 40);
-            }*/ //debug
+            }
           }
 
         } 
@@ -166,64 +174,86 @@
         this.doneScrolling = true;
         this.scrolled += this.speed;
       };
+      Level.prototype.restrainScroll = function(){
+        this.scrolled = floor(constrain(this.scrolled, 0,this.area.length*40 - height+40));
+      };
 
+      var pickedObject = 1;
+      var editorInventory = [1, 0, new Button(1,1), new Door(1)];
 
       var a = new Button(1,1);
       var A = new Door(1);
       var b = new Button(2,5);
       var B = new Door(2);
-      var level1 = new Level("The first",[
+      var editedLevel = new Level("The first",[        
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0,0,0,0],
+        [1,0,0,0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [1,1,1,1,1,1,1,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,1,1,1,1,1,1,1],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [B,B,B,B,B,B,B,B,B,B],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,b,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [1,0,0,1,1,1,1,1,1,1],
-        [1,0,0,1,1,1,1,1,1,1],
-        [1,0,0,0,1,1,1,1,1,1],
-        [1,0,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,A,A,1,1,1,1,1,1],
-        [1,1,A,A,1,1,1,1,1,1],
-        [1,1,0,0,0,0,0,0,1,1],
-        [1,1,0,0,0,0,a,0,1,1],
-        [1,1,0,0,0,0,0,0,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,1,1,1,1,1,1],
-        [1,1,0,0,0,0,0,0,1,1],
-        [1,1,0,0,0,0,0,0,1,1],
-        [1,1,1,1,1,1,0,0,1,1],
-        [1,1,1,1,1,1,0,0,1,1]],2, color(230,230,230),color(100,100,255),[color(255,0,0),color(0,255,0)]);
+        [0,0,0,0,0,0,0,0,0,0]],2, color(230,230,230),color(100,100,255),[color(255,100,100),color(100,255,0)]);
 
-      var levelStr = '{"name":"The first","area":[[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]],"speed":2,"bgCol":[230,230,230],"blockCol":[100,100,255],"channelColors":[[255,100,100],[100,255,0]]}';  // the exported string
-      var levelData = JSON.parse(levelStr);
-      var importLevel = levelData;
+      var currentLevel = editedLevel;
+      // expose the current level object to the outside via processingInstance
+      // so outer scripts can modify properties like `scrolled`.
+      processingInstance.currentLevel = currentLevel;
 
-      var currentLevel = importLevel;
-      println(importLevel.channelColors); 
+      // Export level to JSON string (portable for other games)
+      processingInstance.exportLevelString = function(){
+        var area = currentLevel.area.map(function(row){
+          return row.map(function(cell){
+            if(cell === 0 || cell === 1) return cell;
+            if(cell.type === "button"){
+              return {t: "button", ch: cell.channel, cl: cell.clicks};
+            }
+            if(cell.type === "door"){
+              return {t: "door", ch: cell.channel, inv: cell.invert};
+            }
+            return cell;
+          });
+        });
+        var exported = {
+          name: currentLevel.name,
+          area: area,
+          speed: currentLevel.speed,
+          bgCol: [red(currentLevel.bgCol), green(currentLevel.bgCol), blue(currentLevel.bgCol)],
+          blockCol: [red(currentLevel.blockCol), green(currentLevel.blockCol), blue(currentLevel.blockCol)],
+          channelColors: currentLevel.channelColors.map(function(c){
+            return [red(c), green(c), blue(c)];
+          })
+        };
+        return JSON.stringify(exported);
+      };
+
+      // Download level string as .txt file
+      processingInstance.downloadLevelString = function(){
+        var str = processingInstance.exportLevelString();
+        var blob = new Blob([str], {type: 'text/plain'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = (currentLevel.name || 'level') + '.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
 
       var gridMouseX = 0;
       var gridMouseY = 0;
       var playing = false;
 
-      var checkDeathCollision = function(){
+      {/*var checkDeathCollision = function(){
         // Check if mouse left the canvas
         if(mouseLeftCanvas){
           return true;
@@ -251,8 +281,9 @@
           return true;
         }
       };
+      */
 
-      var checkButtonClick = function(){
+      /*var checkButtonClick = function(){
         if(gridMouseX >= 0 && gridMouseX < currentLevel.area[0].length && gridMouseY >=0 && gridMouseY < currentLevel.area.length){
           var cell = currentLevel.area[gridMouseY][gridMouseX];
           if(cell.type === "button"){
@@ -264,30 +295,76 @@
             }
           }
         }
-      };
+      };*/
 
-      var checkWin = function(){
+      /*var checkWin = function(){
         if(mouseY < currentLevel.scrolled - currentLevel.area.length*40 + height){
           return true;
         }
-      };
+      };*/
 
-      mousePressed = function(){
+      /*mousePressed = function(){
         if(mouseY > height - 120){
           playing = true;
         }
         checkButtonClick();
-      }
+      }*/}
+
 
       draw = function(){
         gridMouseX = floor(mouseX/40);
         gridMouseY = floor((mouseY - currentLevel.scrolled - height)/40 + currentLevel.area.length);
         background(255);
         currentLevel.draw();
+        currentLevel.restrainScroll();
         if(playing){
           currentLevel.update();
         }
-        if(checkDeathCollision()){
+        if(mouseIsPressed && !mouseLeftCanvas && mouseY > 40){
+          currentLevel.area[gridMouseY][gridMouseX] = pickedObject;
+        }
+        // Draw inventory bar at top
+        noStroke();
+        fill(0,0,0,50);
+        rect(0, 0, 400, 40);
+        for(var i = 0; i < editorInventory.length; i++){
+          stroke(0);
+          strokeWeight(2);
+          noFill();
+          rect(i*40, 0, 40, 40);
+          var item = editorInventory[i];
+          if(item === 1){
+            fill(currentLevel.blockCol);
+            noStroke();
+            rect(i*40 + 5, 5, 30, 30);
+          } else if(item.type === "button"){
+            fill(currentLevel.channelColors[item.channel - 1]);
+            noStroke();
+            ellipse(i*40 + 20, 20, 25, 25);
+          } else if(item.type === "door"){
+            fill(currentLevel.channelColors[item.channel - 1]);
+            noStroke();
+            rect(i*40 + 5, 5, 30, 30);
+          }
+        }
+        if(pickedObject !== null){
+          stroke(255, 255, 0);
+          strokeWeight(3);
+          noFill();
+          for(var i = 0; i < editorInventory.length; i++){
+            if(editorInventory[i] === pickedObject){
+              rect(i*40, 0, 40, 40);
+            }
+          }
+        }
+        if(mouseIsPressed && !mouseLeftCanvas && mouseY <= 40){
+          for(var i=0; i<editorInventory.length; i++){
+            if(mouseX >= i*40 && mouseX < (i+1)*40){
+              pickedObject = editorInventory[i];
+            }
+          }
+        }
+        /*if(checkDeathCollision()){
           playing = false;
           currentLevel.scrolled = -120;
           for(var i=0; i<currentLevel.channels.length; i++){
@@ -301,12 +378,12 @@
               }
             }
           }
-        }
-        if(checkWin()){
+        }*/
+        /*if(checkWin()){
           playing = false;
           println("You win!");
           // You win!
-        }
+        }*/
       }
 
 
@@ -315,6 +392,44 @@
   // Get the canvas that ProcessingJS will use
   // var canvas = document.getElementById("mycanvas");  // Already defined above
   // Pass the function to ProcessingJS constructor
-  var processingInstance = new Processing(canvas, programCode); 
+</script>
+
+  <script>
+  // Update the current level's `scrolled` value when the wheel is used over the canvas.
+  // This keeps wheel handling local to the canvas and prevents the page from scrolling.
+  (function(){
+    canvas.addEventListener('wheel', function(e){
+      // prevent the page from also scrolling
+      e.preventDefault();
+
+      var delta = e.deltaY;
+      // normalize line/page modes to approximate pixels
+      if(e.deltaMode === 1) delta *= 40; // lines -> pixels
+      else if(e.deltaMode === 2) delta *= 400; // pages -> pixels
+
+      // `currentLevel` is defined inside the Processing sketch; access it via the
+      // global `processingInstance` created below.
+      console.log('wheel delta:', delta, 'mode:', e.deltaMode);
+      if(typeof processingInstance !== 'undefined' && processingInstance && processingInstance.currentLevel && typeof processingInstance.currentLevel.scrolled === 'number'){
+          processingInstance.currentLevel.scrolled -= delta/5; // adjust scroll speed
+          console.log('updated scrolled:', processingInstance.currentLevel.scrolled);
+        } else {
+          console.log('processingInstance or currentLevel not ready', !!processingInstance, !!(processingInstance && processingInstance.currentLevel));
+        }
+    }, {passive: false});
+  })();
+  </script>
+
+  <script>
+  var processingInstance = new Processing(canvas, programCode);
+  
+  // Download level string when Enter is pressed
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      if(typeof processingInstance !== 'undefined' && processingInstance.downloadLevelString){
+        processingInstance.downloadLevelString();
+      }
+    }
+  });
   </script>
 </html>
