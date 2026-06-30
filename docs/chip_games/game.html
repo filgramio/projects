@@ -37,39 +37,143 @@
   var programCode = function(processingInstance) {
     with (processingInstance) {
       size(600, 600); 
-      frameRate(30);
+      frameRate(60);
         
       // Paste code from Khan Academy here:
 
-      chips = [0,0,0,0,0,10]; // black, purple, orange, blue, green, red
+      var keys = [];
+      keyPressed = function() {
+        keys[keyCode] = true;
+      };
+      keyReleased = function() {
+        keys[keyCode] = false;
+      };
 
-      drawChip = function(x, y, color, size) {
+      chips = [10,0,0,0,0,0];// red, green, blue, orange, purple, black
+      chip_colors = [color(255,0,0), color(0,255,0), color(0,0,255), color(255,165,0), color(128,0,128), color(0,0,0)];
+      chip_values = [1,5,10,50,100,500]
+
+      drawChip = function(x, y, type, size) {
+        col = chip_colors[type];
         pushMatrix();
         translate(x,y);
         scale(size);
         noStroke();
-        fill(color);
+        fill(col);
         ellipse(0,0,50,50);
         fill(255,255,255,180);
         ellipse(0,0,35,35);
-        fill(color);
+        fill(col);
         ellipse(-3,3,38,38);
         popMatrix();
       };
 
-      drawChip(200,200,color(255,0,0));
-
-      person_imgs = {
+      player_imgs = {
         front: loadImage("images/front.png"),
         back: loadImage("images/back.png"),
         left: loadImage("images/left.png"),
         right: loadImage("images/right.png")  
       };
 
-      person_img = person_imgs.front;
+      var Area = function(x, y, area, minigame_array, bg_color) {
+        this.x = x;
+        this.y = y;
+        this.areaImg = area;
+        this.minigame_array = minigame_array;
+        this.bg_color = bg_color;
+      };
+
+      Area.prototype.draw = function() {
+        fill(this.bg_color);
+        noStroke();
+        rect(this.x, this.y, 600, 520);
+        image(this.areaImg, this.x, this.y);
+      };
+
+      var Minigame = function(x,y,draw_function){
+        this.x = x;
+        this.y = y;
+        this.draw_function = draw_function;
+      };
+
+      var minagame_code = function(){};
+
+      var dices = new Minigame(165, 175, function(){
+        stroke(150,100,0);
+        strokeWeight(4);
+        fill(200,130,0);  
+        rect(0,80,600,520);                
+      });
+
+      var playerX = 300;
+      var playerY = 300;
+      var player_img = player_imgs.front;
+      var in_area = true;
+
+      var city = new Area(0, 80, loadImage("images/city.png"), [dices], color(200,200,200));
+
+      current_area = city;
 
       draw = function() {
-        image(person_img, 400, 400, 40, 40);        
+        background(255);
+        //draw chip bar
+        stroke(150,100,0);
+        strokeWeight(4);
+        fill(200,130,0);  
+        rect(0,0,width,80);
+        for(var i = 0; i < 6; i++){
+          if( chips[i] > 0 ){
+            drawChip(50 + i*100, 35, i, 1);
+          }else{
+            fill(150,100,0);
+            ellipse(50 + i*100, 35, 50, 50);  
+          }
+          fill(150);
+          textAlign(CENTER, CENTER);
+          textSize(16);
+          text("x" + chips[i], 50 + i*100, 35);
+          fill(150,100,0);
+          text("$" + chip_values[i], 50 + i*100, 70);
+        }
+
+        if(in_area){
+        //draw current area
+        current_area.draw();
+
+        //draw player
+        image(player_img, playerX - 25, playerY - 50+ 80,40,40);
+
+        //move player
+        if (in_area) {
+          if (keys[UP]) {
+            playerY -= 3;
+            player_img = player_imgs.back;
+          } else if (keys[DOWN]) {
+            playerY += 3;
+            player_img = player_imgs.front;
+          } else if (keys[LEFT]) {
+            playerX -= 3;
+            player_img = player_imgs.left;
+          } else if (keys[RIGHT]) {
+            playerX += 3;
+            player_img = player_imgs.right;
+          }
+        }
+
+        //check for minigame entry
+        for (var i = 0; i < current_area.minigame_array.length; i++) {
+          var mg = current_area.minigame_array[i];
+          if (dist(playerX, playerY, mg.x, mg.y) < 50 && in_area && keys[ENTER]) {
+            in_area = false;
+            println("Entering minigame");
+            minagame_code = mg.draw_function;
+            // Enter minigame logic here
+          }
+        }
+        }else{
+          //draw minigame
+          minagame_code();
+        }
       };
 
     }};
